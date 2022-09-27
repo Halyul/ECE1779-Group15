@@ -6,49 +6,75 @@ import {
   RouterProvider,
   Route
 } from "react-router-dom";
-import Root, {
-  loader as rootLoader,
-  action as rootAction,
-} from "./routes/root";
+import { StyledEngineProvider } from '@mui/material/styles';
+import Root from "./routes/root";
 import ErrorPage from "./routes/error-page";
-import Contact, {
-  loader as contactLoader,
-  action as contactAction,
-} from "./routes/contact";
-import EditContact, {
-  action as editAction,
-} from "./routes/edit";
-import { action as destroyAction } from "./routes/destroy";
-import Index from "./routes/index";
-import 'semantic-ui-css/semantic.min.css';
+import Index, {
+  IndexRoute
+} from "./routes/index";
+import Upload, {
+  UploadRoute
+} from "./routes/upload";
+import Image, {
+  ImageRoute,
+  ImageWithKeyRoute
+} from "./routes/image";
+import Keys, {
+  KeysRoute
+} from "./routes/keys";
+import Config, {
+  ConfigRoute
+} from "./routes/config";
+import Status, {
+  StatusRoute
+} from "./routes/status";
+import 'reset-css';
 import './App.css';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route
       path="/"
-      element={<Root />}
-      loader={rootLoader}
-      action={rootAction}
+      element={
+        <Root
+          title="ECE1779 Group 15"
+          destinations={[
+            IndexRoute,
+            UploadRoute,
+            ImageRoute,
+            KeysRoute,
+            ConfigRoute,
+            StatusRoute
+          ]}
+        />
+      }
       errorElement={<ErrorPage />}
     >
       <Route errorElement={<ErrorPage />}>
         <Route index element={<Index />} />
         <Route
-          path="contacts/:contactId"
-          element={<Contact />}
-          loader={contactLoader}
-          action={contactAction}
+          path={UploadRoute.path}
+          element={<Upload />}
         />
         <Route
-          path="contacts/:contactId/edit"
-          element={<EditContact />}
-          loader={contactLoader}
-          action={editAction}
+          path={ImageRoute.path}
+          element={<Image />}
         />
         <Route
-          path="contacts/:contactId/destroy"
-          action={destroyAction}
+          path={ImageWithKeyRoute.path}
+          element={<Image />}
+        />
+        <Route
+          path={KeysRoute.path}
+          element={<Keys />}
+        />
+        <Route
+          path={ConfigRoute.path}
+          element={<Config />}
+        />
+        <Route
+          path={StatusRoute.path}
+          element={<Status />}
         />
       </Route>
     </Route>
@@ -57,6 +83,8 @@ const router = createBrowserRouter(
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <StyledEngineProvider injectFirst>
+      <RouterProvider router={router} />
+    </StyledEngineProvider>
   </React.StrictMode>
 )

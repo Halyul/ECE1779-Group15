@@ -20,7 +20,7 @@ export async function createContact() {
   contacts.unshift(contact);
   await set(contacts);
   return contact;
-}
+} 
 
 export async function getContact(id) {
   await fakeNetwork(`contact:${id}`);

@@ -1,13 +1,15 @@
+import { BasicCard } from "../components/card.jsx";
+
 export default function Index() {
-    return (
-      <p id="zero-state">
-        This is a demo for React Router.
-        <br />
-        Check out{" "}
-        <a href="https://reactrouter.com/">
-          the docs at reactrouter.com
-        </a>
-        .
-      </p>
-    );
-  }
+  return (
+      <BasicCard
+        title="Welcome"
+        body="Please select a destination from the menu."
+      />
+  );
+}
+
+export const IndexRoute = {
+  name: "Home",
+  path: "",
+};
