@@ -8,18 +8,20 @@ import {
   useSubmit,
 } from "react-router-dom";
 import React, { useState } from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import SwipeableDrawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
+import {
+  AppBar,
+  Box,
+  SwipeableDrawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  Toolbar,
+  Typography,
+  Button,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 
 const drawerWidth = 240;
 
@@ -61,6 +63,7 @@ export default function Root(props) {
           variant="temporary"
           open={isDrawerOpen}
           onClose={handleDrawerToggle}
+          onOpen={handleDrawerToggle}
           ModalProps={{
             keepMounted: true, // Better open performance on mobile.
           }}
@@ -87,10 +90,15 @@ export default function Root(props) {
           </Box>
         </SwipeableDrawer>
       </Box>
-      <Box component="main" sx={{ p: 3 }} className="main">
-        <Toolbar />
+        <Box component="main" sx={{
+          height: "100vh",
+          width: "90vw",
+        maxWidth: "768px !important",
+        margin: "0 auto",
+        }}>
+          <Toolbar sx={{marginBottom: "16px"}} />
         <Outlet />
-      </Box>
+        </Box>
     </Box>
   );
 }
