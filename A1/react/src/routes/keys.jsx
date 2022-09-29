@@ -10,19 +10,25 @@ import {
   ListItem,
   ListItemText,
   IconButton,
-
 } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { retrieveKeys } from "../libs/api";
 
 export async function loader({ params }) {
-  // const image = await getImage(params.imageKey);
-  // return image;
-  return ["123", "456", "789", "101112"];
+  const keys = await retrieveKeys();
+  if (keys.status_code !== 200) {
+    throw new Response(keys.data.message, {
+      status: keys.status_code,
+      statusText: "",
+    });
+  }
+  return keys.data;
 }
 
 export default function Keys() {
-  const keys = useLoaderData();
+  const loaderResponse = useLoaderData();
+  const [keyList, setKeyList] = useState(loaderResponse.keys);
   return (
     <Card sx={{ marginBottom: "1rem" }}>
       <CardHeader
@@ -30,7 +36,11 @@ export default function Keys() {
           <IconButton
             aria-label="refresh"
             onClick={() => {
-        
+              const keys = retrieveKeys();
+              if (keys.status_code !== 200) {
+                // TODO: handle error
+              }
+              setKeyList(keys.data.keys);
             }}
           >
             <RefreshIcon />
@@ -40,7 +50,7 @@ export default function Keys() {
       />
       <CardContent>
         <List>
-          {keys.map((key) => (
+          {keyList.map((key) => (
             <ListItem
               key={key}
               secondaryAction={

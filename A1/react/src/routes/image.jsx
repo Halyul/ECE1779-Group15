@@ -12,24 +12,30 @@ import {
   Button,
   TextField
 } from "@mui/material";
+import { retrieveImage } from "../libs/api";
 
 export async function loader({ params }) {
-  if (!params.key) {
-    return null;
+  const response = await retrieveImage(updates);
+  if (response.status_code !== 200) {
+    throw new Response(response.data.message, {
+      status: response.status_code,
+      statusText: "",
+    });
   }
-  // const image = await getImage(params.imageKey);
-  // return image;
-  return {
-    key: params.key,
-    content: "https://mui.com/static/images/cards/contemplative-reptile.jpg",
-  };
+  return response.data;
 }
 
 export async function action({ request, params }) {
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
-  console.log(updates);
-  // await updateContact(params.contactId, updates);
+  const response = await retrieveImage(updates);
+  if (response.status_code !== 200) {
+    throw new Response(response.data.message, {
+      status: response.status_code,
+      statusText: "",
+    });
+  }
+  return response.data;
 }
 
 export default function Image() {

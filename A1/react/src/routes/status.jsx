@@ -2,6 +2,7 @@ import { useLoaderData } from "react-router-dom";
 import Box from "@mui/material/Box";
 import { DataGrid } from "@mui/x-data-grid";
 import { BasicCard } from "../components/card";
+import { getConfig } from "../libs/api";
 
 const columns = [
   { field: "id", headerName: "ID", width: 70 },
@@ -37,15 +38,14 @@ const rows = [
 ];
 
 export async function loader({ params }) {
-  if (!params.key) {
-    return null;
+  const response = await getConfig();
+  if (response.status_code !== 200) {
+    throw new Response(response.data.message, {
+      status: response.status_code,
+      statusText: "",
+    });
   }
-  // const image = await getImage(params.imageKey);
-  // return image;
-  return {
-    key: params.key,
-    content: "https://mui.com/static/images/cards/contemplative-reptile.jpg",
-  };
+  return response.data;
 }
 
 export default function Status() {

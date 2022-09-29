@@ -9,24 +9,14 @@ import {
   CardContent,
   CardActions,
 } from "@mui/material";
-
-export async function loader({ params }) {
-  if (!params.key) {
-    return null;
-  }
-  // const image = await getImage(params.imageKey);
-  // return image;
-  return {
-    key: params.key,
-    content: "https://mui.com/static/images/cards/contemplative-reptile.jpg",
-  };
-}
+import { upload } from "../libs/api";
 
 export async function action({ request, params }) {
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
-  console.log(updates);
-  // await updateContact(params.contactId, updates);
+  console.log(request, updates);
+  const response = await upload(updates);
+  return response;
 }
 
 export default function Upload() {

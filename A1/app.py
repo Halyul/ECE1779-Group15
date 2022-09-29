@@ -12,6 +12,16 @@ def serve(path):
     else:
         return send_from_directory(app.static_folder, 'index.html')
 
+@app.route("/api/config")
+def summary():
+    d = dict(
+        success="true",
+        config=dict(
+            policy="rr",
+            capacity=100
+        )
+    )
+    return d
 
 if __name__ == '__main__':
     app.run(use_reloader=True, port=5000, threaded=True)

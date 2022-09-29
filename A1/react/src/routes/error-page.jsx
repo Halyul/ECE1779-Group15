@@ -26,10 +26,10 @@ export default function ErrorPage() {
       }}
     >
       <BasicCard
-        title={`${error.status} ${error.statusText || error.statusText}`}
+        title={`${error.status} ${error.data ? (error.statusText || error.statusText) : ""}`}
         body={
           <Typography variant="body1">
-            Please select a destination from the menu.
+            {error.data ? error.data : (error.statusText || error.statusText)}
           </Typography>
         }
         actions={[

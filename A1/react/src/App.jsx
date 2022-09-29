@@ -14,7 +14,6 @@ import Index, {
 } from "./routes/index";
 import Upload, {
   UploadRoute,
-  loader as uploadLoader,
   action as uploadAction,
 } from "./routes/upload";
 import Image, {
@@ -63,7 +62,6 @@ const router = createBrowserRouter(
         <Route
           path={UploadRoute.path}
           element={<Upload />}
-          loader={uploadLoader}
           action={uploadAction}
         />
         <Route
