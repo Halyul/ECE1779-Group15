@@ -7,8 +7,21 @@ app = Flask(__name__, static_folder='react/dist')
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
+    def set_mimetype(filename: str):
+        if filename.endswith("js"):
+            return "text/javascript"
+        elif filename.endswith("css"):
+            return "text/css"
+        elif filename.endswith("svg"):
+            return "image/svg+xml"
+
     if path != "" and os.path.exists(app.static_folder + '/' + path):
-        return send_from_directory(app.static_folder, path)
+        print(path)
+        return send_from_directory(
+            app.static_folder, 
+            path,
+            mimetype=set_mimetype(path)
+        )
     else:
         return send_from_directory(app.static_folder, 'index.html')
 
