@@ -9,6 +9,8 @@ import {
   Button,
   TextField,
   Grid,
+  Checkbox,
+  FormControlLabel
 } from "@mui/material";
 import { getConfig, setConfig } from "../libs/api";
 import SubmissionPrompt from "../components/submission-prompt";
@@ -40,6 +42,7 @@ export default function Config() {
   const actionResponse = useActionData();
   const [capacity, setCapacity] = useState(loaderResponse.config.capacity);
   const [policy, setPolicy] = useState(loaderResponse.config.policy);
+  const [clearCache, setClearCache] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [capacityError, setCapacityError] = useState(false);
 
@@ -56,7 +59,7 @@ export default function Config() {
         >
           <CardContent>
             <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={6}>
                 <TooltipOnError
                   open={capacityError}
                   handleClose={() => setCapacityError(false)}
@@ -88,7 +91,7 @@ export default function Config() {
                   }
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   id="config-form-policy"
                   name="policy"
@@ -97,7 +100,6 @@ export default function Config() {
                   value={policy}
                   fullWidth
                   select
-                  required
                   onChange={(event) => {
                     setPolicy(event.target.value);
                   }}
@@ -109,6 +111,22 @@ export default function Config() {
                     Least Recently Used
                   </MenuItem>
                 </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="config-form-clear-cache"
+                      name="clear_cache"
+                      checked={clearCache}
+                      value={true}
+                      onChange={(event) => {
+                        setClearCache(!clearCache);
+                      }}
+                    />
+                  }
+                  label="Clear Cache"
+                />
               </Grid>
             </Grid>
           </CardContent>

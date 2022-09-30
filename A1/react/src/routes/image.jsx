@@ -1,11 +1,5 @@
-import {
-  useState
-} from "react";
-import {
-  useLoaderData,
-  Form,
-  redirect
-} from "react-router-dom";
+import { useState } from "react";
+import { useLoaderData, Form, redirect } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -13,9 +7,10 @@ import {
   CardContent,
   CardMedia,
   Button,
-  TextField
+  TextField,
 } from "@mui/material";
 import { retrieveImage } from "../libs/api";
+import { TooltipOnError } from "../components/tooltip";
 
 export async function loader({ params }) {
   const response = await retrieveImage(params.key);
@@ -39,32 +34,54 @@ export async function action({ request, params }) {
 
 export default function Image() {
   const image = useLoaderData();
+  const [keyError, setKeyError] = useState(false);
+  const [keyValue, setKeyValue] = useState("");
 
   return (
     <Card>
       {image && (
-        <CardMedia
-          component="img"
-          image={image.content}
-          alt={image.key}
-        />
+        <CardMedia component="img" image={image.content} alt={image.key} />
       )}
       <CardHeader
         title="Image Key"
-        subheader={(image && image.key)|| "No key is presented. Please provide a key."}
+        subheader={
+          (image && image.key) || "No key is presented. Please provide a key."
+        }
       />
       <Form method="POST" id="image-form">
         <CardContent>
-          <TextField
-            id="image-text-field"
-            name="key"
-            label="Enter an image key"
-            variant="outlined"
-            fullWidth
+          <TooltipOnError
+            open={keyError}
+            handleClose={() => setKeyError(false)}
+            title="Please enter a key"
+            body={
+              <TextField
+                id="image-text-field"
+                name="key"
+                label="Enter an image key"
+                variant="outlined"
+                fullWidth
+                error={keyError}
+                value={keyValue}
+                onChange={(e) => {
+                  setKeyValue(e.target.value);
+                  setKeyError(false);
+                }}
+              />
+            }
           />
         </CardContent>
         <CardActions>
-          <Button size="small" type="submit">
+          <Button
+            size="small"
+            type="submit"
+            onClick={(e) => {
+              if (keyValue === "") {
+                setKeyError(true);
+                e.preventDefault();
+              }
+            }}
+          >
             Submit
           </Button>
         </CardActions>
