@@ -130,11 +130,11 @@ async function request(
           statusText: error.message,
         }
       }
-      return error.text().then((text) => {
+      return error.json().then((data) => {
         return {
           data: {
             success: error.ok,
-            message: text,
+            message: data.error.message,
           },
           status: error.status,
           statusText: error.statusText,

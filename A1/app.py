@@ -1,11 +1,42 @@
 import os, json, random
-from flask import Flask, send_from_directory, Response, request
+from flask import Flask, send_from_directory, make_response, request
 
 app = Flask(__name__, static_folder="react/dist")
 config_base = dict(
                 policy="rr",
                 capacity=100
             )
+
+@app.errorhandler(400)
+def bad_request(error):
+    return make_response(dict(
+        success="false",
+        error=dict(
+            code=400,
+            message="Bad request"
+        )
+    ), 400)
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(dict(
+        success="false",
+        error=dict(
+            code=404,
+            message="Not found"
+        )
+    ), 404)
+
+@app.errorhandler(500)
+def server_error(error):
+    return make_response(dict(
+        success="false",
+        error=dict(
+            code=500,
+            message="Internal server error"
+        )
+    ), 500)
+
 # Serve React App
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
