@@ -1,6 +1,6 @@
 export async function upload(requestData) {
   const formData = new FormData();
-  for(const name in requestData) {
+  for (const name in requestData) {
     formData.append(name, requestData[name]);
   }
   const data = await request(
@@ -120,6 +120,16 @@ async function request(
     })
     .catch((error) => {
       console.error("Error:", error);
+      if (error.message) {
+        return {
+          data: {
+            success: false,
+            message: error.message,
+          },
+          status: 500,
+          statusText: error.message,
+        }
+      }
       return error.text().then((text) => {
         return {
           data: {
@@ -131,4 +141,4 @@ async function request(
         }
       })
     });
-}
+};

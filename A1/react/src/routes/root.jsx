@@ -1,12 +1,4 @@
-import {
-  Outlet,
-  NavLink,
-  useLoaderData,
-  Form,
-  redirect,
-  useNavigation,
-  useSubmit,
-} from "react-router-dom";
+import { Outlet, NavLink, useNavigation } from "react-router-dom";
 import React, { useState, useMemo } from "react";
 import {
   AppBar,
@@ -20,6 +12,7 @@ import {
   Toolbar,
   Typography,
   Button,
+  LinearProgress,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -29,6 +22,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 const drawerWidth = 240;
 
 export default function Root(props) {
+  const navigation = useNavigation();
   const [isDrawerOpen, setisDrawerOpen] = useState(false);
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
@@ -77,6 +71,14 @@ export default function Root(props) {
               ))}
             </Box>
           </Toolbar>
+          <Box
+            sx={{
+              width: "100%",
+            }}
+            hidden={navigation.state !== "loading"}
+          >
+            <LinearProgress />
+          </Box>
         </AppBar>
         <Box component="nav">
           <SwipeableDrawer
