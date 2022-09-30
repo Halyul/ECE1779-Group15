@@ -8,23 +8,23 @@ import {
   Box,
   Divider
 } from "@mui/material";
-import { red } from "@mui/material/colors";
+import { red, blue } from "@mui/material/colors";
 import { BasicCard } from "../components/card.jsx";
 
 const members = [
   {
     color: red[500],
-    name: "John Doe",
+    name: "Teng Shu",
+    responsibility: "Backend Developer",
+  },
+  {
+    color: blue[500],
+    name: "Haoyu Xu",
     responsibility: "Frontend Developer",
   },
   {
     color: red[500],
-    name: "John Doc",
-    responsibility: "Backend Developer",
-  },
-  {
-    color: red[500],
-    name: "Joy Doe",
+    name: "Xiaoyu Zhai",
     responsibility: "Backend Developer",
   },
 ];

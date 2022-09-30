@@ -1,10 +1,15 @@
 import {
+  Form,
+} from "react-router-dom";
+import {
   Card,
   CardHeader,
   CardActions,
   CardContent,
   Button,
+  IconButton,
 } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 export function BasicCard(props) {
   return (
@@ -20,6 +25,28 @@ export function BasicCard(props) {
           ))}
         </CardActions>
       )}
+    </Card>
+  );
+}
+
+export function RefreshCard(props) {
+  return (
+    <Card sx={{ marginBottom: "1rem" }}>
+      <Form method="POST" id="image-form">
+        <CardHeader
+          action={
+            <IconButton
+              aria-label="refresh"
+              type="submit"
+              onClick={props.handleOnClick}
+            >
+              <RefreshIcon />
+            </IconButton>
+          }
+          title={props.title}
+        />
+      </Form>
+      <CardContent>{props.body}</CardContent>
     </Card>
   );
 }

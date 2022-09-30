@@ -1,7 +1,10 @@
-import { useState } from "react";
+import {
+  useState
+} from "react";
 import {
   useLoaderData,
-  Form
+  Form,
+  redirect
 } from "react-router-dom";
 import {
   Card,
@@ -15,35 +18,27 @@ import {
 import { retrieveImage } from "../libs/api";
 
 export async function loader({ params }) {
-  const response = await retrieveImage(updates);
-  if (response.status_code !== 200) {
+  const response = await retrieveImage(params.key);
+  if (response.status !== 200) {
     throw new Response(response.data.message, {
-      status: response.status_code,
-      statusText: "",
+      status: response.status,
+      statusText: response.statusText,
     });
   }
-  return response.data;
+  return {
+    content: response.data.content,
+    key: params.key,
+  };
 }
 
 export async function action({ request, params }) {
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
-  const response = await retrieveImage(updates);
-  if (response.status_code !== 200) {
-    throw new Response(response.data.message, {
-      status: response.status_code,
-      statusText: "",
-    });
-  }
-  return response.data;
+  return redirect(`/image/${updates.key}`);
 }
 
 export default function Image() {
   const image = useLoaderData();
-  // TODO: use dialog to show progress
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
 
   return (
     <Card>
@@ -62,7 +57,7 @@ export default function Image() {
         <CardContent>
           <TextField
             id="image-text-field"
-            name="image_key"
+            name="key"
             label="Enter an image key"
             variant="outlined"
             fullWidth

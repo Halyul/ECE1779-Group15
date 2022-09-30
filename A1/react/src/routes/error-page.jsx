@@ -16,9 +16,9 @@ export default function ErrorPage() {
   return (
     <Container
       sx={{
-        maxWidth: "768px",
+        maxWidth: "768px !important",
         width: "90vw",
-        height: "100vh",
+        height: "inherit",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",

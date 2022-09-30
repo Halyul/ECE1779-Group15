@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  Form,
-  useLoaderData,
-  useActionData,
-} from "react-router-dom";
+import { Form, useLoaderData, useActionData } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -12,28 +8,31 @@ import {
   MenuItem,
   Button,
   TextField,
-  Grid
+  Grid,
 } from "@mui/material";
-import {
-  getConfig,
-  setConfig,
-} from "../libs/api";
+import { getConfig, setConfig } from "../libs/api";
+import SubmissionPrompt from "../components/submission-prompt";
+import { TooltipOnError } from "../components/tooltip";
 
 export async function loader({ params }) {
-  const config = await getConfig();
-  if (config.status_code !== 200) {
+  const response = await getConfig();
+  if (response.status !== 200) {
     throw new Response(config.data.message, {
-      status: config.status_code,
-      statusText: "",
+      status: response.status,
+      statusText: response.statusText,
     });
   }
-  return config.data;
+  return response.data;
 }
 
 export async function action({ request, params }) {
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
-  return setConfig(updates);
+  const response = await setConfig(updates);
+  return {
+    status: response.status,
+    statusText: response.statusText,
+  };
 }
 
 export default function Config() {
@@ -41,59 +40,108 @@ export default function Config() {
   const actionResponse = useActionData();
   const [capacity, setCapacity] = useState(loaderResponse.config.capacity);
   const [policy, setPolicy] = useState(loaderResponse.config.policy);
+  const [submitted, setSubmitted] = useState(false);
+  const [capacityError, setCapacityError] = useState(false);
 
   return (
-    <Card>
-      <CardHeader title="Configuration" />
-      <Form method="POST" id="config-form">
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                id="config-form-capacity"
-                name="capacity"
-                label="Capacity in MB"
-                variant="outlined"
-                value={capacity}
-                fullWidth
-                inputProps={{
-                  inputMode: "numeric",
-                  pattern: "[0-9]*",
-                }}
-                type="number"
-                onChange={(e) => setCapacity(e.target.value)}
-              />
+    <>
+      <Card>
+        <CardHeader title="Configuration" />
+        <Form
+          id="config-form"
+          method="POST"
+          onSubmit={(e) => {
+            setSubmitted(true);
+          }}
+        >
+          <CardContent>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <TooltipOnError
+                  open={capacityError}
+                  handleClose={() => setCapacityError(false)}
+                  title="Please enter a positive integer."
+                  body={
+                    <TextField
+                      id="config-form-capacity"
+                      name="capacity"
+                      label="Capacity in MB"
+                      variant="outlined"
+                      value={capacity}
+                      fullWidth
+                      onChange={(e) => {
+                        try {
+                          const value = parseInt(e.target.value);
+                          setCapacity(value || "");
+                          if (value >= 0) {
+                            setCapacityError(false);
+                          } else {
+                            setCapacityError(true);
+                          }
+                        } catch {
+                          setCapacity(0);
+                          setCapacityError(true);
+                        }
+                      }}
+                      error={capacityError}
+                    />
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  id="config-form-policy"
+                  name="policy"
+                  label="Replacement Policy"
+                  variant="outlined"
+                  value={policy}
+                  fullWidth
+                  select
+                  required
+                  onChange={(event) => {
+                    setPolicy(event.target.value);
+                  }}
+                >
+                  <MenuItem key="rr" value="rr">
+                    Random Replacement
+                  </MenuItem>
+                  <MenuItem key="lru" value="lru">
+                    Least Recently Used
+                  </MenuItem>
+                </TextField>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                id="config-form-policy"
-                name="policy"
-                label="Replacement Policy"
-                variant="outlined"
-                value={policy}
-                fullWidth
-                select
-                onChange={(event) => {
-                  setPolicy(event.target.value);
-                }}
-              >
-                <MenuItem key="rr" value="rr">
-                  Random Replacement
-                </MenuItem>
-                <MenuItem key="lru" value="lru">
-                  Least Recently Used
-                </MenuItem>
-              </TextField>
-            </Grid>
-          </Grid>
-        </CardContent>
-        <CardActions>
-          <Button size="small" type="submit">
-            Submit
-          </Button>
-        </CardActions>
-      </Form>
-    </Card>
+          </CardContent>
+          <CardActions>
+            <Button
+              size="small"
+              type="submit"
+              onClick={(e) => {
+                if (capacity < 0) {
+                  setCapacityError(true);
+                  e.preventDefault();
+                }
+              }}
+            >
+              Submit
+            </Button>
+          </CardActions>
+        </Form>
+      </Card>
+      <SubmissionPrompt
+        failed={{
+          title: "Failed to update configuration",
+          text: actionResponse?.statusText,
+        }}
+        submitting={{
+          text: "Configuration is updating...",
+          open: submitted,
+          setOpen: setSubmitted,
+        }}
+        submittedText="Configuration updated successfully"
+        submissionStatus={actionResponse}
+      />
+    </>
   );
 }
 

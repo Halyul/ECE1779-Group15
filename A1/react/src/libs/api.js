@@ -1,11 +1,15 @@
 export async function upload(requestData) {
+  const formData = new FormData();
+  for(const name in requestData) {
+    formData.append(name, requestData[name]);
+  }
   const data = await request(
     "/api/upload",
-    "POST",
-    requestData,
     {
-      "Content-Type": "multipart/form-data",
-    },
+      method: "POST",
+      body: formData,
+      headers: {},
+    }
   )
   return responseAdapter(data);
 }
@@ -17,11 +21,13 @@ export async function retrieveKeys() {
       "keys": [Array of keys(strings)]
     }
   */
-    const data = await request(
-      "/api/list_keys",
-      "POST"
-    )
-    return responseAdapter(data);
+  const data = await request(
+    "/api/list_keys",
+    {
+      method: "POST",
+    }
+  )
+  return responseAdapter(data);
 }
 
 export async function retrieveImage(key) {
@@ -31,11 +37,13 @@ export async function retrieveImage(key) {
       “content” : file contents
     }
    */
-    const data = await request(
-      `/api/key/${key}`,
-      "POST",
-    )
-    return responseAdapter(data);
+  const data = await request(
+    `/api/key/${key}`,
+    {
+      method: "POST",
+    },
+  )
+  return responseAdapter(data);
 }
 
 export async function getConfig() {
@@ -46,10 +54,7 @@ export async function getConfig() {
   //     policy: "lru",
   //   }
   // };
-  const data = await request(
-    "/api/config",
-    "GET",
-  )
+  const data = await request("/api/config")
   return responseAdapter(data);
 }
 
@@ -63,17 +68,16 @@ export async function setConfig(config) {
   //   }
   const data = await request(
     "/api/config",
-    "POST",
-    JSON.stringify(config),
+    {
+      method: "POST",
+      body: JSON.stringify(config),
+    },
   )
   return responseAdapter(data);
 }
 
 export async function getStatus() {
-  const data = await request(
-    "/api/status",
-    "GET",
-  )
+  const data = await request("/api/status")
   return responseAdapter(data);
 }
 
@@ -85,32 +89,46 @@ function responseAdapter(response) {
 
 async function request(
   url = "",
-  method = "GET",
-  body = null, // body data type must match "Content-Type" header
-  headers = {
-    "Content-Type": "application/json",
-  },
-) {
-  try {
-    const response = await fetch(url, {
-      method: method,
-      headers: headers,
-      referrerPolicy: "no-referrer",
-      body: body
-    })
-    const data = await response.json()
-    const status_code = response.status
-      return {
-        data,
-        status_code
-      }
-  } catch (e) {
-    return {
-      data: {
-        success: false,
-        message: e.message,
+  {
+    body,
+    headers,
+    method,
+    ...options
+  } = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
       },
-      status_code: 400
-    }
-  }
+    },
+) {
+  return fetch(url, {
+    method,
+    headers,
+    body,
+  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json().then((data) => {
+          return {
+            data,
+            status: res.status,
+            statusText: res.statusText,
+          };
+        });
+      }
+      return Promise.reject(res)
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      return error.text().then((text) => {
+        return {
+          data: {
+            success: error.ok,
+            message: text,
+          },
+          status: error.status,
+          statusText: error.statusText,
+        }
+      })
+    });
 }

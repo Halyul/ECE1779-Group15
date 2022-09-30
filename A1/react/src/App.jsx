@@ -25,6 +25,7 @@ import Image, {
 import Keys, {
   KeysRoute,
   loader as keysLoader,
+  action as keysAction,
 } from "./routes/keys";
 import Config, {
   ConfigRoute,
@@ -34,6 +35,7 @@ import Config, {
 import Status, {
   StatusRoute,
   loader as statusLoader,
+  action as statusAction,
 } from "./routes/status";
 import 'reset-css';
 import './App.css';
@@ -79,6 +81,7 @@ const router = createBrowserRouter(
           path={KeysRoute.path}
           element={<Keys />}
           loader={keysLoader}
+          action={keysAction}
         />
         <Route
           path={ConfigRoute.path}
@@ -90,6 +93,7 @@ const router = createBrowserRouter(
           path={StatusRoute.path}
           element={<Status />}
           loader={statusLoader}
+          action={statusAction}
         />
       </Route>
     </Route>
@@ -99,7 +103,7 @@ const router = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
-      <RouterProvider router={router} />
+        <RouterProvider router={router} />
     </StyledEngineProvider>
   </React.StrictMode>
 )
