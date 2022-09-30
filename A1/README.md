@@ -25,7 +25,7 @@ $ flask run
 ### Run Flask Instance 2 (Cache)
 
 ```bash
-$ flask -app cache-app run
+$ flask --app cache_app run
 ```
 
 ## Frontend
@@ -35,27 +35,15 @@ $ flask -app cache-app run
 ```bash
 $ yarn install
 ```
-or
-```bash
-$ npm install
-```
 
 ### Run Development Server
 
 ```bash
 $ yarn run dev
 ```
-or
-```bash
-$ npm run dev
-```
 
 ### Generate Static Files
 
 ```bash
 $ yarn run build
-```
-or
-```bash
-$ npm run build
 ```
