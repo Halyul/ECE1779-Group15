@@ -128,7 +128,7 @@ def gen_failed_responce(code, message):
 def main():
     return render_template("main.html")
 
-@webapp.route('/get',methods=['POST'])
+@webapp.route('/api/cache/key',methods=['POST'])
 def get():
     global num_request_served_5s, num_hit_5s
     key = request.form.get('key')
@@ -156,7 +156,7 @@ def get():
     
     return response
 
-@webapp.route('/put',methods=['POST'])
+@webapp.route('/api/cache/content',methods=['POST'])
 def put():
     # check if there is a key
     if request.form.get('key') == '':
@@ -247,7 +247,7 @@ def set_parameters(new_capacity, new_replace):
     return
 
 # remove key, key will be passed from the from
-@webapp.route('/remove', methods=['POST'])
+@webapp.route('/api/cache/key', methods=['DELETE'])
 def remove_key():
     key = request.form.get('key')
     if key in memcache:
@@ -269,20 +269,32 @@ def invalidateKey(key):
 
 # to read mem-cache related details from the database and reconfigure it based 
 # on the values set by the user
-@webapp.route('/refresh',methods=['POST'])
+@webapp.route('/api/cache/config',methods=['GET'])
 def refreshConfiguration():
     query = ("SELECT capacity, replacement_policy FROM memcache_config "
              "WHERE id = 1;")
     data = SQL_command(query)
     (new_capacity, new_replacement_policy) = data[0]
     set_parameters(new_capacity, new_replacement_policy)
-    return redirect(url_for('main'))
+    
+    # make the correct response
+    json_response = {
+        "success": "true"
+    }
+    response = webapp.response_class(
+        response=json.dumps(json_response),
+        status=200,
+        mimetype='application/json'
+    )
+    
+    return response
 
+# just for testing
 @webapp.route('/keys', methods=['GET','POST'])
 def show_keys():
     return json.dumps(key_list)
 
-@webapp.route('/clear',methods=['POST'])
+@webapp.route('/api/cache',methods=['DELETE'])
 def CLEAR():
     global memcache, used_size, key_list, capacity_used_5s
     memcache = {}
@@ -290,9 +302,20 @@ def CLEAR():
     capacity_used_5s = capacity_used_5s - used_size
     used_size = 0
     logging.debug('CLEAR - cache cleared')
-    return redirect(url_for('main'))
+    
+    # make the correct response
+    json_response = {
+        "success": "true"
+    }
+    response = webapp.response_class(
+        response=json.dumps(json_response),
+        status=200,
+        mimetype='application/json'
+    )
+    
+    return response
 
-@webapp.route('/info',methods=['POST'])
+@webapp.route('/api/cache/statistics',methods=['GET'])
 def show_info():
     query = ("SELECT total_request_served, total_hit "
              "FROM statistics WHERE id = 1;")
