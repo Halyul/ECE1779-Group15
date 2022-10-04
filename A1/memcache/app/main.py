@@ -95,6 +95,7 @@ def SQL_command(command):
         return
     else:
         query = command  
+        print(query)
         
         cursor.execute(query)
         out_data = cursor.fetchall()
@@ -322,7 +323,7 @@ def show_info():
     data = SQL_command(query)
     (total_request_served, total_hit) = data[0]
     total_request_served = total_request_served + num_request_served_5s
-    total_hit = num_hit_5s
+    total_hit = total_hit + num_hit_5s
     num_item_in_cache = len(memcache)
     if total_request_served != 0:
         total_miss_rate = (total_request_served - total_hit) / total_request_served
