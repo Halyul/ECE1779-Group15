@@ -1,10 +1,11 @@
+import datetime
 import json
 
 from flask import request, jsonify
 
 from app import webapp, config
 from app.db_operations.configurations import get_capacity_in_mb_db, get_replacement_policy_db
-from app.db_operations.keys import delete_all_keys_db
+from app.db_operations.keys import delete_all_keys_db, update_time_last_used_db
 from app.services.helper import delete_specific_cache, release_cache_memory
 
 
@@ -21,6 +22,8 @@ def get_cache(key):
 
     if key in config.memcache:
         value = config.memcache[key]
+        current_time = datetime.datetime.now()
+        update_time_last_used_db(current_time, key)
         response = webapp.response_class(
             response=json.dumps(value),
             status=200,

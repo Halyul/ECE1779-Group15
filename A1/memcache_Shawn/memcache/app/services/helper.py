@@ -29,7 +29,7 @@ def release_cache_memory():
 
 def create_cache_statistics():
     threading.Timer(5.0, create_cache_statistics).start()
-    timestamp = datetime.time()
+    timestamp = datetime.datetime.now()
     cache_nums = len(config.memcache)
     cache_size = config.memcache_used_memory
     req_nums = config.request_nums
