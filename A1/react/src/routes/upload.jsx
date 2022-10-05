@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardContent,
   CardActions,
+  CardMedia,
 } from "@mui/material";
 import { upload } from "../libs/api";
 import SubmissionPrompt from "../components/submission-prompt";
@@ -24,9 +25,9 @@ export async function action({ request, params }) {
 }
 
 export default function Upload() {
-  // TODO: form validation (onClick), use tooltip to show error and change style
   const actionResponse = useActionData();
   const [filename, setFilename] = useState("Select a file");
+  const [image, setImage] = useState(null);
   const [keyValue, setKeyValue] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [keyError, setKeyError] = useState(false);
@@ -35,6 +36,9 @@ export default function Upload() {
   return (
     <>
       <Card>
+        {image && (
+          <CardMedia component="img" image={image} />
+        )}
         <CardHeader title="Upload" />
         <Form
           method="POST"
@@ -89,9 +93,11 @@ export default function Upload() {
                         onChange={(e) => {
                           if (e.target.files.length > 0) {
                             setFilename(`Selected: ${e.target.files[0].name}`);
+                            setImage(URL.createObjectURL(e.target.files[0]));
                             setFileError(false);
                           } else {
                             setFilename("Select a file");
+                            setImage(null);
                             setFileError(true);
                           }
                         }}
