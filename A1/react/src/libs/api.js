@@ -7,8 +7,7 @@ export async function upload(requestData) {
     "/api/upload",
     {
       method: "POST",
-      body: formData,
-      headers: {},
+      body: formData
     }
   )
   return responseAdapter(data);
@@ -71,6 +70,9 @@ export async function setConfig(config) {
     {
       method: "POST",
       body: JSON.stringify(config),
+      headers: {
+        "Content-Type": "application/json",
+      },
     },
   )
   return responseAdapter(data);
@@ -89,23 +91,9 @@ function responseAdapter(response) {
 
 async function request(
   url = "",
-  {
-    body,
-    headers,
-    method,
-    ...options
-  } = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
+  options = {},
 ) {
-  return fetch(url, {
-    method,
-    headers,
-    body,
-  })
+  return fetch(url, options)
     .then((res) => {
       if (res.ok) {
         return res.json().then((data) => {

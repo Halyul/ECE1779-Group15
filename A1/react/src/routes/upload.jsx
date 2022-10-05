@@ -1,5 +1,13 @@
-import { useState } from "react";
-import { Form, useActionData } from "react-router-dom";
+import {
+  useState,
+  useEffect
+} from "react";
+import {
+  Form,
+  useActionData,
+  NavLink,
+  useSearchParams
+} from "react-router-dom";
 import {
   Grid,
   TextField,
@@ -8,6 +16,7 @@ import {
   CardHeader,
   CardContent,
   CardActions,
+  CardMedia,
 } from "@mui/material";
 import { upload } from "../libs/api";
 import SubmissionPrompt from "../components/submission-prompt";
@@ -24,17 +33,30 @@ export async function action({ request, params }) {
 }
 
 export default function Upload() {
-  // TODO: form validation (onClick), use tooltip to show error and change style
   const actionResponse = useActionData();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filename, setFilename] = useState("Select a file");
-  const [keyValue, setKeyValue] = useState("");
+  const [image, setImage] = useState(null);
+  const [keyValue, setKeyValue] = useState(searchParams.get("key") || "");
   const [submitted, setSubmitted] = useState(false);
   const [keyError, setKeyError] = useState(false);
   const [fileError, setFileError] = useState(false);
+  const [navigateToUploaded, setNavigateToUploaded] = useState(false);
+
+  useEffect(() => {
+    if (actionResponse) {
+      if (actionResponse.status === 200) {
+        setNavigateToUploaded(true);
+      }
+    }
+  }, [actionResponse]);
 
   return (
     <>
       <Card>
+        {image && (
+          <CardMedia component="img" image={image} />
+        )}
         <CardHeader title="Upload" />
         <Form
           method="POST"
@@ -50,7 +72,7 @@ export default function Upload() {
                 <TooltipOnError
                   open={keyError}
                   handleClose={() => setKeyError(false)}
-                  title="Please enter a key"
+                  title="Please enter a key, spaces are NOT allowed."
                   body={
                     <TextField
                       id="upload-form-key"
@@ -61,8 +83,12 @@ export default function Upload() {
                       error={keyError}
                       value={keyValue}
                       onChange={(e) => {
-                        setKeyValue(e.target.value);
-                        setKeyError(false);
+                        if (e.target.value.includes(" ")) {
+                          setKeyError(true);
+                        } else {
+                          setKeyValue(e.target.value);
+                          setKeyError(false);
+                        }
                       }}
                     />
                   }
@@ -89,9 +115,11 @@ export default function Upload() {
                         onChange={(e) => {
                           if (e.target.files.length > 0) {
                             setFilename(`Selected: ${e.target.files[0].name}`);
+                            setImage(URL.createObjectURL(e.target.files[0]));
                             setFileError(false);
                           } else {
                             setFilename("Select a file");
+                            setImage(null);
                             setFileError(true);
                           }
                         }}
@@ -119,6 +147,20 @@ export default function Upload() {
             >
               Submit
             </Button>
+            {navigateToUploaded && (
+              <NavLink
+                to={`../image/${keyValue}`}
+                style={{
+                  marginLeft: "auto",
+                }}
+              >
+                <Button
+                  size="small"
+                >
+                  Take a look
+                </Button>
+              </NavLink>
+            )}
           </CardActions>
         </Form>
       </Card>
