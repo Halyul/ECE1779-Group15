@@ -36,7 +36,7 @@ export default function Keys() {
       <RefreshCard
         title="Keys"
         body={
-          keyList ? (
+          keyList.length > 0 ? (
             <List>
             {keyList.map((key) => (
               <ListItem

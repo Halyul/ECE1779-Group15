@@ -72,7 +72,7 @@ export default function Upload() {
                 <TooltipOnError
                   open={keyError}
                   handleClose={() => setKeyError(false)}
-                  title="Please enter a key, spaces are allowed."
+                  title="Please enter a key, spaces are NOT allowed."
                   body={
                     <TextField
                       id="upload-form-key"
