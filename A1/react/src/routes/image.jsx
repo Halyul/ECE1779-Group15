@@ -15,14 +15,20 @@ import { TooltipOnError } from "../components/tooltip";
 export async function loader({ params }) {
   const response = await retrieveImage(params.key);
   if (response.status !== 200) {
-    throw new Response(response.data.message, {
+    return {
       status: response.status,
-      statusText: response.statusText,
-    });
+      details: {
+        message: response.data.message,
+        statusText: response.statusText
+      }
+    }
   }
   return {
-    content: response.data.content,
-    key: params.key,
+    status: 200,
+    image: {
+      content: response.data.content,
+      key: params.key,
+    }
   };
 }
 
@@ -33,9 +39,19 @@ export async function action({ request, params }) {
 }
 
 export default function Image() {
-  const image = useLoaderData();
+  const loaderResponse = useLoaderData();
   const [keyError, setKeyError] = useState(false);
   const [keyValue, setKeyValue] = useState("");
+  let image = null;
+  let error = null;
+
+  if (loaderResponse) {
+    if (loaderResponse.status === 200) {
+      image = loaderResponse.image;
+    } else {
+      error = loaderResponse;
+    }
+  }
 
   return (
     <Card>
@@ -43,9 +59,9 @@ export default function Image() {
         <CardMedia component="img" image={image.content} alt={image.key} />
       )}
       <CardHeader
-        title="Image Key"
+        title={ (error && `${error.status} ${error.details.statusText}`) || "Image Key" }
         subheader={
-          (image && image.key) || "No key is presented. Please provide a key."
+          (image && image.key) || (error && error.details.message) || "Key is not presented. Please provide a key."
         }
       />
       <Form method="POST" id="image-form">
@@ -58,7 +74,9 @@ export default function Image() {
               <TextField
                 id="image-text-field"
                 name="key"
-                label="Enter an image key"
+                label={
+                  ((image || error) && "Enter another image key") || "Enter an image key"
+                }
                 variant="outlined"
                 fullWidth
                 error={keyError}
