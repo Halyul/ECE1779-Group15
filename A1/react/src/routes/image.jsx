@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLoaderData, Form, redirect } from "react-router-dom";
+import { useLoaderData, Form, redirect, NavLink } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -84,6 +84,16 @@ export default function Image() {
           >
             Submit
           </Button>
+          {image && (
+            <NavLink
+              to={`../upload/?key=${image.key}`}
+              style={{
+                marginLeft: "auto",
+              }}
+            >
+              <Button size="small">Re-upload</Button>
+            </NavLink>
+          )}
         </CardActions>
       </Form>
     </Card>

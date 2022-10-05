@@ -3,6 +3,7 @@ from server.config import Config
 CONFIG = Config().fetch()
 
 def create_key(args):
+    # TODO: deal with spaces
     file = args["file"]
     if not file.content_type.startswith("image/"):
         return False, 400, "Only image file is allowed."
