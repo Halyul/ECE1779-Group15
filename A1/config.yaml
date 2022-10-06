@@ -7,7 +7,8 @@ server:
   cache_url: http://127.0.0.1:5001
 
 database:
-  host: 127.0.0.1:3500
+  host: 127.0.0.1
+  port: 3500
   user: root
   password: my_SQL_password
   name: ece1779_memcache

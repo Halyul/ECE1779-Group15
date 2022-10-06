@@ -4,6 +4,7 @@ DB = Database()
 
 def status():
     """
+        TODO
         1. get status from database
     """
     status = DB.get_status()
