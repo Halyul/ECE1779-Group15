@@ -18,13 +18,16 @@ def get_image_size_db(key):
 def update_time_last_used_db(current_time, key):
     query = "UPDATE cache_keys SET time_last_used = %d WHERE key_value = %d"
     app.cursor.execute(query, current_time, key)
+    app.cnx.commit()
 
 
 def delete_key_db(key):
     query = "DELETE FROM cache_keys WHERE key_value = %d"
     app.cursor.execute(query, key)
+    app.cnx.commit()
 
 
 def delete_all_keys_db():
     query = "DELETE FROM cache_keys"
     app.cursor.execute(query)
+    app.cnx.commit()
