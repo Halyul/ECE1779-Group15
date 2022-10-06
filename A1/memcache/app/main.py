@@ -245,9 +245,9 @@ def set_parameters(new_capacity, new_replace):
     # check if the replace policy is valid or not
     if new_replace in ['Random', 'Least Recently Used']:
         replace = new_replace
+        return (200, '')
     else:
-        response = gen_failed_responce(400, "Invalid replace policy")
-        return response
+        return (400, "Invalid replace policy")
     return
 
 # remove key, key will be passed from the from
@@ -284,23 +284,29 @@ def invalidateKey(key):
 # on the values set by the user
 @webapp.route('/api/cache/config',methods=['GET'])
 def refreshConfiguration():
-    query = ("SELECT capacity, replacement_policy FROM memcache_config "
-             "WHERE id = 1;")
+    query = ("SELECT value_string FROM config WHERE key_string = \'capacity\';")
     data = SQL_command(query)
-    (new_capacity, new_replacement_policy) = data[0]
-    set_parameters(new_capacity, new_replacement_policy)
+    (new_capacity,) = data[0]
+    new_capacity = int(new_capacity)
+    query = ("SELECT value_string FROM config WHERE key_string = \'policy\';")
+    data = SQL_command(query)
+    (new_replacement_policy,) = data[0]
     
-    # make the correct response
-    json_response = {
-        "success": "true"
-    }
-    response = webapp.response_class(
-        response=json.dumps(json_response),
-        status=200,
-        mimetype='application/json'
-    )
-    
-    return response
+    (code, msg) = set_parameters(new_capacity, new_replacement_policy)
+    if code == 200:
+        # make the correct response
+        json_response = {
+            "success": "true"
+        }
+        response = webapp.response_class(
+            response=json.dumps(json_response),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+    else:
+        response = gen_failed_responce(code, msg)
+        return response
 
 # just for testing
 @webapp.route('/keys', methods=['GET','POST'])
