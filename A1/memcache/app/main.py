@@ -95,7 +95,7 @@ def SQL_command(command):
         return
     else:
         query = command  
-        print(query)
+        # print(query)
         
         cursor.execute(query)
         out_data = cursor.fetchall()
