@@ -69,7 +69,7 @@ export default function Image() {
           <TooltipOnError
             open={keyError}
             handleClose={() => setKeyError(false)}
-            title="Please enter a key"
+            title="Please enter a key wihtout spaces"
             body={
               <TextField
                 id="image-text-field"
@@ -82,8 +82,12 @@ export default function Image() {
                 error={keyError}
                 value={keyValue}
                 onChange={(e) => {
-                  setKeyValue(e.target.value);
-                  setKeyError(false);
+                  if (e.target.value.includes(" ")) {
+                    setKeyError(true);
+                  } else {
+                    setKeyValue(e.target.value);
+                    setKeyError(false);
+                  }
                 }}
               />
             }

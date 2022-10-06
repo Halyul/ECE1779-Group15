@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: my_SQL_password
+      MYSQL_DATABASE: ece1779_memcache
+    ports:
+      - 3500:3306
+    volumes:
+      - ./db:/var/lib/mysql

@@ -53,6 +53,6 @@ def response(func):
                     result[k] = v
             return result, code
         except Exception as e:
-            print(e)
+            print(e.__class__.__name__, ":", e)
             return errorhandler(500, "Internal Server Error. Please Check Server Console."), 500
     return wrapper

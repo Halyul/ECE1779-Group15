@@ -1,4 +1,13 @@
+from server.libs.database import Database
+
+DB = Database()
+
 def status():
+    """
+        1. get status from database
+    """
+    status = DB.get_status()
+    print(status)
     return True, 200, dict(
         status=[
             { "name": "Snow", "value": "Jon" },

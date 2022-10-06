@@ -8,6 +8,7 @@ flask = "*"
 flask-restful = "*"
 flask-cors = "*"
 pyyaml = "*"
+"mysql.connector" = "*"
 
 [dev-packages]
 
