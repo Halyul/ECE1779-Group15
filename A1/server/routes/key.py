@@ -2,8 +2,12 @@ import mimetypes
 import pathlib, base64, time
 from server.config import Config
 from server.libs.database import Database
+import json
+import requests
+
 DB = Database()
 CONFIG = Config().fetch()
+CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
 
 def create_key(args):
     """
@@ -29,7 +33,8 @@ def create_key(args):
         DB.create_key_image_pair(args["key"], filename)
     else:
         file_fullpath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], file_entry[0])
-        # TODO: invalidate cache
+        # invalidate the key in the memcache
+        response = requests.delete(CACHE_URL + "/api/cache/key", data=[("key", args["key"])])
     file.save(file_fullpath)
     return True, 200, None
 
@@ -41,20 +46,28 @@ def get_key(key):
         4. If key-image pair exists, get the image from local storage, convert to base64 and response to both webpage and cache
         5. If key-image pair does not exist, return 404 
     """
-    # TODO: 1 - 2
-    key_image_pair = DB.get_key_image_pair(key)
-    if not key_image_pair:
-        return False, 404, "No such key."
-    content = None
-    filepath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], key_image_pair[0])
-    with open(filepath, "rb") as f:
-        image_content = f.read()
-        encoded_bytes = base64.b64encode(image_content)
-        humanreadable_data = encoded_bytes.decode("utf-8")
-        content = "data:{};base64,".format(mimetypes.guess_type(filepath)[0]) + humanreadable_data
-    return True, 200, dict(
-        content=content
-    )
+    response = json.loads(requests.post(CACHE_URL + "/api/cache/key", data=[("key", key)]))
+    if response['success'] == 'true': # if key exists in memcache, get it from the http responce
+        return True, 200, dict(
+            content=response['content']
+        )
+    else: 
+        key_image_pair = DB.get_key_image_pair(key)
+        if not key_image_pair:
+            return False, 404, "No such key."
+        content = None
+        filepath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], key_image_pair[0])
+        with open(filepath, "rb") as f:
+            image_content = f.read()
+            encoded_bytes = base64.b64encode(image_content)
+            humanreadable_data = encoded_bytes.decode("utf-8")
+            content = "data:{};base64,".format(mimetypes.guess_type(filepath)[0]) + humanreadable_data
+        response = json.loads(requests.post(CACHE_URL + "/api/cache/content", data=[('key', key), ('value', content)]))
+        if response['success'] == 'false': # handle cases like the value is larger then the whole cache size
+            pass # TODO: maybe need to do something?
+        return True, 200, dict(
+            content=content
+        )
 
 def list_keys():
     """

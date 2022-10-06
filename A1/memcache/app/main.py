@@ -176,6 +176,9 @@ def put():
     if len(value) > capacity:
         response = gen_failed_responce(400, "File is bigger then the whole cache")
         return response
+    # if the current key exist, remove it before adding so the used_size calculation is correct
+    if key in key_list:
+        invalidateKey(key)
     # if free space is not enough, do some replacement until cache is empty or having enough space
     if used_size + len(value) > capacity: 
         while len(memcache) > 0 and used_size + len(value) > capacity:
@@ -253,7 +256,16 @@ def remove_key():
     key = request.form.get('key')
     if key in memcache:
         invalidateKey(key)
-    return redirect(url_for('show_keys'))
+    # make the correct response
+    json_response = {
+        "success": "true"
+    }
+    response = webapp.response_class(
+        response=json.dumps(json_response),
+        status=200,
+        mimetype='application/json'
+    )
+    return response
 
 # remove key, key will be passed by the argument
 def invalidateKey(key):
