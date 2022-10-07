@@ -5,8 +5,8 @@ from flask import request, jsonify
 
 from app import webapp, config
 from app.db_operations.configurations import get_capacity_in_mb_db, get_replacement_policy_db
-from app.db_operations.keys import delete_all_keys_db, update_time_last_used_db
-from app.services.helper import delete_specific_cache, release_cache_memory
+from app.db_operations.keys import delete_all_keys_db, update_time_last_used_db, get_image_size_db
+from app.services.helper import release_cache_memory
 
 
 def get_cache(key):
@@ -46,22 +46,32 @@ def create_cache():
     value = request.form.get('value')
     size = int(request.form.get('image_size'))
 
-    if key in config.memcache:
-        delete_specific_cache(key)
-    else:
-        memory = int(get_capacity_in_mb_db())
-        while config.memcache_used_memory + size > memory:
-            release_cache_memory()
+    memory = int(get_capacity_in_mb_db())
+    while config.memcache_used_memory + size > memory:
+        release_cache_memory()
 
-        config.memcache[key] = value
-        config.memcache_used_memory += size
+    config.memcache[key] = value
+    config.memcache_used_memory += size
 
     response = webapp.response_class(
         response=json.dumps("OK"),
         status=200,
         mimetype='application/json'
     )
+    return response
 
+
+def delete_specific_cache(key):
+    config.request_nums += 1
+    config.memcache.pop(key)
+    image_size = get_image_size_db(key)
+    config.memcache_used_memory -= image_size
+
+    response = webapp.response_class(
+        response=json.dumps("OK"),
+        status=200,
+        mimetype='application/json'
+    )
     return response
 
 
@@ -86,5 +96,3 @@ def get_cache_configuration():
         capacity_in_mb=capacity_in_mb,
         replacement_policy=replacement_policy
     )
-
-

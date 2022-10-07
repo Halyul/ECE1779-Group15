@@ -8,13 +8,6 @@ from app.db_operations.keys import get_image_size_db, get_least_recently_used_ke
 from app.db_operations.statistics import store_stats_db
 
 
-def delete_specific_cache(key):
-    config.request_nums += 1
-    config.memcache.pop(key)
-    image_size = get_image_size_db(key)
-    config.memcache_used_memory -= image_size
-
-
 def release_cache_memory():
     replacement_policy = get_capacity_in_mb_db()[1]
 
