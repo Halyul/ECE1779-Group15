@@ -211,7 +211,7 @@ def put():
 
 def remove_element():
     global used_size, capacity_used_5s
-    if replace == 'Random':
+    if replace == 'rr':
         (key, value) = random.choice(list(memcache.items()))
         del memcache[key]
         key_list.remove(key)
@@ -221,7 +221,7 @@ def remove_element():
         logging.debug('remove_element - key: ' + key + ' with len(value) of ' + str(len(value)) + ' removed from the cache')
         logging.info('remove_element - cache used = ' + str(used_size))
         return
-    elif replace == 'Least Recently Used':
+    elif replace == 'lru':
         key = key_list[0]
         value = memcache[key]
         del memcache[key]
@@ -243,7 +243,7 @@ def set_parameters(new_capacity, new_replace):
     while used_size > capacity:
         remove_element()
     # check if the replace policy is valid or not
-    if new_replace in ['Random', 'Least Recently Used']:
+    if new_replace in ['rr', 'lru']:
         replace = new_replace
         return (200, '')
     else:
@@ -284,11 +284,11 @@ def invalidateKey(key):
 # on the values set by the user
 @webapp.route('/api/cache/config',methods=['GET'])
 def refreshConfiguration():
-    query = ("SELECT value_string FROM config WHERE key_string = \'capacity\';")
+    query = ("SELECT `value` FROM config WHERE `key` = \'capacity\';")
     data = SQL_command(query)
     (new_capacity,) = data[0]
     new_capacity = int(new_capacity)
-    query = ("SELECT value_string FROM config WHERE key_string = \'policy\';")
+    query = ("SELECT `value` FROM config WHERE `key` = \'policy\';")
     data = SQL_command(query)
     (new_replacement_policy,) = data[0]
     
