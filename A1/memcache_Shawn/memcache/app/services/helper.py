@@ -1,6 +1,6 @@
 import datetime
 import random
-import time
+import threading
 
 from app import config
 from app.db_operations.configurations import get_capacity_in_mb_db
@@ -21,6 +21,7 @@ def release_cache_memory():
 
 
 def create_cache_statistics():
+    threading.Timer(5, create_cache_statistics).start()
     timestamp = datetime.datetime.now()
     cache_nums = len(config.memcache)
     cache_size = config.memcache_used_memory
@@ -35,9 +36,3 @@ def create_cache_statistics():
     store_stats_db(timestamp, cache_nums, cache_size, req_nums, miss_rate, hit_rate)
     print("Stats stored")
 
-
-def every(delay, task):
-    next_time = time.time() + delay
-    while True:
-        time.sleep(max(0, next_time - time.time()))
-        task()

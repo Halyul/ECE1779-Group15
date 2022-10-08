@@ -1,9 +1,7 @@
-import threading
-
 import mysql.connector
 from flask import Flask
 
-from app.services.helper import create_cache_statistics, every
+from app.services.helper import create_cache_statistics
 
 webapp = Flask(__name__)
 
@@ -17,6 +15,4 @@ cursor = cnx.cursor(buffered=True)
 
 from app import routes
 
-# Store cache statistics every 5s
-threading.Thread(target=lambda: every(5, create_cache_statistics)).start()
-
+create_cache_statistics()
