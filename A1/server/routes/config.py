@@ -1,7 +1,7 @@
 from server.config import Config
 from server.libs.database import Database
+from server.libs.thread_task import ThreadTask
 import requests
-import json
 
 DB = Database()
 CONFIG = Config().fetch()
@@ -15,17 +15,25 @@ def get_config():
 def set_config(args):
     """
         1. save the config to database
-        2. TODO: notify the config changes?
+        2. notify the config changes
     """
-    # TODO: do we need to handle the case that http responce from memcache returns an error?
-    response = ""
     if args["clear"]:
-        response = json.loads(requests.delete(CACHE_URL + "/api/cache"))
+        ThreadTask(
+            requests.delete, 
+            kwargs=dict(
+                url = CACHE_URL + "/api/cache",
+            )
+        ).start()
     if args["policy"]:
         DB.set_config("policy", args["policy"])
     if args["capacity"]:
         DB.set_config("capacity", args["capacity"])
-    response = json.loads(requests.get(CACHE_URL + "/api/cache/config"))
+    ThreadTask(
+        requests.get,
+        kwargs=dict(
+            url = CACHE_URL + "/api/cache/config",
+        )
+    ).start()
     return True, 200, dict(
         config=__serialize_config()
     )

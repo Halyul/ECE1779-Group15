@@ -2,6 +2,7 @@ import mimetypes
 import pathlib, base64, time
 from server.config import Config
 from server.libs.database import Database
+from server.libs.thread_task import ThreadTask
 import json
 import requests
 
@@ -34,7 +35,13 @@ def create_key(args):
     else:
         file_fullpath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], file_entry[0])
         # invalidate the key in the memcache
-        response = requests.delete(CACHE_URL + "/api/cache/key", data=[("key", args["key"])])
+        ThreadTask(
+            requests.delete, 
+            kwargs=dict(
+                url=CACHE_URL + "/api/cache/key", 
+                data=[("key", args["key"])]
+            )
+        ).start()
     file.save(file_fullpath)
     return True, 200, None
 
@@ -46,7 +53,13 @@ def get_key(key):
         4. If key-image pair exists, get the image from local storage, convert to base64 and response to both webpage and cache
         5. If key-image pair does not exist, return 404 
     """
-    response = json.loads(requests.post(CACHE_URL + "/api/cache/key", data=[("key", key)]))
+    try:
+        response = json.loads(requests.post(CACHE_URL + "/api/cache/key", data=[("key", key)]))
+    except Exception as e:
+        response = dict(
+            success="false",
+            message="Cache server is not available"
+        )
     if response['success'] == 'true': # if key exists in memcache, get it from the http responce
         return True, 200, dict(
             content=response['content']
@@ -62,9 +75,13 @@ def get_key(key):
             encoded_bytes = base64.b64encode(image_content)
             humanreadable_data = encoded_bytes.decode("utf-8")
             content = "data:{};base64,".format(mimetypes.guess_type(filepath)[0]) + humanreadable_data
-        response = json.loads(requests.post(CACHE_URL + "/api/cache/content", data=[('key', key), ('value', content)]))
-        if response['success'] == 'false': # handle cases like the value is larger then the whole cache size
-            pass # TODO: maybe need to do something?
+        ThreadTask(
+            requests.post,
+            kwargs=dict(
+                url = CACHE_URL + "/api/cache/content", 
+                data = [('key', key), ('value', content)]
+            )
+        ).start()
         return True, 200, dict(
             content=content
         )
