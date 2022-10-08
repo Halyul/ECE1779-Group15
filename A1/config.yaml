@@ -11,6 +11,10 @@ database:
   user: root
   password: my_SQL_password
   name: ece1779_memcache
+  table_names:
+    key_image: key_image
+    config: config
+    status: status
 
 cache:
   host: 127.0.0.1
