@@ -25,7 +25,7 @@ def get_service():
         response = gen_failed_responce(400, "Unknown key")
     
     statistics.num_request_served_5s = statistics.num_request_served_5s + 1
-    
+    print(config.key_list)
     return response
 
 def put_service():
@@ -71,6 +71,7 @@ def put_service():
         
     # make the correct response
     response = gen_success_responce("")
+    print(config.key_list)
     return response
 
 # remove key, key will be passed from the from
