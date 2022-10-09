@@ -17,15 +17,15 @@ db = app.lib.db_lib.my_db(config_info['database']['user'], config_info['database
 
 def get_config_from_db():
     data = {}
-    data['capacity'] = db.get_from_table('config', '`value`', "`key` = 'capacity'")[0][0]
+    data['capacity'] = db.get_from_table(config_info['database']["table_names"]['config'], '`value`', "`key` = 'capacity'")[0][0]
     data['capacity'] = int(data['capacity'])
-    data['policy'] = db.get_from_table('config', '`value`', "`key` = 'policy'")[0][0]
+    data['policy'] = db.get_from_table(config_info['database']["table_names"]['config'], '`value`', "`key` = 'policy'")[0][0]
     return data
 
 def get_statistics_from_db():
     data = {}
-    data['total_request_served'] = db.get_from_table('statistics', 'total_request_served', "id = 1")[0][0]
-    data['total_hit'] = db.get_from_table('statistics', 'total_hit', "id = 1")[0][0]
+    data['total_request_served'] = db.get_from_table(config_info['database']["table_names"]['status'], 'total_request_served', "id = 1")[0][0]
+    data['total_hit'] = db.get_from_table(config_info['database']["table_names"]['status'], 'total_hit', "id = 1")[0][0]
     return data
 
 # def get_5s_statistics_from_db():

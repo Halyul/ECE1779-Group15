@@ -10,7 +10,8 @@ from app import webapp
 import app.config as config
 import app.statistics as statistics
 
-from app.lib.db_operations import db, get_statistics_from_db, delete_5s_statistics_from_db, insert_5s_statistics_to_db
+from app.lib.db_operations import db, get_statistics_from_db, delete_5s_statistics_from_db, \
+    insert_5s_statistics_to_db, config_info
 
 def gen_failed_responce(code, message):
     json_response = {
@@ -112,18 +113,18 @@ def update_database_every_5s():
             if total_request_served != 0:
                 miss_rate = (total_request_served - total_hit) / total_request_served
                 hit_rate = total_hit / total_request_served
-                pre_query = ("UPDATE statistics "
+                pre_query = ("UPDATE {} "
                              "SET num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
                              "total_hit = {}, miss_rate = {}, hit_rate = {} "
                              "WHERE id = 1;")
-                query = pre_query.format(num_item_in_cache, statistics.used_size, total_request_served, \
+                query = pre_query.format(config_info['database']["table_names"]['status'], num_item_in_cache, statistics.used_size, total_request_served, \
                                          total_hit, miss_rate, hit_rate)
             else:
-                pre_query = ("UPDATE statistics "
+                pre_query = ("UPDATE {} "
                              "SET num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
                              "total_hit = {} "
                              "WHERE id = 1;")
-                query = pre_query.format(num_item_in_cache, statistics.used_size, total_request_served, \
+                query = pre_query.format(config_info['database']["table_names"]['status'] ,num_item_in_cache, statistics.used_size, total_request_served, \
                                          total_hit)
             db.SQL_command(query)
             
