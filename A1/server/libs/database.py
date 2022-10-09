@@ -11,7 +11,7 @@ TABLES = [
         KEY_IMAGE_TABLE_NAME),
     "CREATE TABLE IF NOT EXISTS `{}` (`id` int NOT NULL AUTO_INCREMENT, `key` varchar(64) NOT NULL, `value` varchar(64) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci".format(
         CONFIG_TABLE_NAME),
-    "CREATE TABLE IF NOT EXISTS `{}` (`id` int NOT NULL AUTO_INCREMENT, `num_item_in_cache` int NOT NULL, `used_size` int NOT NULL, `total_request_served` int NOT NULL, `total_hit` int NOT NULL, `miss_rate` float DEFAULT NULL, `hit_rate` float DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci".format(
+    "CREATE TABLE IF NOT EXISTS `{}` (`id` int NOT NULL AUTO_INCREMENT, `cache_nums` int NOT NULL, `used_size` int NOT NULL, `total_request_served` int NOT NULL, `total_hit` int NOT NULL, `miss_rate` float DEFAULT NULL, `hit_rate` float DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci".format(
         STATUS_TABLE_NAME),
 ]
 

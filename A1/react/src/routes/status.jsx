@@ -34,7 +34,7 @@ export default function Status() {
       <RefreshCard
         title="Status"
         body={
-          statusList ? (
+          statusList.length > 0 ? (
             <Box sx={{ height: "61.8vh", maxHeight: 768 }}>
               <DataGrid
                 getRowId={(r) => r.name}

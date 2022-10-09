@@ -1,4 +1,4 @@
-import mysql
+import mysql.connector
 import yaml
 
 project_path = __file__.split('memcache_Shawn')[0]

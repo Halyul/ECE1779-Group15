@@ -5,16 +5,20 @@ DB = Database()
 
 def status():
     """
-        TODO
         1. get status from database
     """
     status = DB.get_status()
-    cache_nums_10mins = status[0]
-    used_size_10mins = status[1]
-    total_request_served_10mins = status[2]
-    total_hit_10mins = status[3]
-    hit_rate_10mins = status[4] / 120
-    miss_rate_10mins = status[5] / 120
+    if None in status[0]: # empty status
+        return True, 200, dict(
+            status=[]
+        )
+    status = status[0]
+    cache_nums_10mins = int(status[0])
+    used_size_10mins = int(status[1])
+    total_request_served_10mins = int(status[2])
+    total_hit_10mins = int(status[3])
+    hit_rate_10mins = str(round(status[4] / 120 * 100, 2)) + "%"
+    miss_rate_10mins = str(round(status[5] / 120 * 100, 2)) + "%"
 
     return True, 200, dict(
         status=[

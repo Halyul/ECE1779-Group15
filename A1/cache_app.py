@@ -1,17 +1,3 @@
-import os
-from flask import Flask, send_from_directory
+from memcache_Shawn.memcache.app import webapp
 
-app = Flask(__name__, static_folder='react/dist')
-
-# Serve React App
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    if path != "" and os.path.exists(app.static_folder + '/' + path):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, 'index.html')
-
-
-if __name__ == '__main__':
-    app.run(use_reloader=True, port=5001, threaded=True)
+webapp.run('0.0.0.0', 5001, debug=False)
