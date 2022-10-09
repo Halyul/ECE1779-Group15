@@ -55,16 +55,9 @@ def get_key(key):
     """
     try:
         response = json.loads(requests.post(CACHE_URL + "/api/cache/key", data=[("key", key)]))
+        content = response["content"]
     except Exception as e:
-        response = dict(
-            success="false",
-            message="Cache server is not available"
-        )
-    if response['success'] == 'true': # if key exists in memcache, get it from the http responce
-        return True, 200, dict(
-            content=response['content']
-        )
-    else: 
+        print(e)
         key_image_pair = DB.get_key_image_pair(key)
         if not key_image_pair:
             return False, 404, "No such key."
@@ -82,6 +75,7 @@ def get_key(key):
                 data = [('key', key), ('value', content)]
             )
         ).start()
+    finally:
         return True, 200, dict(
             content=content
         )
