@@ -3,12 +3,12 @@ import logging
 
 import sys
 sys.path.append("../..") 
-import app.config as config
-import app.statistics as statistics
+import memcache.config as config
+import memcache.statistics as statistics
 
-from app.lib.cache_support_func import gen_failed_responce, invalidateKey, remove_element, \
+from memcache.libs.cache_support_func import gen_failed_responce, invalidateKey, remove_element, \
     set_parameters, gen_success_responce, file_size
-from app.lib.db_operations import db, get_config_from_db
+from memcache.libs.db_operations import db, get_config_from_db
 
 def get_service():
     key = request.form.get('key')

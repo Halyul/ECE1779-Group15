@@ -6,11 +6,11 @@ import time
 
 import sys
 sys.path.append("../..") 
-from app import webapp
-import app.config as config
-import app.statistics as statistics
+from memcache import webapp
+import memcache.config as config
+import memcache.statistics as statistics
 
-from app.lib.db_operations import db, insert_5s_statistics_to_db, config_info
+from memcache.libs.db_operations import db, insert_5s_statistics_to_db, config_info
 
 def gen_failed_responce(code, message):
     json_response = {

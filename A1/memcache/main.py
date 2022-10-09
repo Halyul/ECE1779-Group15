@@ -2,11 +2,11 @@ from flask import render_template
 from flask import json
 import threading
 
-from app import webapp
-import app.config as config
-from app.lib.cache_operations import get_service, put_service, remove_key_service, \
+from memcache import webapp
+import config as config
+from libs.cache_operations import get_service, put_service, remove_key_service, \
     refreshConfiguration_service, clear_service, show_info_service
-from app.lib.cache_support_func import initialize_5s_varables, update_database_every_5s
+from libs.cache_support_func import initialize_5s_varables, update_database_every_5s
 
 @webapp.route('/api/cache/key',methods=['POST'])
 def get():

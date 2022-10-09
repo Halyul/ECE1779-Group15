@@ -4,4 +4,4 @@ global memcache
 
 webapp = Flask(__name__)
 
-from app import main
+import main

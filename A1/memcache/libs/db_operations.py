@@ -1,4 +1,4 @@
-import app.lib.db_lib
+import libs.db_lib
 import sys
 import pathlib
 
@@ -11,7 +11,7 @@ config_info = setup_config.fetch()
 
 # setup the my_db object with the correct database parameters
 # db = db_lib.my_db('root', 'my_SQL_password', '127.0.0.1', 'ece1779_memcache')
-db = app.lib.db_lib.my_db(config_info['database']['user'], config_info['database']['password'], \
+db = libs.db_lib.my_db(config_info['database']['user'], config_info['database']['password'], \
                   config_info['database']['host'], config_info['database']['name'])
 
 def get_config_from_db():
