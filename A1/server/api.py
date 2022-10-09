@@ -52,7 +52,7 @@ class Api(Resource):
         if destination == "config":
             parser.add_argument("policy", type=str)
             parser.add_argument("capacity", type=int)
-            parser.add_argument("clear", type=bool)
+            parser.add_argument("clear_cache", type=bool)
             args = parser.parse_args()
             return set_config(args)
         return False, 400, None

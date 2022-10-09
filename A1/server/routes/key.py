@@ -54,10 +54,9 @@ def get_key(key):
         5. If key-image pair does not exist, return 404 
     """
     try:
-        response = json.loads(requests.post(CACHE_URL + "/api/cache/key", data=[("key", key)]))
+        response = requests.post(CACHE_URL + "/api/cache/key", data=[("key", key)]).json()
         content = response["content"]
     except Exception as e:
-        print(e)
         key_image_pair = DB.get_key_image_pair(key)
         if not key_image_pair:
             return False, 404, "No such key."
