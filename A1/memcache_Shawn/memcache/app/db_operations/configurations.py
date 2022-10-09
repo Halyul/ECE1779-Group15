@@ -6,7 +6,7 @@ def get_replacement_policy_db():
     cnx = connect_to_db()
     cursor = cnx.cursor()
 
-    query = "SELECT `key` FROM cache_configs ORDER BY id LIMIT 1"
+    query = "SELECT `key` FROM config ORDER BY id LIMIT 1"
     cursor.execute(query)
     for replacement_policy in cursor:
         return replacement_policy[0]
@@ -19,7 +19,7 @@ def get_capacity_in_mb_db():
     cnx = connect_to_db()
     cursor = cnx.cursor()
 
-    query = "SELECT `key` FROM cache_configs ORDER BY id DESC LIMIT 1"
+    query = "SELECT `key` FROM config ORDER BY id DESC LIMIT 1"
     cursor.execute(query)
     for capacity_in_mb in cursor:
         return capacity_in_mb[0]
