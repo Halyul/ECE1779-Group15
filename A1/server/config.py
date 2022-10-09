@@ -3,16 +3,13 @@ import yaml
 
 class Config:
 
-    def __init__(self, config="config.yaml", path = ""):
+    def __init__(self, config="config.yaml"):
         """
             self.path: config path
             self.config: system config
         """
         # to handle the case that the function is called in different path
-        if path == "":
-            self.path = pathlib.Path.cwd().joinpath(config)
-        else:
-            self.path = path.joinpath(config)
+        self.path = pathlib.Path(__file__).parent.absolute().joinpath("..", config)
         self.config = yaml.safe_load(open(self.path, "r"))
     
     def fetch(self):
