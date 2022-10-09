@@ -8,7 +8,7 @@ import app.statistics as statistics
 
 from app.lib.cache_support_func import gen_failed_responce, invalidateKey, remove_element, \
     set_parameters, gen_success_responce, file_size
-from app.lib.db_operations import db, get_config_from_db, get_statistics_from_db
+from app.lib.db_operations import db, get_config_from_db
 
 def get_service():
     key = request.form.get('key')
@@ -29,6 +29,7 @@ def get_service():
     return response
 
 def put_service():
+    logging.info("test")
     # check if there is a key
     if request.form.get('key') == '':
         response = gen_failed_responce(400, "Missing key")
@@ -111,22 +112,29 @@ def clear_service():
 
 # for testing only
 def show_info_service():
-    data = get_statistics_from_db()
-    total_request_served = data['total_request_served']
-    total_hit = data['total_hit']
+    total_request_served = "not supported"
+    total_hit = "not supported"
+    total_miss_rate = "not supported"
+    total_hit_rate = "not supported"
     
-    total_request_served = total_request_served + statistics.num_request_served_5s
-    total_hit = total_hit + statistics.num_hit_5s
+    # data = get_statistics_from_db()
+    # total_request_served = data['total_request_served']
+    # total_hit = data['total_hit']
+    
+    # total_request_served = total_request_served + statistics.num_request_served_5s
+    # total_hit = total_hit + statistics.num_hit_5s
     num_item_in_cache = len(config.memcache)
-    if total_request_served != 0:
-        total_miss_rate = (total_request_served - total_hit) / total_request_served
-        total_hit_rate = total_hit / total_request_served
-    else:
-        total_miss_rate = "n/a"
-        total_hit_rate = "n/a"
+    # if total_request_served != 0:
+    #     total_miss_rate = (total_request_served - total_hit) / total_request_served
+    #     total_hit_rate = total_hit / total_request_served
+    # else:
+    #     total_miss_rate = "n/a"
+    #     total_hit_rate = "n/a"
     
-    query = ("SELECT num_item_added, capacity_used, num_request_served, num_miss, num_hit "
-             "FROM statistics_10min;")
+    
+    
+    query = ("SELECT num_item_in_cache, used_size, total_request_served, total_hit "
+             "FROM status ORDER BY id DESC LIMIT 120;")
     data = db.SQL_command(query)
     num_key_added_10min = statistics.item_added_5s
     used_size_10min = statistics.capacity_used_5s
@@ -134,11 +142,10 @@ def show_info_service():
     num_miss_10min = statistics.num_request_served_5s - statistics.num_hit_5s
     num_hit_10min = statistics.num_hit_5s
     
-    for (num_key_added_sql, used_size_sql, request_served_sql, num_miss_sql, num_hit_sql) in data:
+    for (num_key_added_sql, used_size_sql, request_served_sql, num_hit_sql) in data:
         num_key_added_10min = num_key_added_10min + num_key_added_sql
         used_size_10min = used_size_10min + used_size_sql
         request_served_10min = request_served_10min + request_served_sql
-        num_miss_10min = num_miss_10min + num_miss_sql
         num_hit_10min = num_hit_10min + num_hit_sql
     if request_served_10min != 0:
         miss_rate_10min = num_miss_10min / request_served_10min

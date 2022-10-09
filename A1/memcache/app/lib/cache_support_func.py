@@ -10,8 +10,7 @@ from app import webapp
 import app.config as config
 import app.statistics as statistics
 
-from app.lib.db_operations import db, get_statistics_from_db, delete_5s_statistics_from_db, \
-    insert_5s_statistics_to_db, config_info
+from app.lib.db_operations import db, insert_5s_statistics_to_db, config_info
 
 def gen_failed_responce(code, message):
     json_response = {
@@ -103,38 +102,38 @@ def initialize_5s_varables():
 def update_database_every_5s():
     try:
         while(config.stop_threads == False):
-            data = get_statistics_from_db()
-            total_request_served = data['total_request_served']
-            total_hit = data['total_hit']
+            # data = get_statistics_from_db()
+            # total_request_served = data['total_request_served']
+            # total_hit = data['total_hit']
             
-            num_item_in_cache = len(config.memcache)
-            total_request_served = total_request_served + statistics.num_request_served_5s
-            total_hit = total_hit + statistics.num_hit_5s
-            if total_request_served != 0:
-                miss_rate = (total_request_served - total_hit) / total_request_served
-                hit_rate = total_hit / total_request_served
-                pre_query = ("UPDATE {} "
-                             "SET num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
-                             "total_hit = {}, miss_rate = {}, hit_rate = {} "
-                             "WHERE id = 1;")
-                query = pre_query.format(config_info['database']["table_names"]['status'], num_item_in_cache, statistics.used_size, total_request_served, \
-                                         total_hit, miss_rate, hit_rate)
-            else:
-                pre_query = ("UPDATE {} "
-                             "SET num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
-                             "total_hit = {} "
-                             "WHERE id = 1;")
-                query = pre_query.format(config_info['database']["table_names"]['status'] ,num_item_in_cache, statistics.used_size, total_request_served, \
-                                         total_hit)
-            db.SQL_command(query)
+            # num_item_in_cache = len(config.memcache)
+            # total_request_served = total_request_served + statistics.num_request_served_5s
+            # total_hit = total_hit + statistics.num_hit_5s
+            # if total_request_served != 0:
+            #     miss_rate = (total_request_served - total_hit) / total_request_served
+            #     hit_rate = total_hit / total_request_served
+            #     pre_query = ("UPDATE {} "
+            #                  "SET num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
+            #                  "total_hit = {}, miss_rate = {}, hit_rate = {} "
+            #                  "WHERE id = 1;")
+            #     query = pre_query.format(config_info['database']["table_names"]['status'], num_item_in_cache, statistics.used_size, total_request_served, \
+            #                              total_hit, miss_rate, hit_rate)
+            # else:
+            #     pre_query = ("UPDATE {} "
+            #                  "SET num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
+            #                  "total_hit = {} "
+            #                  "WHERE id = 1;")
+            #     query = pre_query.format(config_info['database']["table_names"]['status'] ,num_item_in_cache, statistics.used_size, total_request_served, \
+            #                              total_hit)
+            # db.SQL_command(query)
             
             # update statistics for last 5s (this table will be used for 'last 10min statistics')
-            now = datetime.now()
-            current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-            prev_time = now - timedelta(minutes = 10)
-            prev_time = prev_time.strftime("%Y-%m-%d %H:%M:%S")
+            # now = datetime.now()
+            # current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+            # prev_time = now - timedelta(minutes = 10)
+            # prev_time = prev_time.strftime("%Y-%m-%d %H:%M:%S")
             
-            delete_5s_statistics_from_db(prev_time)
+            # delete_5s_statistics_from_db(prev_time)
             
             # pre_query = ("INSERT INTO statistics_10min (time, num_item_added, capacity_used, num_request_served, num_miss, num_hit) "
             #              "VALUES (\'{}\', {}, {}, {}, {}, {});")
@@ -142,14 +141,15 @@ def update_database_every_5s():
             #                          statistics.num_request_served_5s, statistics.num_request_served_5s - statistics.num_hit_5s, statistics.num_hit_5s)
             # SQL_command(query)
             
-            insert_5s_statistics_to_db(current_time, statistics.item_added_5s, statistics.capacity_used_5s, \
+            insert_5s_statistics_to_db(statistics.item_added_5s, statistics.capacity_used_5s, \
                                      statistics.num_request_served_5s, statistics.num_request_served_5s - statistics.num_hit_5s, statistics.num_hit_5s)
             
             # initialize varables every 5s
             initialize_5s_varables()
             time.sleep(5)
-    except:
-        print("end")
+    except Exception as error:
+        print(error)
+        print("background update terminated")
     return
 
 def file_size(string):

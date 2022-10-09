@@ -21,11 +21,11 @@ def get_config_from_db():
     data['policy'] = db.get_from_table(config_info['database']["table_names"]['config'], '`value`', "`key` = 'policy'")[0][0]
     return data
 
-def get_statistics_from_db():
-    data = {}
-    data['total_request_served'] = db.get_from_table(config_info['database']["table_names"]['status'], 'total_request_served', "id = 1")[0][0]
-    data['total_hit'] = db.get_from_table(config_info['database']["table_names"]['status'], 'total_hit', "id = 1")[0][0]
-    return data
+# def get_statistics_from_db():
+#     data = {}
+#     data['total_request_served'] = db.get_from_table(config_info['database']["table_names"]['status'], 'total_request_served', "id = 1")[0][0]
+#     data['total_hit'] = db.get_from_table(config_info['database']["table_names"]['status'], 'total_hit', "id = 1")[0][0]
+#     return data
 
 # def get_5s_statistics_from_db():
 #     data = {}
@@ -36,16 +36,26 @@ def get_statistics_from_db():
 #     data['num_hit_10min'] = db.get_from_table('statistics_10min', 'num_hit')[0][0]
 #     return data
 
-def insert_5s_statistics_to_db(current_time, item_added_5s, capacity_used_5s, num_request_served_5s, num_miss_5s, num_hit_5s):
-    command = ("INSERT INTO statistics_10min (time, num_item_added, capacity_used, num_request_served, num_miss, num_hit) "
-                         "VALUES (\'{}\', {}, {}, {}, {}, {});").format(current_time, item_added_5s, \
-                                                                        capacity_used_5s, \
-                                                                            num_request_served_5s, \
-                                                                                num_miss_5s, num_hit_5s)
+def insert_5s_statistics_to_db(item_added_5s, capacity_used_5s, num_request_served_5s, num_miss_5s, num_hit_5s):
+    if num_request_served_5s != 0:
+        command = ("INSERT INTO {} (num_item_in_cache, used_size, total_request_served, total_hit, miss_rate, hit_rate) "
+                             "VALUES ({}, {}, {}, {}, {}, {});").format(config_info['database']["table_names"]['status'], \
+                                                                            item_added_5s, \
+                                                                            capacity_used_5s, \
+                                                                                num_request_served_5s, \
+                                                                                    num_hit_5s, num_miss_5s / num_request_served_5s, \
+                                                                                        num_hit_5s / num_request_served_5s)
+    else:
+        command = ("INSERT INTO {} (num_item_in_cache, used_size, total_request_served, total_hit) "
+                             "VALUES ({}, {}, {}, {});").format(config_info['database']["table_names"]['status'], \
+                                                                            item_added_5s, \
+                                                                            capacity_used_5s, \
+                                                                                num_request_served_5s, \
+                                                                                    num_hit_5s)
     db.SQL_command(command)
     return
 
-def delete_5s_statistics_from_db(time_list):
-    command = "DELETE FROM statistics_10min WHERE time < \'{}\'; ".format(time_list)
-    db.SQL_command(command)
-    return
+# def delete_5s_statistics_from_db(time_list):
+#     command = "DELETE FROM {} WHERE time < \'{}\'; ".format(config_info['database']["table_names"]['status'], time_list)
+#     db.SQL_command(command)
+#     return
