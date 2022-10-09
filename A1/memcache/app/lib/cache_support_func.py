@@ -43,8 +43,9 @@ def gen_success_responce(content):
 def invalidateKey(key):
     if key in config.key_list:
         value = config.memcache[key]
-        statistics.capacity_used_5s = statistics.capacity_used_5s - len(value)
-        statistics.used_size = statistics.used_size - len(value)
+        size = file_size(value)
+        statistics.capacity_used_5s = statistics.capacity_used_5s - size
+        statistics.used_size = statistics.used_size - size
         del config.memcache[key]
         config.key_list.remove(key)
     else:
@@ -56,10 +57,11 @@ def remove_element():
         (key, value) = random.choice(list(config.memcache.items()))
         del config.memcache[key]
         config.key_list.remove(key)
-        statistics.used_size = statistics.used_size - len(value)
-        statistics.capacity_used_5s = statistics.capacity_used_5s - len(value)
+        size = file_size(value)
+        statistics.used_size = statistics.used_size - size
+        statistics.capacity_used_5s = statistics.capacity_used_5s - size
         logging.debug('remove_element - replace policy is ' + config.replace)
-        logging.debug('remove_element - key: ' + key + ' with len(value) of ' + str(len(value)) + ' removed from the cache')
+        logging.debug('remove_element - key: ' + key + ' with len(value) of ' + str(size) + ' removed from the cache')
         logging.info('remove_element - cache used = ' + str(statistics.used_size))
         return
     elif config.replace == 'lru':
@@ -67,10 +69,11 @@ def remove_element():
         value = config.memcache[key]
         del config.memcache[key]
         config.key_list.remove(key)
-        statistics.used_size = statistics.used_size - len(value)
-        statistics.capacity_used_5s = statistics.capacity_used_5s - len(value)
+        size = file_size(value)
+        statistics.used_size = statistics.used_size - size
+        statistics.capacity_used_5s = statistics.capacity_used_5s - size
         logging.debug('remove_element - replace policy is ' + config.replace)
-        logging.debug('remove_element - key: ' + key + ' with len(value) of ' + str(len(value)) + ' removed from the cache')
+        logging.debug('remove_element - key: ' + key + ' with len(value) of ' + str(size) + ' removed from the cache')
         logging.info('remove_element - cache used = ' + str(statistics.used_size))
         return
     else:
@@ -147,3 +150,12 @@ def update_database_every_5s():
     except:
         print("end")
     return
+
+def file_size(string):
+    if "base64," in string:
+        data_string = string.split("base64,")[1]
+        length = len(data_string) * 3 / 4 - data_string.count("=", -2)
+        return length
+    else:
+        logging.ERROR("file_size - invalid content type: 'base64,' not found, size calculation will be incorrect")
+        return -1
