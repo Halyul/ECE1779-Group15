@@ -56,9 +56,12 @@ def get_key(key):
     try:
         response = requests.post(CACHE_URL + "/api/cache/key", data=[("key", key)]).json()
         content = response["content"]
+        return True, 200, dict(
+            content=content
+        )
     except Exception as e:
         key_image_pair = DB.get_key_image_pair(key)
-        if not key_image_pair:
+        if key_image_pair is None:
             return False, 404, "No such key."
         content = None
         filepath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], key_image_pair[0])
@@ -74,7 +77,6 @@ def get_key(key):
                 data = [('key', key), ('value', content)]
             )
         ).start()
-    finally:
         return True, 200, dict(
             content=content
         )

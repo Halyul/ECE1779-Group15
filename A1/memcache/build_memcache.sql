@@ -73,7 +73,7 @@ DROP TABLE IF EXISTS `statistics`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `statistics` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `num_item_in_cache` int NOT NULL,
+  `cache_nums` int NOT NULL,
   `used_size` int NOT NULL,
   `total_request_served` int NOT NULL,
   `total_hit` int NOT NULL,

@@ -7,6 +7,14 @@ DB = Database()
 CONFIG = Config().fetch()
 CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
 
+# speical accommodations for the cache server
+ThreadTask(
+        requests.get,
+        kwargs=dict(
+            url = CACHE_URL + "/api/cache/config",
+        )
+    ).start()
+
 def get_config():
     return True, 200, dict(
         config=__serialize_config()

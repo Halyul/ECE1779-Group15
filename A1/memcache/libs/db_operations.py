@@ -1,4 +1,4 @@
-import libs.db_lib
+from memcache.libs.db_lib import my_db
 import sys
 import pathlib
 
@@ -11,7 +11,7 @@ config_info = setup_config.fetch()
 
 # setup the my_db object with the correct database parameters
 # db = db_lib.my_db('root', 'my_SQL_password', '127.0.0.1', 'ece1779_memcache')
-db = libs.db_lib.my_db(config_info['database']['user'], config_info['database']['password'], \
+db = my_db(config_info['database']['user'], config_info['database']['password'], \
                   config_info['database']['host'], config_info['database']['name'])
 
 def get_config_from_db():
@@ -38,7 +38,7 @@ def get_config_from_db():
 
 def insert_5s_statistics_to_db(item_added_5s, capacity_used_5s, num_request_served_5s, num_miss_5s, num_hit_5s):
     if num_request_served_5s != 0:
-        command = ("INSERT INTO {} (num_item_in_cache, used_size, total_request_served, total_hit, miss_rate, hit_rate) "
+        command = ("INSERT INTO {} (cache_nums, used_size, total_request_served, total_hit, miss_rate, hit_rate) "
                              "VALUES ({}, {}, {}, {}, {}, {});").format(config_info['database']["table_names"]['status'], \
                                                                             item_added_5s, \
                                                                             capacity_used_5s, \
@@ -46,7 +46,7 @@ def insert_5s_statistics_to_db(item_added_5s, capacity_used_5s, num_request_serv
                                                                                     num_hit_5s, num_miss_5s / num_request_served_5s, \
                                                                                         num_hit_5s / num_request_served_5s)
     else:
-        command = ("INSERT INTO {} (num_item_in_cache, used_size, total_request_served, total_hit) "
+        command = ("INSERT INTO {} (cache_nums, used_size, total_request_served, total_hit) "
                              "VALUES ({}, {}, {}, {});").format(config_info['database']["table_names"]['status'], \
                                                                             item_added_5s, \
                                                                             capacity_used_5s, \

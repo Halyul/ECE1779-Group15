@@ -4,9 +4,9 @@ import threading
 
 from memcache import webapp
 import memcache.config as config
-from libs.cache_operations import get_service, put_service, remove_key_service, \
+from memcache.libs.cache_operations import get_service, put_service, remove_key_service, \
     refreshConfiguration_service, clear_service, show_info_service
-from libs.cache_support_func import initialize_5s_varables, update_database_every_5s
+from memcache.libs.cache_support_func import initialize_5s_varables, update_database_every_5s
 
 @webapp.route('/api/cache/key',methods=['POST'])
 def get():

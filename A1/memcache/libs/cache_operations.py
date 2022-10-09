@@ -134,7 +134,7 @@ def show_info_service():
     
     
     
-    query = ("SELECT num_item_in_cache, used_size, total_request_served, total_hit "
+    query = ("SELECT cache_nums, used_size, total_request_served, total_hit "
              "FROM status ORDER BY id DESC LIMIT 120;")
     data = db.SQL_command(query)
     num_key_added_10min = statistics.item_added_5s
