@@ -6,7 +6,8 @@ sys.path.append("../..")
 import app.config as config
 import app.statistics as statistics
 
-from app.lib.cache_support_func import gen_failed_responce, invalidateKey, remove_element, set_parameters, gen_success_responce
+from app.lib.cache_support_func import gen_failed_responce, invalidateKey, remove_element, \
+    set_parameters, gen_success_responce, file_size
 from app.lib.db_operations import db, get_config_from_db, get_statistics_from_db
 
 def get_service():
@@ -41,19 +42,20 @@ def put_service():
     key = request.form.get('key')
     value = request.form.get('value')
     # space check
-    if len(value) > config.capacity:
+    size = file_size(value)
+    if size > config.capacity:
         response = gen_failed_responce(400, "File is bigger then the whole cache")
         return response
     # if the current key exist, remove it before adding so the used_size calculation is correct
     if key in config.key_list:
         invalidateKey(key)
     # if free space is not enough, do some replacement until cache is empty or having enough space
-    if statistics.used_size + len(value) > config.capacity: 
-        while len(config.memcache) > 0 and statistics.used_size + len(value) > config.capacity:
+    if statistics.used_size + size > config.capacity: 
+        while len(config.memcache) > 0 and statistics.used_size + size > config.capacity:
             remove_element()
     # once we have enough free space, save the file into the cache
     config.memcache[key] = value
-    statistics.used_size = statistics.used_size + len(value)
+    statistics.used_size = statistics.used_size + size
     # added to config.key_list to keep track of which one is been recently used
     if key in config.key_list:
         config.key_list.remove(key) # remove it from the list
@@ -61,9 +63,9 @@ def put_service():
     else:
         config.key_list.append(key) # add it to the end of the list
     statistics.item_added_5s = statistics.item_added_5s + 1
-    statistics.capacity_used_5s = statistics.capacity_used_5s + len(value)
+    statistics.capacity_used_5s = statistics.capacity_used_5s + size
     
-    logging.debug('put - key: ' + key + ' with len(value) of ' + str(len(value)) + ' added to the cache')
+    logging.debug('put - key: ' + key + ' with len(value) of ' + str(size) + ' added to the cache')
     logging.info('put - cache used = ' + str(statistics.used_size))
         
     # make the correct response
