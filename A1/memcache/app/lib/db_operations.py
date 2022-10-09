@@ -6,8 +6,7 @@ sys.path.append("..")
 import server.config
 
 # read the setup config from the yaml file
-config_file_path = pathlib.Path.cwd().parents[0]
-setup_config = server.config.Config(path=config_file_path)
+setup_config = server.config.Config()
 config_info = setup_config.fetch()
 
 # setup the my_db object with the correct database parameters
