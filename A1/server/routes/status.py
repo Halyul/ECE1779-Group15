@@ -10,7 +10,7 @@ def status():
             status=[]
         )
     cache_nums_10mins = int(status[0])
-    used_size_10mins = int(status[1])
+    used_size_10mins = str(round(int(status[1]) / (1024 * 1024), 2)) + " MB"
     total_request_served_10mins = int(status[2])
     total_hit_10mins = int(status[3])
     try:

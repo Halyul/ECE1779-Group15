@@ -6,15 +6,6 @@ CONFIG_TABLE_NAME = CONFIG["table_names"]["config"]
 KEY_IMAGE_TABLE_NAME = CONFIG["table_names"]["key_image"]
 STATUS_TABLE_NAME = CONFIG["table_names"]["status"]
 
-TABLES = [
-    "CREATE TABLE IF NOT EXISTS `{}` (`id` int NOT NULL AUTO_INCREMENT, `key` varchar(64) NOT NULL, `image` varchar(1024) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci".format(
-        KEY_IMAGE_TABLE_NAME),
-    "CREATE TABLE IF NOT EXISTS `{}` (`id` int NOT NULL AUTO_INCREMENT, `key` varchar(64) NOT NULL, `value` varchar(64) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci".format(
-        CONFIG_TABLE_NAME),
-    "CREATE TABLE IF NOT EXISTS `{}` (`id` int NOT NULL AUTO_INCREMENT, `cache_nums` int NOT NULL, `used_size` int NOT NULL, `total_request_served` int NOT NULL, `total_hit` int NOT NULL, `miss_rate` float NOT NULL DEFAULT 0, `hit_rate` float NOT NULL DEFAULT 0, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci".format(STATUS_TABLE_NAME),
-]
-
-
 class Database:
 
     def __init__(self):
@@ -26,7 +17,6 @@ class Database:
         self.connection = None
         self.cursor = None
         self.__connect()
-        self.__create_table()
         self.__create_default_config()
 
     def __connect(self):
@@ -38,10 +28,6 @@ class Database:
             database=self.database
         )
         self.cursor = self.connection.cursor()
-
-    def __create_table(self):
-        for e in TABLES:
-            self.__execute(e)
 
     def __create_default_config(self):
         if not self.get_config():
