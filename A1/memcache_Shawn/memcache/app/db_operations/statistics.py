@@ -1,10 +1,17 @@
-import app
+from memcache_Shawn.memcache.app.db_operations.db_connection import connect_to_db
 
 
-def store_stats_db(time_created, cache_nums, cache_size, req_nums, hit_rate, miss_rate):
+def store_stats_db(cache_nums, cache_used_size, req_nums, total_hit, hit_rate, miss_rate):
+    cnx = connect_to_db()
+    cursor = cnx.cursor()
+
     query = ("INSERT INTO cache_stats"
-             "(time_created, cache_nums, cache_size, req_nums, miss_rate, hit_rate) "
+             "(cache_nums, used_size, total_request_served, total_hit, miss_rate, hit_rate) "
              "VALUES (%s, %s, %s, %s, %s, %s)")
-    query_data = (time_created, cache_nums, cache_size, req_nums, miss_rate, hit_rate)
-    app.cursor.execute(query, query_data)
-    app.cnx.commit()
+    query_data = (cache_nums, cache_used_size, req_nums, total_hit, hit_rate, miss_rate)
+    cursor.execute(query, query_data)
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()

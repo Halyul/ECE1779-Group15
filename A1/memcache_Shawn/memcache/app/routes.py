@@ -1,27 +1,22 @@
-from app import webapp
-from app.services import cache_service
+from memcache_Shawn.memcache.app import webapp
+from memcache_Shawn.memcache.app.services import cache_service
 
 
-@webapp.route('/api/upload', methods=['POST'])
+@webapp.route('/api/cache/content', methods=['POST'])
 def put():
     return cache_service.create_cache()
 
 
-@webapp.route('/api/key/<key_value>', methods=['GET'])
-def get(key_value):
-    return cache_service.get_cache(key_value)
-
-
-@webapp.route('/api/config', methods=['GET'])
-def refresh_configuration():
-    return cache_service.get_cache_configuration()
-
-
-@webapp.route('/api/key', methods=['DELETE'])
+@webapp.route('/api/cache', methods=['DELETE'])
 def clear():
     return cache_service.delete_all_cache()
 
 
-@webapp.route('/api/key/<key_value>', methods=['DELETE'])
-def invalidate_key(key_value):
-    return cache_service.delete_specific_cache(key_value)
+@webapp.route('/api/cache/key', methods=['POST'])
+def get():
+    return cache_service.get_cache()
+
+
+@webapp.route('/api/cache/key', methods=['DELETE'])
+def invalidate_key():
+    return cache_service.delete_specific_cache()
