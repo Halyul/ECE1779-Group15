@@ -54,3 +54,6 @@ except mysql.connector.errors.ProgrammingError:
     cursor.execute("RENAME TABLE `{table_name}` TO `{table_name}__old`, `{table_name}__new` TO `{table_name}`".format(table_name=STATUS_TABLE_NAME))
 # Drop status__old table
 cursor.execute("DROP TABLE IF EXISTS `{}__old`".format(STATUS_TABLE_NAME))
+
+# Disconnect from the database
+connection.close()
