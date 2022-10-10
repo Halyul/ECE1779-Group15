@@ -1,10 +1,10 @@
 import json
 import math
 
-from flask import request
+from flask import request, jsonify
 
 from memcache_Shawn.memcache.app import webapp, config
-from memcache_Shawn.memcache.app.db_operations.configurations import get_capacity_in_mb_db
+from memcache_Shawn.memcache.app.db_operations.configurations import get_capacity_in_mb_db, get_replacement_policy_db
 from memcache_Shawn.memcache.app.services.helper import release_cache_memory
 
 
@@ -42,7 +42,7 @@ def get_cache():
 def create_cache():
     key = request.form.get('key')
     value = request.form.get('value')
-    memory = int(get_capacity_in_mb_db())
+    memory = int(config.memcache_config_capacity_in_mb)
 
     # Base 64 conversion, result in MB
     value = value.split("base64,")[1]
@@ -104,3 +104,12 @@ def delete_all_cache():
         mimetype='application/json'
     )
     return response
+
+
+def update_cache_configs():
+    config.memcache_config_capacity_in_mb = get_capacity_in_mb_db()
+    config.memcache_config_replacement_policy = get_replacement_policy_db()
+    return jsonify(
+        capacity_in_mb=config.memcache_config_capacity_in_mb,
+        replacement_policy=config.memcache_config_replacement_policy,
+    )
