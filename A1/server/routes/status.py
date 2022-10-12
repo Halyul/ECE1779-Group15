@@ -15,14 +15,14 @@ def status():
     total_GET_request_served_10mins = int(status[3])
     total_hit_10mins = int(status[4])
     try:
-        hit_rate_10mins = str(round(status[5] / total_GET_request_served_10mins * 100, 2)) + "%"
+        hit_rate_10mins = round(total_hit_10mins / total_GET_request_served_10mins * 100, 2)
+        miss_rate_10mins = str(100 - hit_rate_10mins) + "%"
+        hit_rate_10mins = str(hit_rate_10mins) + "%"
     except ZeroDivisionError:
         hit_rate_10mins = "0%"
-    try:
-        miss_rate_10mins = str(round(status[6] / total_GET_request_served_10mins * 100, 2)) + "%"
-    except ZeroDivisionError:
         miss_rate_10mins = "0%"
-    utilization = str(round(status[7], 2) * 100) + "%"
+
+    utilization = str(round(status[5], 2) * 100) + "%"
 
     return True, 200, dict(
         status=[

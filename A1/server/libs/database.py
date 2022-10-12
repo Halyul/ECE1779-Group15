@@ -46,11 +46,22 @@ class Database:
                        (value, str(key)))
 
     def get_status(self):
-        status_base = self.__fetch_one("SELECT SUM(`cache_nums`), SUM(`used_size`), SUM(`total_request_served`), SUM(`total_GET_request_served`), "
-                            "SUM(`total_hit`), SUM(`hit_rate`), SUM(`miss_rate`) "
-                            "FROM (SELECT * FROM {table_name} ORDER BY `id` DESC LIMIT 120) as `s*`".format(table_name=STATUS_TABLE_NAME))
-        utl = self.__fetch_one("SELECT `utilization` FROM {table_name} ORDER BY `id` DESC LIMIT 1".format(table_name=STATUS_TABLE_NAME))
-        return status_base + utl
+        # status_base = self.__fetch_one("SELECT SUM(`cache_nums`), SUM(`used_size`), SUM(`total_request_served`), SUM(`total_GET_request_served`), "
+                            # "SUM(`total_hit`), SUM(`hit_rate`), SUM(`miss_rate`) "
+                            # "FROM (SELECT * FROM {table_name} ORDER BY `id` DESC LIMIT 120) as `s*`".format(table_name=STATUS_TABLE_NAME))
+        # utl = self.__fetch_one("SELECT `utilization` FROM {table_name} ORDER BY `id` DESC LIMIT 1".format(table_name=STATUS_TABLE_NAME))
+        data = self.__fetch("SELECT `cache_nums`, `used_size`, `total_request_served`, `total_GET_request_served`, `total_hit`, `utilization` "
+                                "FROM {table_name} ORDER BY `id` DESC LIMIT 120;".format(table_name=STATUS_TABLE_NAME))
+        (num_key_added_end, used_size_end, request_served_end, GET_request_served_end, num_hit_end, utl) = data[0]
+        (num_key_added_start, used_size_start, request_served_start, GET_request_served_start, num_hit_start, unused) = data[-1]
+        
+        status_base = (num_key_added_end - num_key_added_start, \
+                       used_size_end - used_size_start, \
+                       request_served_end - request_served_start, \
+                       GET_request_served_end - GET_request_served_start, \
+                       num_hit_end - num_hit_start, \
+                       utl)
+        return status_base
 
     def create_key_image_pair(self, key, image):
         self.__execute(
