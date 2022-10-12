@@ -6,7 +6,7 @@ from memcache import webapp
 import memcache.config as config
 from memcache.libs.cache_operations import get_service, put_service, remove_key_service, \
     refreshConfiguration_service, clear_service, show_info_service
-from memcache.libs.cache_support_func import initialize_5s_varables, update_database_every_5s
+from memcache.libs.cache_support_func import update_database_every_5s
 
 @webapp.route('/api/cache/key',methods=['POST'])
 def get():
@@ -43,7 +43,7 @@ def show_info():
 
 
 # code exicute in the background
-initialize_5s_varables()
+# initialize_5s_varables() # legacy code
 try:
     thread = threading.Thread(target = update_database_every_5s, daemon = True)
     thread.start()

@@ -44,7 +44,6 @@ def invalidateKey(key):
     if key in config.key_list:
         value = config.memcache[key]
         size = file_size(value)
-        statistics.capacity_used_5s = statistics.capacity_used_5s - size
         statistics.used_size = statistics.used_size - size
         del config.memcache[key]
         config.key_list.remove(key)
@@ -59,7 +58,6 @@ def remove_element():
         config.key_list.remove(key)
         size = file_size(value)
         statistics.used_size = statistics.used_size - size
-        statistics.capacity_used_5s = statistics.capacity_used_5s - size
         logging.debug('remove_element - replace policy is ' + config.replace)
         logging.debug('remove_element - key: ' + key + ' with len(value) of ' + str(size) + ' removed from the cache')
         logging.info('remove_element - cache used = ' + str(statistics.used_size))
@@ -71,7 +69,6 @@ def remove_element():
         config.key_list.remove(key)
         size = file_size(value)
         statistics.used_size = statistics.used_size - size
-        statistics.capacity_used_5s = statistics.capacity_used_5s - size
         logging.debug('remove_element - replace policy is ' + config.replace)
         logging.debug('remove_element - key: ' + key + ' with len(value) of ' + str(size) + ' removed from the cache')
         logging.info('remove_element - cache used = ' + str(statistics.used_size))
@@ -93,12 +90,12 @@ def set_parameters(new_config, new_replace):
         return (400, "Invalid replace policy")
     return
 
-def initialize_5s_varables():
-    statistics.item_added_5s = 0
-    statistics.capacity_used_5s= 0
-    statistics.num_request_served_5s = 0
-    statistics.num_GET_request_served_5s = 0
-    statistics.num_hit_5s = 0
+# def initialize_5s_varables():
+    # statistics.item_added_5s = 0
+    # statistics.capacity_used_5s= 0
+    # statistics.num_request_served_5s = 0
+    # statistics.num_GET_request_served_5s = 0
+    # statistics.num_hit_5s = 0
 
 def update_database_every_5s():
     try:
@@ -107,24 +104,24 @@ def update_database_every_5s():
             # total_request_served = data['total_request_served']
             # total_hit = data['total_hit']
             
-            # num_item_in_cache = len(config.memcache)
+            # num_num_item_in_cache = len(config.memcache)
             # total_request_served = total_request_served + statistics.num_request_served_5s
             # total_hit = total_hit + statistics.num_hit_5s
             # if total_request_served != 0:
             #     miss_rate = (total_request_served - total_hit) / total_request_served
             #     hit_rate = total_hit / total_request_served
             #     pre_query = ("UPDATE {} "
-            #                  "SET num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
+            #                  "SET num_num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
             #                  "total_hit = {}, miss_rate = {}, hit_rate = {} "
             #                  "WHERE id = 1;")
-            #     query = pre_query.format(config_info['database']["table_names"]['status'], num_item_in_cache, statistics.used_size, total_request_served, \
+            #     query = pre_query.format(config_info['database']["table_names"]['status'], num_num_item_in_cache, statistics.used_size, total_request_served, \
             #                              total_hit, miss_rate, hit_rate)
             # else:
             #     pre_query = ("UPDATE {} "
-            #                  "SET num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
+            #                  "SET num_num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
             #                  "total_hit = {} "
             #                  "WHERE id = 1;")
-            #     query = pre_query.format(config_info['database']["table_names"]['status'] ,num_item_in_cache, statistics.used_size, total_request_served, \
+            #     query = pre_query.format(config_info['database']["table_names"]['status'] ,num_num_item_in_cache, statistics.used_size, total_request_served, \
             #                              total_hit)
             # db.SQL_command(query)
             
@@ -143,13 +140,13 @@ def update_database_every_5s():
             # SQL_command(query)
             
             utilization = statistics.used_size / config.capacity
-            insert_5s_statistics_to_db(statistics.item_added_5s, statistics.capacity_used_5s, \
-                                     statistics.num_request_served_5s, statistics.num_GET_request_served_5s, \
-                                         statistics.num_GET_request_served_5s - statistics.num_hit_5s, statistics.num_hit_5s, \
+            insert_5s_statistics_to_db(statistics.num_item_in_cache, statistics.used_size, \
+                                     statistics.num_request_served, statistics.num_GET_request_served, \
+                                         statistics.num_GET_request_served - statistics.num_hit, statistics.num_hit, \
                                              utilization)
             
             # initialize varables every 5s
-            initialize_5s_varables()
+            # initialize_5s_varables() # legacy code
             time.sleep(5)
     except Exception as error:
         print(error)
