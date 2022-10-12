@@ -46,8 +46,8 @@ class Database:
                        (value, str(key)))
 
     def get_status(self):
-        return self.__fetch_one("SELECT SUM(`cache_nums`), SUM(`used_size`), SUM(`total_request_served`), "
-                            "SUM(`total_hit`), SUM(`hit_rate`), SUM(`miss_rate`) "
+        return self.__fetch_one("SELECT SUM(`cache_nums`), SUM(`used_size`), SUM(`total_request_served`), SUM(`total_GET_request_served`), "
+                            "SUM(`total_hit`), SUM(`hit_rate`), SUM(`miss_rate`), `utilization` "
                             "FROM (SELECT * FROM {table_name} ORDER BY `id` DESC LIMIT 120) as `s*`".format(table_name=STATUS_TABLE_NAME))
 
     def create_key_image_pair(self, key, image):

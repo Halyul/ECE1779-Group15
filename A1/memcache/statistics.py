@@ -5,4 +5,5 @@ used_size = 0
 item_added_5s = 0
 capacity_used_5s= 0
 num_request_served_5s = 0
+num_GET_request_served_5s = 0
 num_hit_5s = 0

@@ -36,22 +36,22 @@ def get_config_from_db():
 #     data['num_hit_10min'] = db.get_from_table('statistics_10min', 'num_hit')[0][0]
 #     return data
 
-def insert_5s_statistics_to_db(item_added_5s, capacity_used_5s, num_request_served_5s, num_miss_5s, num_hit_5s):
-    if num_request_served_5s != 0:
-        command = ("INSERT INTO {} (cache_nums, used_size, total_request_served, total_hit, miss_rate, hit_rate) "
+def insert_5s_statistics_to_db(item_added_5s, capacity_used_5s, num_request_served_5s, num_GET_request_served_5s, num_miss_5s, num_hit_5s, utilization):
+    if num_GET_request_served_5s != 0:
+        command = ("INSERT INTO {} (cache_nums, used_size, total_request_served, total_GET_request_served, total_hit, miss_rate, hit_rate, utilization) "
+                             "VALUES ({}, {}, {}, {}, {}, {}, {}, {});").format(config_info['database']["table_names"]['status'], \
+                                                                            item_added_5s, \
+                                                                            capacity_used_5s, \
+                                                                                num_request_served_5s, num_GET_request_served_5s, \
+                                                                                    num_hit_5s, num_miss_5s / num_GET_request_served_5s, \
+                                                                                        num_hit_5s / num_GET_request_served_5s, utilization)
+    else:
+        command = ("INSERT INTO {} (cache_nums, used_size, total_request_served, total_GET_request_served, total_hit, utilization) "
                              "VALUES ({}, {}, {}, {}, {}, {});").format(config_info['database']["table_names"]['status'], \
                                                                             item_added_5s, \
                                                                             capacity_used_5s, \
-                                                                                num_request_served_5s, \
-                                                                                    num_hit_5s, num_miss_5s / num_request_served_5s, \
-                                                                                        num_hit_5s / num_request_served_5s)
-    else:
-        command = ("INSERT INTO {} (cache_nums, used_size, total_request_served, total_hit) "
-                             "VALUES ({}, {}, {}, {});").format(config_info['database']["table_names"]['status'], \
-                                                                            item_added_5s, \
-                                                                            capacity_used_5s, \
-                                                                                num_request_served_5s, \
-                                                                                    num_hit_5s)
+                                                                                num_request_served_5s, num_GET_request_served_5s, \
+                                                                                    num_hit_5s, utilization)
     db.SQL_command(command)
     return
 

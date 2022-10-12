@@ -25,11 +25,12 @@ def get_service():
         response = gen_failed_responce(400, "Unknown key")
     
     statistics.num_request_served_5s = statistics.num_request_served_5s + 1
+    statistics.num_GET_request_served_5s = statistics.num_GET_request_served_5s + 1
+
     print(config.key_list)
     return response
 
 def put_service():
-    logging.info("test")
     # check if there is a key
     if request.form.get('key') == '':
         response = gen_failed_responce(400, "Missing key")
@@ -65,6 +66,7 @@ def put_service():
         config.key_list.append(key) # add it to the end of the list
     statistics.item_added_5s = statistics.item_added_5s + 1
     statistics.capacity_used_5s = statistics.capacity_used_5s + size
+    statistics.num_request_served_5s = statistics.num_request_served_5s + 1
     
     logging.debug('put - key: ' + key + ' with len(value) of ' + str(size) + ' added to the cache')
     logging.info('put - cache used = ' + str(statistics.used_size))
@@ -91,6 +93,7 @@ def refreshConfiguration_service():
     new_replacement_policy = data['policy']
     
     (code, msg) = set_parameters(new_capacity, new_replacement_policy)
+    logging.info('refreshConfiguration - capacity = ' + str(config.capacity) + ', replacement policy = ' + config.replace)
     if code == 200:
         # make the correct response
         response = gen_success_responce("")
@@ -134,23 +137,25 @@ def show_info_service():
     
     
     
-    query = ("SELECT cache_nums, used_size, total_request_served, total_hit "
+    query = ("SELECT cache_nums, used_size, total_request_served, total_GET_request_served, total_hit "
              "FROM status ORDER BY id DESC LIMIT 120;")
     data = db.SQL_command(query)
     num_key_added_10min = statistics.item_added_5s
     used_size_10min = statistics.capacity_used_5s
     request_served_10min = statistics.num_request_served_5s
-    num_miss_10min = statistics.num_request_served_5s - statistics.num_hit_5s
+    GET_request_served_10min = statistics.num_GET_request_served_5s
     num_hit_10min = statistics.num_hit_5s
     
-    for (num_key_added_sql, used_size_sql, request_served_sql, num_hit_sql) in data:
+    for (num_key_added_sql, used_size_sql, request_served_sql, GET_request_served_sql, num_hit_sql) in data:
         num_key_added_10min = num_key_added_10min + num_key_added_sql
         used_size_10min = used_size_10min + used_size_sql
         request_served_10min = request_served_10min + request_served_sql
+        GET_request_served_10min = GET_request_served_10min + GET_request_served_sql
         num_hit_10min = num_hit_10min + num_hit_sql
-    if request_served_10min != 0:
-        miss_rate_10min = num_miss_10min / request_served_10min
-        hit_rate_10min = num_hit_10min / request_served_10min
+    if GET_request_served_10min != 0:
+        num_miss_10min = GET_request_served_10min - num_hit_10min
+        miss_rate_10min = num_miss_10min / GET_request_served_10min
+        hit_rate_10min = num_hit_10min / GET_request_served_10min
     else:
         miss_rate_10min = "n/a"
         hit_rate_10min = "n/a"

@@ -40,9 +40,11 @@ cursor.execute("CREATE TABLE IF NOT EXISTS `{}__new` ("
                 "`cache_nums` int NOT NULL,"
                 "`used_size` int NOT NULL,"
                 "`total_request_served` int NOT NULL,"
+                "`total_GET_request_served` int NOT NULL,"
                 "`total_hit` int NOT NULL,"
                 "`miss_rate` float NOT NULL DEFAULT 0,"
                 "`hit_rate` float NOT NULL DEFAULT 0,"
+                "`utilization` float NOT NULL DEFAULT 0,"
                 "PRIMARY KEY (`id`)"
                 ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci".format(STATUS_TABLE_NAME))
 

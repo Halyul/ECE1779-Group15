@@ -97,6 +97,7 @@ def initialize_5s_varables():
     statistics.item_added_5s = 0
     statistics.capacity_used_5s= 0
     statistics.num_request_served_5s = 0
+    statistics.num_GET_request_served_5s = 0
     statistics.num_hit_5s = 0
 
 def update_database_every_5s():
@@ -141,8 +142,11 @@ def update_database_every_5s():
             #                          statistics.num_request_served_5s, statistics.num_request_served_5s - statistics.num_hit_5s, statistics.num_hit_5s)
             # SQL_command(query)
             
+            utilization = statistics.used_size / config.capacity
             insert_5s_statistics_to_db(statistics.item_added_5s, statistics.capacity_used_5s, \
-                                     statistics.num_request_served_5s, statistics.num_request_served_5s - statistics.num_hit_5s, statistics.num_hit_5s)
+                                     statistics.num_request_served_5s, statistics.num_GET_request_served_5s, \
+                                         statistics.num_GET_request_served_5s - statistics.num_hit_5s, statistics.num_hit_5s, \
+                                             utilization)
             
             # initialize varables every 5s
             initialize_5s_varables()
