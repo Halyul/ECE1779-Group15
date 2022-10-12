@@ -18,12 +18,10 @@ def create_key(args):
         4. add/update entry to database
     """
     if " " in args["key"]:
-        return False, 400, dict(
-            message="Key cannot contain spaces"
-        )
+        return False, 400, "Key cannot contain spaces"
     file = args["file"]
     if not file.content_type.startswith("image/"):
-        return False, 400, "Only image file is allowed."
+        return False, 403, "Only image file is allowed."
     file_entry = DB.get_key_image_pair(args["key"])
     if not file_entry:
         filepath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"])
