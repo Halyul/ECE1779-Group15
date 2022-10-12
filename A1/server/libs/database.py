@@ -46,9 +46,11 @@ class Database:
                        (value, str(key)))
 
     def get_status(self):
-        return self.__fetch_one("SELECT SUM(`cache_nums`), SUM(`used_size`), SUM(`total_request_served`), SUM(`total_GET_request_served`), "
-                            "SUM(`total_hit`), SUM(`hit_rate`), SUM(`miss_rate`), `utilization` "
+        status_base = self.__fetch_one("SELECT SUM(`cache_nums`), SUM(`used_size`), SUM(`total_request_served`), SUM(`total_GET_request_served`), "
+                            "SUM(`total_hit`), SUM(`hit_rate`), SUM(`miss_rate`) "
                             "FROM (SELECT * FROM {table_name} ORDER BY `id` DESC LIMIT 120) as `s*`".format(table_name=STATUS_TABLE_NAME))
+        utl = self.__fetch_one("SELECT `utilization` FROM {table_name} ORDER BY `id` DESC LIMIT 1".format(table_name=STATUS_TABLE_NAME))
+        return status_base + utl
 
     def create_key_image_pair(self, key, image):
         self.__execute(

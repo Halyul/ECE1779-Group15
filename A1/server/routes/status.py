@@ -22,7 +22,7 @@ def status():
         miss_rate_10mins = str(round(status[6] / total_GET_request_served_10mins * 100, 2)) + "%"
     except ZeroDivisionError:
         miss_rate_10mins = "0%"
-    utilization = float(status[7])
+    utilization = str(round(status[7], 2) * 100) + "%"
 
     return True, 200, dict(
         status=[
