@@ -69,7 +69,7 @@ export default function Image() {
           <TooltipOnError
             open={keyError}
             handleClose={() => setKeyError(false)}
-            title="Please enter a key wihtout spaces"
+            title="Please enter a key wihtout spaces. More than 48 characters are NOT allowed."
             body={
               <TextField
                 id="image-text-field"
@@ -82,7 +82,7 @@ export default function Image() {
                 error={keyError}
                 value={keyValue}
                 onChange={(e) => {
-                  if (e.target.value.includes(" ")) {
+                  if (e.target.value.includes(" ") || e.target.value.length > 48) {
                     setKeyError(true);
                   } else {
                     setKeyValue(e.target.value);
@@ -98,7 +98,7 @@ export default function Image() {
             size="small"
             type="submit"
             onClick={(e) => {
-              if (keyValue === "") {
+              if (keyValue === "" || keyValue.includes(" ") || keyValue.length > 48) {
                 setKeyError(true);
                 e.preventDefault();
               }

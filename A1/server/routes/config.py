@@ -35,7 +35,8 @@ def set_config(args):
     if args["policy"]:
         DB.set_config("policy", args["policy"])
     if args["capacity"]:
-        DB.set_config("capacity", args["capacity"])
+        if 0 <= args["capacity"] <= 2048:
+            DB.set_config("capacity", args["capacity"])
     ThreadTask(
         requests.get,
         kwargs=dict(

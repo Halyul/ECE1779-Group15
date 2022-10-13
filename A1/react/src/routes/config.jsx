@@ -63,7 +63,7 @@ export default function Config() {
                 <TooltipOnError
                   open={capacityError}
                   handleClose={() => setCapacityError(false)}
-                  title="Please enter a positive integer."
+                  title="Range: 0-2048 MB"
                   body={
                     <TextField
                       id="config-form-capacity"
@@ -75,8 +75,10 @@ export default function Config() {
                       onChange={(e) => {
                         try {
                           const value = parseInt(e.target.value);
-                          setCapacity(value || "");
-                          if (value >= 0) {
+                          setCapacity(value < 0 ? "" : (
+                            isNaN(value) ? "" : value
+                          ));
+                          if (value >= 0 && value <= 2048) {
                             setCapacityError(false);
                           } else {
                             setCapacityError(true);
@@ -135,7 +137,7 @@ export default function Config() {
               size="small"
               type="submit"
               onClick={(e) => {
-                if (capacity < 0) {
+                if (capacity < 0 || capacity > 2048 || capacity === "") {
                   setCapacityError(true);
                   e.preventDefault();
                 }

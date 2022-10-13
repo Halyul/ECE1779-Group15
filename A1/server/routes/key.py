@@ -17,8 +17,8 @@ def create_key(args):
         3. invalidate cache
         4. add/update entry to database
     """
-    if " " in args["key"]:
-        return False, 400, "Key cannot contain spaces"
+    if " " in args["key"] or "" == args["key"] or len(args["key"]) > 48:
+        return False, 400, "Key does not meet the requirement."
     file = args["file"]
     if not file.content_type.startswith("image/"):
         return False, 403, "Only image file is allowed."
@@ -51,6 +51,8 @@ def get_key(key):
         4. If key-image pair exists, get the image from local storage, convert to base64 and response to both webpage and cache
         5. If key-image pair does not exist, return 404 
     """
+    if " " in key or "" == key or len(key) > 48:
+        return False, 400, "Key does not meet the requirement."
     try:
         response = requests.post(CACHE_URL + "/api/cache/key", data=[("key", key)]).json()
         content = response["content"]
