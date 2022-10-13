@@ -3,10 +3,8 @@ import pathlib, base64, time
 from server.config import Config
 from server.libs.database import Database
 from server.libs.thread_task import ThreadTask
-import json
 import requests
 
-DB = Database()
 CONFIG = Config().fetch()
 CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
 
@@ -22,14 +20,14 @@ def create_key(args):
     file = args["file"]
     if not file.content_type.startswith("image/"):
         return False, 403, "Only image file is allowed."
-    file_entry = DB.get_key_image_pair(args["key"])
+    file_entry = Database().get_key_image_pair(args["key"])
     if not file_entry:
         filepath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"])
         filepath.mkdir(parents=True, exist_ok=True)
         file_ext = file.filename.split(".")[-1]
         filename = "{}.{}".format(str(int(time.time() * 1000)), file_ext)
         file_fullpath = filepath.joinpath(filename)
-        DB.create_key_image_pair(args["key"], filename)
+        Database().create_key_image_pair(args["key"], filename)
     else:
         file_fullpath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], file_entry[0])
         # invalidate the key in the memcache
@@ -60,7 +58,7 @@ def get_key(key):
             content=content
         )
     except Exception as e:
-        key_image_pair = DB.get_key_image_pair(key)
+        key_image_pair = Database().get_key_image_pair(key)
         if key_image_pair is None:
             return False, 404, "No such key."
         content = None
@@ -85,7 +83,7 @@ def list_keys():
     """
         1. List all keys in the database
     """
-    keys_entries = DB.get_keys()
+    keys_entries = Database().get_keys()
     return True, 200, dict(
         keys=[e[0] for e in keys_entries]
     )

@@ -3,7 +3,6 @@ from server.libs.database import Database
 from server.libs.thread_task import ThreadTask
 import requests
 
-DB = Database()
 CONFIG = Config().fetch()
 CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
 
@@ -33,10 +32,10 @@ def set_config(args):
             )
         ).start()
     if args["policy"]:
-        DB.set_config("policy", args["policy"])
+        Database().set_config("policy", args["policy"])
     if args["capacity"]:
         if 0 <= args["capacity"] <= 2048:
-            DB.set_config("capacity", args["capacity"])
+            Database().set_config("capacity", args["capacity"])
     ThreadTask(
         requests.get,
         kwargs=dict(
@@ -48,7 +47,7 @@ def set_config(args):
     )
 
 def __serialize_config():
-    config_entries = DB.get_config()
+    config_entries = Database().get_config()
     config = {
         "policy": None,
         "capacity": None
