@@ -139,7 +139,7 @@ def update_database_every_5s():
             #                          statistics.num_request_served_5s, statistics.num_request_served_5s - statistics.num_hit_5s, statistics.num_hit_5s)
             # SQL_command(query)
             
-            utilization = statistics.used_size / config.capacity
+            utilization = statistics.used_size / config.capacity if config.capacity != 0 else 0
             insert_5s_statistics_to_db(statistics.num_item_in_cache, statistics.used_size, \
                                      statistics.num_request_served, statistics.num_GET_request_served, \
                                          statistics.num_GET_request_served - statistics.num_hit, statistics.num_hit, \

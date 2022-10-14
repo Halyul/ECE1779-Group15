@@ -24,16 +24,16 @@ def set_config(args):
         1. save the config to database
         2. notify the config changes
     """
-    if args["clear_cache"]:
+    if "clear_cache" in args:
         ThreadTask(
             requests.delete, 
             kwargs=dict(
                 url = CACHE_URL + "/api/cache",
             )
         ).start()
-    if args["policy"]:
+    if "policy" in args:
         Database().set_config("policy", args["policy"])
-    if args["capacity"]:
+    if "capacity" in args:
         if 0 <= args["capacity"] <= 2048:
             Database().set_config("capacity", args["capacity"])
     ThreadTask(
