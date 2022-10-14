@@ -62,10 +62,14 @@ except mysql.connector.errors.ProgrammingError:
 # Drop status__old table
 cursor.execute("DROP TABLE IF EXISTS `{}__old`".format(STATUS_TABLE_NAME))
 
-# Create default config
-cursor.execute("INSERT INTO `{table_name}` (`key`, `value`) VALUES (%s, %s)".format(table_name=CONFIG_TABLE_NAME),("policy", "rr"))
-cursor.execute("INSERT INTO `{table_name}` (`key`, `value`) VALUES (%s, %s)".format(table_name=CONFIG_TABLE_NAME),("capacity", "100"))
-connection.commit()
+# Check default config
+cursor.execute("SELECT `key`, `value` FROM {}".format(CONFIG_TABLE_NAME))
+config = cursor.fetchall()
+if len(config) == 0:
+    # Create default config
+    cursor.execute("INSERT INTO `{table_name}` (`key`, `value`) VALUES (%s, %s)".format(table_name=CONFIG_TABLE_NAME),("policy", "rr"))
+    cursor.execute("INSERT INTO `{table_name}` (`key`, `value`) VALUES (%s, %s)".format(table_name=CONFIG_TABLE_NAME),("capacity", "100"))
+    connection.commit()
 
 # Disconnect from the database
 connection.close()
