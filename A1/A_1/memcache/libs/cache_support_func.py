@@ -45,6 +45,7 @@ def invalidateKey(key):
         value = config.memcache[key]
         size = file_size(value)
         statistics.used_size = statistics.used_size - size
+        statistics.num_item_in_cache = statistics.num_item_in_cache - 1
         del config.memcache[key]
         config.key_list.remove(key)
     else:
@@ -58,6 +59,7 @@ def remove_element():
         config.key_list.remove(key)
         size = file_size(value)
         statistics.used_size = statistics.used_size - size
+        statistics.num_item_in_cache = statistics.num_item_in_cache - 1
         logging.debug('remove_element - replace policy is ' + config.replace)
         logging.debug('remove_element - key: ' + key + ' with len(value) of ' + str(size) + ' removed from the cache')
         logging.info('remove_element - cache used = ' + str(statistics.used_size))
@@ -69,6 +71,7 @@ def remove_element():
         config.key_list.remove(key)
         size = file_size(value)
         statistics.used_size = statistics.used_size - size
+        statistics.num_item_in_cache = statistics.num_item_in_cache - 1
         logging.debug('remove_element - replace policy is ' + config.replace)
         logging.debug('remove_element - key: ' + key + ' with len(value) of ' + str(size) + ' removed from the cache')
         logging.info('remove_element - cache used = ' + str(statistics.used_size))
