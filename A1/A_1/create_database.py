@@ -12,11 +12,16 @@ connection = mysql.connector.connect(
     port=CONFIG["port"],
     user=CONFIG["user"],
     password=CONFIG["password"],
-    database=CONFIG["name"]
 )
 
 # Create a cursor
 cursor = connection.cursor()
+
+# Create database
+cursor.execute("CREATE DATABASE IF NOT EXISTS {}".format(CONFIG["name"]))
+
+# Use database
+cursor.execute("USE {}".format(CONFIG["name"]))
 
 # Create key_image table
 cursor.execute("CREATE TABLE IF NOT EXISTS `{}` ("
@@ -56,6 +61,11 @@ except mysql.connector.errors.ProgrammingError:
     cursor.execute("RENAME TABLE `{table_name}` TO `{table_name}__old`, `{table_name}__new` TO `{table_name}`".format(table_name=STATUS_TABLE_NAME))
 # Drop status__old table
 cursor.execute("DROP TABLE IF EXISTS `{}__old`".format(STATUS_TABLE_NAME))
+
+# Create default config
+cursor.execute("INSERT INTO `{table_name}` (`key`, `value`) VALUES (%s, %s)".format(table_name=CONFIG_TABLE_NAME),("policy", "rr"))
+cursor.execute("INSERT INTO `{table_name}` (`key`, `value`) VALUES (%s, %s)".format(table_name=CONFIG_TABLE_NAME),("capacity", "100"))
+connection.commit()
 
 # Disconnect from the database
 connection.close()

@@ -17,7 +17,6 @@ class Database:
         self.connection = None
         self.cursor = None
         self.__connect()
-        self.__create_default_config()
 
     def __connect(self):
         self.connection = mysql.connector.connect(
@@ -29,15 +28,6 @@ class Database:
         )
         self.cursor = self.connection.cursor()
 
-    def __create_default_config(self):
-        if not self.get_config():
-            self.__execute(
-                "INSERT INTO `{table_name}` (`key`, `value`) VALUES (%s, %s)".format(table_name=CONFIG_TABLE_NAME),
-                ("policy", "rr"))
-            self.__execute(
-                "INSERT INTO `{table_name}` (`key`, `value`) VALUES (%s, %s)".format(table_name=CONFIG_TABLE_NAME),
-                ("capacity", "100"))
-
     def get_config(self):
         return self.__fetch("SELECT `key`, `value` FROM {}".format(CONFIG_TABLE_NAME))
 
@@ -46,10 +36,6 @@ class Database:
                        (value, str(key)))
 
     def get_status(self):
-        # status_base = self.__fetch_one("SELECT SUM(`cache_nums`), SUM(`used_size`), SUM(`total_request_served`), SUM(`total_GET_request_served`), "
-                            # "SUM(`total_hit`), SUM(`hit_rate`), SUM(`miss_rate`) "
-                            # "FROM (SELECT * FROM {table_name} ORDER BY `id` DESC LIMIT 120) as `s*`".format(table_name=STATUS_TABLE_NAME))
-        # utl = self.__fetch_one("SELECT `utilization` FROM {table_name} ORDER BY `id` DESC LIMIT 1".format(table_name=STATUS_TABLE_NAME))
         data = self.__fetch("SELECT `cache_nums`, `used_size`, `total_request_served`, `total_GET_request_served`, `total_hit`, `utilization` "
                                 "FROM {table_name} ORDER BY `id` DESC LIMIT 120;".format(table_name=STATUS_TABLE_NAME))
         (num_key_added_end, used_size_end, request_served_end, GET_request_served_end, num_hit_end, utl) = data[0]
