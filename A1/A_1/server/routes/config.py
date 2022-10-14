@@ -24,7 +24,7 @@ def set_config(args):
         1. save the config to database
         2. notify the config changes
     """
-    if "clear_cache" in args:
+    if "clear_cache" in args and args["clear_cache"]:
         ThreadTask(
             requests.delete, 
             kwargs=dict(
