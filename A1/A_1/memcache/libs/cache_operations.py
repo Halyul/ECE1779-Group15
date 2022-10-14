@@ -105,6 +105,7 @@ def clear_service():
     config.memcache = {}
     config.key_list = []
     statistics.used_size = 0
+    statistics.num_item_in_cache = 0
     logging.debug('CLEAR - cache cleared')
     
     # make the correct response
