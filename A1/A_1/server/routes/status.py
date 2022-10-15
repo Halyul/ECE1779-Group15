@@ -26,11 +26,11 @@ def status():
 
     return True, 200, dict(
         status=[
-            {"name": "The number of items in cache", "value": cache_nums_10mins},
-            {"name": "Cache memory used", "value": used_size_10mins},
-            {"name": "The number of cache request", "value": total_request_served_10mins},
-            {"name": "The number of cache GET request", "value": total_GET_request_served_10mins},
-            {"name": "The number of hit", "value": total_hit_10mins},
+            {"name": "Cache items changes", "value": cache_nums_10mins},
+            {"name": "Cache usage changes", "value": used_size_10mins},
+            {"name": "Cache request changes", "value": total_request_served_10mins},
+            {"name": "Cache GET request changes", "value": total_GET_request_served_10mins},
+            {"name": "Cache hit changes", "value": total_hit_10mins},
             {"name": "Hit rate", "value": hit_rate_10mins},
             {"name": "Miss rate", "value": miss_rate_10mins},
             {"name": "Utilization", "value": utilization},

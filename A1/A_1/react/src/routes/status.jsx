@@ -33,6 +33,7 @@ export default function Status() {
     <>
       <RefreshCard
         title="Status"
+        subtitle="The status changes in last 10 minutes of the system"
         body={
           statusList.length > 0 ? (
             <Box sx={{ height: "61.8vh", maxHeight: 768 }}>

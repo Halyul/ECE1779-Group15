@@ -44,6 +44,7 @@ export function RefreshCard(props) {
             </IconButton>
           }
           title={props.title}
+          subheader={props.subtitle}
         />
       </Form>
       <CardContent>{props.body}</CardContent>
