@@ -7,6 +7,7 @@ import requests
 
 CONFIG = Config().fetch()
 CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
+KEY_IMAGE_TABLE_NAME = CONFIG["database"]["table_names"]["key_image"]
 
 def create_key(args):
     """
@@ -20,14 +21,16 @@ def create_key(args):
     file = args["file"]
     if not file.content_type.startswith("image/"):
         return False, 403, "Only image file is allowed."
-    file_entry = Database().get_key_image_pair(args["key"])
+    database = Database()
+    database.lock(table=KEY_IMAGE_TABLE_NAME)
+    file_entry = database.get_key_image_pair(args["key"])
     if not file_entry:
         filepath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"])
         filepath.mkdir(parents=True, exist_ok=True)
         file_ext = file.filename.split(".")[-1]
         filename = "{}.{}".format(str(int(time.time() * 1000)), file_ext)
         file_fullpath = filepath.joinpath(filename)
-        Database().create_key_image_pair(args["key"], filename)
+        database.create_key_image_pair(args["key"], filename)
     else:
         file_fullpath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], file_entry[0])
         # invalidate the key in the memcache
@@ -39,6 +42,7 @@ def create_key(args):
             )
         ).start()
     file.save(file_fullpath)
+    database.unlock()
     return True, 200, None
 
 def get_key(key):
@@ -58,8 +62,11 @@ def get_key(key):
             content=content
         )
     except Exception as e:
-        key_image_pair = Database().get_key_image_pair(key)
+        database = Database()
+        database.lock(table=KEY_IMAGE_TABLE_NAME)
+        key_image_pair = database.get_key_image_pair(key)
         if key_image_pair is None:
+            database.unlock()
             return False, 404, "No such key."
         content = None
         filepath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], key_image_pair[0])
@@ -75,6 +82,7 @@ def get_key(key):
                 data = [('key', key), ('value', content)]
             )
         ).start()
+        database.unlock()
         return True, 200, dict(
             content=content
         )
@@ -83,7 +91,10 @@ def list_keys():
     """
         1. List all keys in the database
     """
-    keys_entries = Database().get_keys()
+    database = Database()
+    database.lock(table=KEY_IMAGE_TABLE_NAME)
+    keys_entries = database.get_keys()
+    database.unlock()
     return True, 200, dict(
         keys=[e[0] for e in keys_entries]
     )

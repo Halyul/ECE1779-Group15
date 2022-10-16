@@ -5,6 +5,7 @@ import requests
 
 CONFIG = Config().fetch()
 CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
+CONFIG_TABLE_NAME = CONFIG["database"]["table_names"]["config"]
 
 # speical accommodations for the cache server
 ThreadTask(
@@ -24,6 +25,8 @@ def set_config(args):
         1. save the config to database
         2. notify the config changes
     """
+    database = Database()
+    database.lock(table=CONFIG_TABLE_NAME)
     if "clear_cache" in args and args["clear_cache"]:
         ThreadTask(
             requests.delete, 
@@ -32,22 +35,26 @@ def set_config(args):
             )
         ).start()
     if "policy" in args:
-        Database().set_config("policy", args["policy"])
+        database.set_config("policy", args["policy"])
     if "capacity" in args:
         if 0 <= args["capacity"] <= 2048:
-            Database().set_config("capacity", args["capacity"])
+            database.set_config("capacity", args["capacity"])
     ThreadTask(
         requests.get,
         kwargs=dict(
             url = CACHE_URL + "/api/cache/config",
         )
     ).start()
+    database.unlock()
     return True, 200, dict(
         config=__serialize_config()
     )
 
 def __serialize_config():
-    config_entries = Database().get_config()
+    database = Database()
+    database.lock(table=CONFIG_TABLE_NAME)
+    config_entries = database.get_config()
+    database.unlock()
     config = {
         "policy": None,
         "capacity": None

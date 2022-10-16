@@ -1,3 +1,4 @@
+from enum import Enum
 import mysql.connector
 from server.config import Config
 
@@ -5,6 +6,10 @@ CONFIG = Config().fetch()["database"]
 CONFIG_TABLE_NAME = CONFIG["table_names"]["config"]
 KEY_IMAGE_TABLE_NAME = CONFIG["table_names"]["key_image"]
 STATUS_TABLE_NAME = CONFIG["table_names"]["status"]
+
+class Mode(Enum):
+    WRITE = 1
+    READ = 0
 
 class Database:
 
@@ -39,7 +44,7 @@ class Database:
         data = self.__fetch("SELECT `cache_nums`, `used_size`, `total_request_served`, `total_GET_request_served`, `total_hit`, `utilization` "
                                 "FROM {table_name} ORDER BY `id` DESC LIMIT 120;".format(table_name=STATUS_TABLE_NAME))
         (num_key_added_end, used_size_end, request_served_end, GET_request_served_end, num_hit_end, utl) = data[0]
-        (num_key_added_start, used_size_start, request_served_start, GET_request_served_start, num_hit_start, unused) = data[-1]
+        (num_key_added_start, used_size_start, request_served_start, GET_request_served_start, num_hit_start, _) = data[-1]
         
         status_base = (num_key_added_end - num_key_added_start, \
                        used_size_end - used_size_start, \
@@ -60,6 +65,12 @@ class Database:
 
     def get_keys(self):
         return self.__fetch("SELECT `key` FROM {table_name}".format(table_name=KEY_IMAGE_TABLE_NAME))
+    
+    def lock(self, table, mode=Mode.WRITE):
+        self.__execute("LOCK TABLES `{table_name}` {mode}".format(table_name=table, mode="WRITE" if mode == Mode.WRITE else "READ"))
+    
+    def unlock(self):
+        self.__execute("UNLOCK TABLES")
 
     def __disconnect(self):
         self.connection.close()

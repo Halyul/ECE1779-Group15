@@ -1,10 +1,16 @@
 from server.libs.database import Database
+from server.config import Config
+CONFIG = Config().fetch()
+STATUS_TABLE_NAME = CONFIG["database"]["table_names"]["status"]
 
 def status():
     """
         1. get status from database
     """
-    status = Database().get_status()
+    database = Database()
+    database.lock(table=STATUS_TABLE_NAME)
+    status = database.get_status()
+    database.unlock()
     if None in status: # empty status
         return True, 200, dict(
             status=[]
