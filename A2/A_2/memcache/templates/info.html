@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<head>
+    <title>Very simple memcache</title>
+</head>
+<html>
+    <body>
+        <h1>Memcache info page</h1>
+		<p>
+        	<h2>config info</h2>
+            capacity = {{capacity}} bytes
+            <br>replacement policy = {{replacement_policy}}
+
+            <h2>long-term info</h2>
+            number of keys in cache = {{total_num_item_in_cache}}
+            <br>used size = {{total_used_size}} bytes
+            <br>total request served = {{total_request_served}}
+            <br>total hit = {{total_hit}}
+            <br>miss rate = {{total_miss_rate}}
+            <br>hit rate = {{total_hit_rate}}
+
+            <h2>recent 10min info</h2>
+            number of keys added = {{num_key_added_10min}}
+            <br>capacity recently used = {{used_size_10min}} bytes (count for both add and remove keys)
+            <br>request served = {{request_served_10min}} (count only for getting keys)
+            <br>miss rate = {{miss_rate_10min}}
+            <br>hit rate = {{hit_rate_10min}}
+        </p>
+        
+    <body>    
+</html>
