@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<head>
+    <title>auto_scaler</title>
+</head>
+<html>
+    <body>
+        <h1>auto_scaler info page</h1>
+		<p>
+        	<h2>config info</h2>
+            auto_mode = {{data['auto_mode']}}
+            <br>current miss rate = {{data['miss_rate']}}
+            <br>max miss rate threshold = {{data['max_miss_rate_threshold']}}
+            <br>min miss rate threshold = {{data['min_miss_rate_threshold']}}
+            <br>expand ratio = {{data['expand_ratio']}}
+            <br>shrink ratio = {{data['shrink_ratio']}}
+            
+            <h2>pool info</h2>
+            current cache pool size = {{data['cache_pool_size']}}
+            <br>cache nodes info:
+            {% for instance in instances %}
+                <br><br>id = {{instance['id']}}, address = {{instance['address']}}
+            {% endfor %}
+            
+            <br>
+            <form action="{{ url_for('terminate_all')}}" method="post">
+                <input type="submit" value="terminate all nodes" />
+            </form>
+        </p>
+        
+    <body>    
+</html>

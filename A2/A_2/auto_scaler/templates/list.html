@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<head>
+    <title>auto_scaler</title>
+</head>
+<html>
+    <body>
+        <h1>auto_scaler ec2 list page</h1>
+        
+         <table/>
+         <thead>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Availability Zone</th>
+            <th>Status</th>
+     	   <th>IP Address</th>
+         </thead> 
+         {% for instance in instances %}
+             <tr>
+                 <td>{{ instance.id }}</td>
+                 <td>{{ instance.instance_type }}</td>
+                 <td>{{ instance.placement['AvailabilityZone']}}</td>
+                 <td>{{ instance.state['Name'] }}</td>
+     			 <td>{{ instance.public_ip_address }}</td>
+             </tr>
+         {% endfor %}
+         </table>
+            
+    <body>
+</html>
