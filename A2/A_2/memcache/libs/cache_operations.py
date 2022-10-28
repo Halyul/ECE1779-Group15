@@ -1,5 +1,6 @@
 from flask import render_template, request
 import logging
+import json
 
 import sys
 sys.path.append("../..") 
@@ -111,6 +112,16 @@ def clear_service():
     # make the correct response
     response = gen_success_responce("")
     
+    return response
+
+def send_stats_service():
+    data = {}
+    data['used_size'] = statistics.used_size
+    data['num_item_in_cache'] = statistics.num_item_in_cache
+    data['num_request_served'] = statistics.num_request_served
+    data['num_GET_request_served'] = statistics.num_GET_request_served
+    data['num_hit'] = statistics.num_hit
+    response = gen_success_responce(json.dumps(data))
     return response
 
 # for testing only
