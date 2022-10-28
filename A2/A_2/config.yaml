@@ -19,3 +19,13 @@ database:
 cache:
   host: 127.0.0.1
   port: 5001
+  
+aws:
+  private_key_file: C:/Users/13698/.ssh/ece1779_assignment1_keypair.pem
+  ami_id: ami-080ff70d8f5b80ba5
+  subnet_id: subnet-005acfeb3976436cd
+  security_group_id: sg-0b51a4f8399515236
+  ssh_key_name: ece1779_assignment1_keypair
+
+github:
+  access_token: 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

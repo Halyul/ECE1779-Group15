@@ -23,6 +23,11 @@ config_info = setup_config.fetch()
 cache_port = config_info['cache']['port']
 
 # aws configs
-ami_id = 'ami-0a1a1906efbd4c711'
-subnet_id = 'subnet-005acfeb3976436cd'
-security_group_id = 'sg-0b51a4f8399515236'
+ami_id = config_info['aws']['ami_id']
+subnet_id = config_info['aws']['subnet_id']
+security_group_id = config_info['aws']['security_group_id']
+ssh_key_name = config_info['aws']['ssh_key_name']
+private_key_file = config_info['aws']['private_key_file']
+
+# github
+github_access_token = config_info['github']['access_token']

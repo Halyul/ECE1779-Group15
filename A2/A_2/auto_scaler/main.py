@@ -29,7 +29,7 @@ def terminate_all():
 def list_cache():
     return responce_list_cache()
 
-# initialization()
+initialization()
 # code exicute in the background
 try:
     thread = threading.Thread(target = check_miss_rate_every_min, daemon = True)
