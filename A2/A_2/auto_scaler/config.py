@@ -4,18 +4,22 @@ import sys
 sys.path.append("..") 
 import server.config
 
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.INFO)
 max_miss_rate_threshold = 0.8
 min_miss_rate_threshold = 0.4
 expand_ratio = 1.5
 shrink_ratio = 1.5
 
 cache_pool_size = 0 # size can be from 1 to 8
-cache_pool_ids = []
+cache_pool_ids = [] # keeps a list of ids, can be used to look up the ip address, or find out the cache node index
 
 auto_mode = True
 
 stop_threads = False
+
+# cache config
+capacity = 1 # in MB
+replacement_policy = 'rr'
 
 # read the setup config from the yaml file
 setup_config = server.config.Config()

@@ -48,7 +48,7 @@ def responce_refresh_config():
 def check_miss_rate_every_min():
     miss_rate = get_miss_rate()
     
-    if config.auto_mode == True:
+    if config.auto_mode == True and miss_rate != 'n/a':
         if miss_rate < config.min_miss_rate_threshold:
             expected_pool_size = get_cache_pool_size() / config.shrink_ratio
         elif miss_rate > config.max_miss_rate_threshold:
