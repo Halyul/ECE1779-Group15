@@ -44,8 +44,8 @@ def add_cache_node():
     instance = ec2_create()
     statistics.node_running[instance.id] = False
     
-    thread = threading.Thread(target = run_cache_update_status, kwargs={'id' : instance.id}, daemon = True)
-    thread.start()
+    # thread = threading.Thread(target = run_cache_update_status, kwargs={'id' : instance.id}, daemon = True)
+    # thread.start()
     
     config.cache_pool_size += 1
     config.cache_pool_ids.append(instance.id)
@@ -146,9 +146,9 @@ def get_miss_rate(manully_triggered = False):
             if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
                 addr = ec2_get_instance_ip(config.cache_pool_ids[i])
                 if i == 0:
-                    response = requests.get("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', total_hit)])
+                    response = requests.post("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', total_hit)])
                 else:
-                    response = requests.get("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', 0)])
+                    response = requests.post("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', 0)])
         # start calculating the miss rate
         if total_get_request == 0:
             return 'n/a'
