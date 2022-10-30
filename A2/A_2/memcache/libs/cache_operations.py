@@ -9,7 +9,6 @@ import memcache.statistics as statistics
 
 from memcache.libs.cache_support_func import gen_failed_responce, invalidateKey, remove_element, \
     set_parameters, gen_success_responce, file_size
-from memcache.libs.db_operations import db, get_config_from_db
 
 def get_service():
     key = request.form.get('key')
@@ -88,9 +87,11 @@ def remove_key_service():
 # to read mem-cache related details from the database and reconfigure it based 
 # on the values set by the user
 def refreshConfiguration_service():
-    data = get_config_from_db()
-    new_capacity = data['capacity']
-    new_replacement_policy = data['policy']
+    new_capacity = int(request.form.get('capacity'))
+    new_replacement_policy = request.form.get('replacement_policy')
+    config.cache_index = int(request.form.get('cache_index'))
+
+    logging.info(new_capacity, new_replacement_policy, config.cache_index)
     
     (code, msg) = set_parameters(new_capacity, new_replacement_policy)
     logging.info('refreshConfiguration - capacity = ' + str(config.capacity) + ', replacement policy = ' + config.replace)
@@ -126,17 +127,12 @@ def send_stats_service():
 
 # for testing only
 def show_info_service():
-    query = ("SELECT cache_nums, used_size, total_request_served, total_GET_request_served, total_hit "
-             "FROM status ORDER BY id DESC LIMIT 120;")
-    data = db.SQL_command(query)
-    
-    (num_key_added_end, used_size_end, request_served_end, GET_request_served_end, num_hit_end) = data[0]
-    (num_key_added_start, used_size_start, request_served_start, GET_request_served_start, num_hit_start) = data[-1]
-    num_key_added_10min = num_key_added_end - num_key_added_start
-    used_size_10min = used_size_end - used_size_start
-    request_served_10min = request_served_end - request_served_start
-    GET_request_served_10min = GET_request_served_end - GET_request_served_start
-    num_hit_10min = num_hit_end - num_hit_start
+    num_key_added_10min = statistics.statistics_10min['num_item_in_cache']
+    used_size_10min = statistics.statistics_10min['used_size']
+    request_served_10min = statistics.statistics_10min['num_request_served']
+    GET_request_served_10min = statistics.statistics_10min['num_GET_request_served']
+    num_hit_10min = statistics.statistics_10min['num_hit']
+
     if GET_request_served_10min != 0:
         hit_rate_10min = num_hit_10min / GET_request_served_10min
         miss_rate_10min = 1 - hit_rate_10min

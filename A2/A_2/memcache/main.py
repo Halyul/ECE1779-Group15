@@ -20,7 +20,7 @@ def put():
 def remove_key():
     return remove_key_service()
 
-@webapp.route('/api/cache/config',methods=['GET'])
+@webapp.route('/api/cache/config',methods=['POST'])
 def refreshConfiguration():
     return refreshConfiguration_service()
 

@@ -10,7 +10,7 @@ from memcache import webapp
 import memcache.config as config
 import memcache.statistics as statistics
 
-from memcache.libs.db_operations import db, insert_5s_statistics_to_db, config_info
+from memcache.libs.cloudwatch_lib import my_put_metric_data
 
 def gen_failed_responce(code, message):
     json_response = {
@@ -93,67 +93,58 @@ def set_parameters(new_config, new_replace):
         return (400, "Invalid replace policy")
     return
 
-# def initialize_5s_varables():
-    # statistics.item_added_5s = 0
-    # statistics.capacity_used_5s= 0
-    # statistics.num_request_served_5s = 0
-    # statistics.num_GET_request_served_5s = 0
-    # statistics.num_hit_5s = 0
-
 def update_database_every_5s():
     try:
         while(config.stop_threads == False):
-            # data = get_statistics_from_db()
-            # total_request_served = data['total_request_served']
-            # total_hit = data['total_hit']
-            
-            # num_num_item_in_cache = len(config.memcache)
-            # total_request_served = total_request_served + statistics.num_request_served_5s
-            # total_hit = total_hit + statistics.num_hit_5s
-            # if total_request_served != 0:
-            #     miss_rate = (total_request_served - total_hit) / total_request_served
-            #     hit_rate = total_hit / total_request_served
-            #     pre_query = ("UPDATE {} "
-            #                  "SET num_num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
-            #                  "total_hit = {}, miss_rate = {}, hit_rate = {} "
-            #                  "WHERE id = 1;")
-            #     query = pre_query.format(config_info['database']["table_names"]['status'], num_num_item_in_cache, statistics.used_size, total_request_served, \
-            #                              total_hit, miss_rate, hit_rate)
-            # else:
-            #     pre_query = ("UPDATE {} "
-            #                  "SET num_num_item_in_cache = {}, used_size = {}, total_request_served = {}, "
-            #                  "total_hit = {} "
-            #                  "WHERE id = 1;")
-            #     query = pre_query.format(config_info['database']["table_names"]['status'] ,num_num_item_in_cache, statistics.used_size, total_request_served, \
-            #                              total_hit)
-            # db.SQL_command(query)
-            
-            # update statistics for last 5s (this table will be used for 'last 10min statistics')
-            # now = datetime.now()
-            # current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-            # prev_time = now - timedelta(minutes = 10)
-            # prev_time = prev_time.strftime("%Y-%m-%d %H:%M:%S")
-            
-            # delete_5s_statistics_from_db(prev_time)
-            
-            # pre_query = ("INSERT INTO statistics_10min (time, num_item_added, capacity_used, num_request_served, num_miss, num_hit) "
-            #              "VALUES (\'{}\', {}, {}, {}, {}, {});")
-            # query = pre_query.format(current_time, statistics.item_added_5s, statistics.capacity_used_5s, \
-            #                          statistics.num_request_served_5s, statistics.num_request_served_5s - statistics.num_hit_5s, statistics.num_hit_5s)
-            # SQL_command(query)
-            
             utilization = statistics.used_size / config.capacity if config.capacity != 0 else 0
-            insert_5s_statistics_to_db(statistics.num_item_in_cache, statistics.used_size, \
-                                     statistics.num_request_served, statistics.num_GET_request_served, \
-                                         statistics.num_GET_request_served - statistics.num_hit, statistics.num_hit, \
-                                             utilization)
+
+            curr_statistics = {}
+            curr_statistics['num_item_in_cache'] = statistics.num_item_in_cache
+            curr_statistics['used_size'] = statistics.used_size
+            curr_statistics['num_request_served'] = statistics.num_request_served
+            curr_statistics['num_GET_request_served'] = statistics.num_GET_request_served
+            curr_statistics['num_hit'] = statistics.num_hit
+
+            if len(statistics.prev_statistics_every_5s) < 120:
+                statistics.prev_statistics_every_5s.append(curr_statistics)
+            else:
+                statistics.prev_statistics_every_5s.pop(0)
+                statistics.prev_statistics_every_5s.append(curr_statistics)
             
+            statistics.statistics_10min = {
+                'num_item_in_cache' : curr_statistics['num_item_in_cache'] - statistics.prev_statistics_every_5s[0]['num_item_in_cache'],
+                'used_size' : curr_statistics['used_size'] - statistics.prev_statistics_every_5s[0]['used_size'],
+                'num_request_served' : curr_statistics['num_request_served'] - statistics.prev_statistics_every_5s[0]['num_request_served'],
+                'num_GET_request_served' : curr_statistics['num_GET_request_served'] - statistics.prev_statistics_every_5s[0]['num_GET_request_served'],
+                'num_hit' : curr_statistics['num_hit'] - statistics.prev_statistics_every_5s[0]['num_hit'],
+                'utilization' : utilization
+            }
+            statistics.statistics_10min['num_miss'] = statistics.statistics_10min['num_GET_request_served'] - statistics.statistics_10min['num_hit']
+
+            if statistics.statistics_10min['num_GET_request_served'] == 0:
+                hit_rate = -1
+                miss_rate = -1
+            else:
+                hit_rate = (statistics.statistics_10min['num_hit'] / statistics.statistics_10min['num_GET_request_served']) * 100
+                miss_rate = 100 - hit_rate
+
+            # insert_5s_statistics_to_db(statistics.statistics_10min['num_item_in_cache'], statistics.statistics_10min['used_size'], \
+            #                          statistics.statistics_10min['num_request_served'], statistics.statistics_10min['num_GET_request_served'], \
+            #                              statistics.statistics_10min['num_miss'], statistics.statistics_10min['num_hit'], \
+            #                                  statistics.statistics_10min['utilization'])
+            my_put_metric_data(config.cache_index, 'number of keys added', statistics.statistics_10min['num_item_in_cache'])
+            my_put_metric_data(config.cache_index, 'capacity used', statistics.statistics_10min['used_size'])
+            my_put_metric_data(config.cache_index, 'request served', statistics.statistics_10min['num_request_served'])
+            my_put_metric_data(config.cache_index, 'GET request served', statistics.statistics_10min['num_GET_request_served'])
+            my_put_metric_data(config.cache_index, 'cache utilization', utilization)
+            if hit_rate != -1:
+                my_put_metric_data(config.cache_index, 'hit rate', statistics.statistics_10min['num_item_in_cache'])
+                my_put_metric_data(config.cache_index, 'miss rate', statistics.statistics_10min['num_item_in_cache'])
+
             # initialize varables every 5s
-            # initialize_5s_varables() # legacy code
             time.sleep(5)
     except Exception as error:
-        print(error)
-        print("background update terminated")
+        logging.error("background update terminated! {}".format(error))
     return
 
 def file_size(string):
