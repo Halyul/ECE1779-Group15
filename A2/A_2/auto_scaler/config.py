@@ -32,6 +32,7 @@ subnet_id = config_info['aws']['subnet_id']
 security_group_id = config_info['aws']['security_group_id']
 ssh_key_name = config_info['aws']['ssh_key_name']
 private_key_file = config_info['aws']['private_key_file']
+credential_file = config_info['aws']['credential_file']
 
 # github
 github_access_token = config_info['github']['access_token']

@@ -103,6 +103,13 @@ def remove_cache_node(id):
     config.cache_pool_size -= 1
     config.cache_pool_ids.remove(id)
 
+def clear_cache_node():
+    for instance_id in config.cache_pool_ids:
+        ec2_destroy(instance_id)
+        del statistics.node_running[instance_id]
+    config.cache_pool_size = 0
+    config.cache_pool_ids = []
+
 def initialization():
     add_cache_node()
 
@@ -122,17 +129,30 @@ def get_miss_rate(manully_triggered = False):
     if manully_triggered == False:
         total_get_request = 0
         total_hit = 0
+        # read total_get_request and total_hit
         for i in range(len(config.cache_pool_ids)):
             if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
                 addr = ec2_get_instance_ip(config.cache_pool_ids[i])
                 status = get_memcache_statistics(addr)
+                logging.debug("get_miss_rate - cache #{}, status = {}".format(i, status))
                 if i == 0:
                     # the first node exist from the beginning, so the get request it served 
                     # should be the number of total get request 
                     total_get_request = status['num_GET_request_served']
                 total_hit += status['num_hit']
+        # update total_hit to cache node 0 so the statistics will not lost if some nodes are distroyed
+        # rest of cache nodes will have num_hit set to 0
+        for i in range(len(config.cache_pool_ids)):
+            if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
+                addr = ec2_get_instance_ip(config.cache_pool_ids[i])
+                if i == 0:
+                    response = requests.get("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', total_hit)])
+                else:
+                    response = requests.get("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', 0)])
+        # start calculating the miss rate
         if total_get_request == 0:
             return 'n/a'
+        logging.debug("get_miss_rate - total_get_request = {}, total_hit = {}".format(total_get_request, total_hit))
         return (total_get_request - total_hit) / total_get_request
     else: # for testing only
         return statistics.test_miss_rate

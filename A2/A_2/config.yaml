@@ -22,6 +22,7 @@ cache:
   
 aws:
   private_key_file: C:/Users/13698/.ssh/ece1779_assignment1_keypair.pem
+  credential_file: C:/Users/13698/.aws/credentials
   ami_id: ami-080ff70d8f5b80ba5
   subnet_id: subnet-005acfeb3976436cd
   security_group_id: sg-0b51a4f8399515236
