@@ -45,6 +45,9 @@ def put_service():
     value = request.form.get('value')
     # space check
     size = file_size(value)
+    if size == -1:
+        response = gen_failed_responce(400, "invalid content type: 'base64,' not found, PUT failed")
+        return response
     if size > config.capacity:
         response = gen_failed_responce(400, "File is bigger then the whole cache")
         return response

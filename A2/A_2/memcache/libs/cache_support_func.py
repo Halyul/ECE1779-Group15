@@ -153,5 +153,5 @@ def file_size(string):
         length = len(data_string) * 3 / 4 - data_string.count("=", -2)
         return length
     else:
-        logging.ERROR("file_size - invalid content type: 'base64,' not found, size calculation will be incorrect")
+        logging.error("file_size - invalid content type: 'base64,' not found, PUT failed")
         return -1
