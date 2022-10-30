@@ -147,10 +147,10 @@ def show_info_service():
         hit_rate = "n/a"
         miss_rate = "n/a"
         
-    return render_template("info.html", capacity = config.capacity, replacement_policy = config.replace, \
-                           total_num_item_in_cache = statistics.num_item_in_cache, total_used_size = statistics.used_size, \
-                           total_request_served = statistics.num_request_served, total_hit = statistics.num_hit, \
-                           total_miss_rate = miss_rate, total_hit_rate = hit_rate, \
-                           num_key_added_10min = num_key_added_10min, used_size_10min = used_size_10min, \
-                           request_served_10min = request_served_10min, miss_rate_10min = miss_rate_10min, \
-                           hit_rate_10min = hit_rate_10min)
+    return render_template("info.html", cache_index = config.cache_index, capacity = config.capacity, \
+        replacement_policy = config.replace, total_num_item_in_cache = statistics.num_item_in_cache, \
+            total_used_size = statistics.used_size, total_request_served = statistics.num_request_served, \
+                total_hit = statistics.num_hit, total_miss_rate = miss_rate, total_hit_rate = hit_rate, \
+                    num_key_added_10min = num_key_added_10min, used_size_10min = used_size_10min, \
+                        request_served_10min = request_served_10min, miss_rate_10min = miss_rate_10min, \
+                            hit_rate_10min = hit_rate_10min)

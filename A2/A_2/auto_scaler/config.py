@@ -5,7 +5,7 @@ sys.path.append("..")
 import server.config
 
 logging.basicConfig(level=logging.INFO)
-max_miss_rate_threshold = 0.8
+max_miss_rate_threshold = 0.6
 min_miss_rate_threshold = 0.4
 expand_ratio = 1.5
 shrink_ratio = 1.5

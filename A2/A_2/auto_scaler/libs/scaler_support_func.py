@@ -51,6 +51,7 @@ def add_cache_node():
     config.cache_pool_ids.append(instance.id)
 
 def run_cache_update_status(id):
+    time.sleep(1) # add small delay so the 'ec2.instances.filter' can find the newly created instance
     address = ec2_get_instance_ip(id)
     
     error_count = 0
@@ -117,25 +118,29 @@ def get_memcache_statistics(address):
     else:
         return -1
 
-def get_miss_rate():
-    total_get_request = 0
-    total_hit = 0
-    for i in range(len(config.cache_pool_ids)):
-        if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
-            addr = ec2_get_instance_ip(config.cache_pool_ids[i])
-            status = get_memcache_statistics(addr)
-            if i == 0:
-                # the first node exist from the beginning, so the get request it served 
-                # should be the number of total get request 
-                total_get_request = status['num_GET_request_served']
-            total_hit += status['num_hit']
-    if total_get_request == 0:
-        return 'n/a'
-    return (total_get_request - total_hit) / total_get_request
+def get_miss_rate(manully_triggered = False):
+    if manully_triggered == False:
+        total_get_request = 0
+        total_hit = 0
+        for i in range(len(config.cache_pool_ids)):
+            if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
+                addr = ec2_get_instance_ip(config.cache_pool_ids[i])
+                status = get_memcache_statistics(addr)
+                if i == 0:
+                    # the first node exist from the beginning, so the get request it served 
+                    # should be the number of total get request 
+                    total_get_request = status['num_GET_request_served']
+                total_hit += status['num_hit']
+        if total_get_request == 0:
+            return 'n/a'
+        return (total_get_request - total_hit) / total_get_request
+    else: # for testing only
+        return statistics.test_miss_rate
 
 def get_cache_pool_size():
     if config.auto_mode == True:
         return config.cache_pool_size
     else: # get the list of IDs of nodes from the manager-app
         # TODO: need to get it from the manager-app
+        logging.error("get_cache_pool_size - config.auto_mode == True case not yet supported!")
         return config.cache_pool_size

@@ -1,8 +1,9 @@
-from flask import render_template, redirect, url_for
+from flask import render_template, redirect, url_for, request
 import threading
 
 from auto_scaler import webapp
 import auto_scaler.config as config
+import auto_scaler.statistics as statistics
 from auto_scaler.libs.scaler_operations import responce_main, responce_refresh_config, \
     responce_terminate_all, responce_list_cache, check_miss_rate_every_min
 from auto_scaler.libs.scaler_support_func import initialization
@@ -29,10 +30,18 @@ def terminate_all():
 def list_cache():
     return responce_list_cache()
 
+# for testing
+@webapp.route('/api/scaler/set_test_miss_rate',methods=['POST'])
+def set_test_miss_rate():
+    statistics.test_miss_rate = float(request.form.get('test_miss_rate'))
+    check_miss_rate_every_min(manully_triggered = True)
+    return redirect(url_for('main'))
+
 initialization()
+thread = threading.Thread(target = check_miss_rate_every_min, daemon = True)
 # code exicute in the background
 try:
-    thread = threading.Thread(target = check_miss_rate_every_min, daemon = True)
+    pass
     # thread.start()
 except:
     config.stop_threads = True

@@ -6,7 +6,6 @@ import numpy as np
 import sys
 sys.path.append("../..") 
 import auto_scaler.config as config
-import json
 
 from auto_scaler.libs.scaler_support_func import gen_failed_responce, gen_success_responce, get_miss_rate, \
     get_cache_pool_size, remove_cache_node, add_cache_node
@@ -32,36 +31,38 @@ def responce_main():
 
 def responce_refresh_config():
     try:
-        new_config = json.loads(request.form.get('config'))
-        
-        config.max_miss_rate_threshold = new_config['max_miss_rate_threshold']
-        config.min_miss_rate_threshold = new_config['min_miss_rate_threshold']
-        config.expand_ratio = new_config['expand_ratio']
-        config.shrink_ratio = new_config['shrink_ratio']
-        config.auto_mode = new_config['auto_mode']
+        config.max_miss_rate_threshold = float(request.form.get('max_miss_rate_threshold'))
+        config.min_miss_rate_threshold = float(request.form.get('min_miss_rate_threshold'))
+        config.expand_ratio = float(request.form.get('expand_ratio'))
+        config.shrink_ratio = float(request.form.get('shrink_ratio'))
+        config.auto_mode = request.form.get('auto_mode') == 'True'
         
         return gen_success_responce("")
     except Exception as error:
         logging.error('responce_refresh_config - ' + error)
         return gen_failed_responce(400, error)
     
-def check_miss_rate_every_min():
-    miss_rate = get_miss_rate()
+def check_miss_rate_every_min(manully_triggered = False):
+    miss_rate = get_miss_rate(manully_triggered = manully_triggered)
     
     if config.auto_mode == True and miss_rate != 'n/a':
+        expected_pool_size = get_cache_pool_size()
         if miss_rate < config.min_miss_rate_threshold:
             expected_pool_size = get_cache_pool_size() / config.shrink_ratio
         elif miss_rate > config.max_miss_rate_threshold:
             expected_pool_size = get_cache_pool_size() * config.expand_ratio
         
         expected_pool_size = np.clip(round(expected_pool_size), 1, 8)
+        logging.info("check_miss_rate_every_min - adjusting pool size: miss_rate = {}, expected_pool_size = {}, curr_pool_size = {}".format(miss_rateexpected_pool_size, get_cache_pool_size()))
         while expected_pool_size != get_cache_pool_size():
             if expected_pool_size > get_cache_pool_size():
                 add_cache_node()
             else:
                 remove_cache_node(config.cache_pool_ids[-1])
-    
-    time.sleep(60)
+
+    # if this update of num cache nodes is manully triggered, will be done only once so do not need to wait
+    if manully_triggered == False:
+        time.sleep(60)
     return miss_rate
 
 # for testing
