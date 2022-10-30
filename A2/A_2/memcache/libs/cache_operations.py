@@ -19,6 +19,7 @@ def get_service():
         config.key_list.remove(key) # remove it from the list
         config.key_list.append(key) # add it to the end of the list
         statistics.num_hit = statistics.num_hit + 1
+        statistics.num_hit_cloudwatch = statistics.num_hit_cloudwatch + 1
         
         response = gen_success_responce(value)
     else:
@@ -138,16 +139,17 @@ def show_info_service():
     request_served_10min = statistics.statistics_10min['num_request_served']
     GET_request_served_10min = statistics.statistics_10min['num_GET_request_served']
     num_hit_10min = statistics.statistics_10min['num_hit']
+    num_hit_cloudwatch_10min = statistics.statistics_10min['num_hit_cloudwatch']
 
     if GET_request_served_10min != 0:
-        hit_rate_10min = num_hit_10min / GET_request_served_10min
+        hit_rate_10min = num_hit_cloudwatch_10min / GET_request_served_10min
         miss_rate_10min = 1 - hit_rate_10min
     else:
         hit_rate_10min = "n/a"
         miss_rate_10min = "n/a"
 
     if statistics.num_GET_request_served != 0:
-        hit_rate = statistics.num_hit / statistics.num_GET_request_served
+        hit_rate = statistics.num_hit_cloudwatch / statistics.num_GET_request_served
         miss_rate = 1 - hit_rate
     else:
         hit_rate = "n/a"
@@ -156,7 +158,8 @@ def show_info_service():
     return render_template("info.html", cache_index = config.cache_index, capacity = config.capacity, \
         replacement_policy = config.replace, total_num_item_in_cache = statistics.num_item_in_cache, \
             total_used_size = statistics.used_size, total_request_served = statistics.num_request_served, \
-                total_hit = statistics.num_hit, total_miss_rate = miss_rate, total_hit_rate = hit_rate, \
+                total_hit = statistics.num_hit, total_hit_cloudwatch = statistics.num_hit_cloudwatch, \
+                    total_miss_rate = miss_rate, total_hit_rate = hit_rate, \
                     num_key_added_10min = num_key_added_10min, used_size_10min = used_size_10min, \
                         request_served_10min = request_served_10min, miss_rate_10min = miss_rate_10min, \
                             hit_rate_10min = hit_rate_10min)

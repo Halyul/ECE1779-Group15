@@ -29,6 +29,10 @@ def refreshConfiguration():
 def CLEAR():
     return clear_service()
 
+@webapp.route('/api/cache/statistics',methods=['GET'])
+def send_stats():
+    return send_stats_service()
+
 # this is used to make the master node (node 0) have the num_hit of the whole pool
 # and slave nodes will have num_hit equals to 0 once master node has its num_hit updated
 @webapp.route('/api/cache/set_num_hit',methods=['POST'])
@@ -48,10 +52,6 @@ def show_keys():
 @webapp.route('/api/cache/statistics',methods=['POST'])
 def show_info():
     return show_info_service()
-
-@webapp.route('/api/cache/statistics',methods=['GET'])
-def send_stats():
-    return send_stats_service()
 
 # code exicute in the background
 # initialize_5s_varables() # legacy code

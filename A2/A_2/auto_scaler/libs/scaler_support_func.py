@@ -44,8 +44,8 @@ def add_cache_node():
     instance = ec2_create()
     statistics.node_running[instance.id] = False
     
-    # thread = threading.Thread(target = run_cache_update_status, kwargs={'id' : instance.id}, daemon = True)
-    # thread.start()
+    thread = threading.Thread(target = run_cache_update_status, kwargs={'id' : instance.id}, daemon = True)
+    thread.start()
     
     config.cache_pool_size += 1
     config.cache_pool_ids.append(instance.id)
