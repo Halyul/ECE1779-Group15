@@ -89,7 +89,10 @@ def remove_key_service():
 def refreshConfiguration_service():
     new_capacity = int(request.form.get('capacity'))
     new_replacement_policy = request.form.get('replacement_policy')
-    config.cache_index = int(request.form.get('cache_index'))
+    try:
+        config.cache_index = int(request.form.get('cache_index'))
+    except:
+        pass
 
     logging.info(new_capacity, new_replacement_policy, config.cache_index)
     

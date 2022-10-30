@@ -4,6 +4,7 @@ import threading
 
 from memcache import webapp
 import memcache.config as config
+import memcache.statistics as statistics
 from memcache.libs.cache_operations import get_service, put_service, remove_key_service, \
     refreshConfiguration_service, clear_service, show_info_service, send_stats_service
 from memcache.libs.cache_support_func import update_database_every_5s
@@ -27,6 +28,13 @@ def refreshConfiguration():
 @webapp.route('/api/cache',methods=['DELETE'])
 def CLEAR():
     return clear_service()
+
+# this is used to make the master node (node 0) have the num_hit of the whole pool
+# and slave nodes will have num_hit equals to 0 once master node has its num_hit updated
+@webapp.route('/api/cache/set_num_hit',methods=['POST'])
+def set_num_hit():
+    statistics.num_hit = int(request.form.get('num_hit'))
+    return "cache node {} statistics.num_hit = {}".format(config.cache_index, statistics.num_hit)
 
 # functions for testting
 @webapp.route('/')
