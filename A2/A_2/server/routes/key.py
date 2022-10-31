@@ -19,6 +19,8 @@ def create_key(args):
     if " " in args["key"] or "" == args["key"] or len(args["key"]) > 48:
         return False, 400, "Key does not meet the requirement."
     file = args["file"]
+    if file.content_type is None:
+        return False, 400, "The upload request is invalid due to empty content type."
     if not file.content_type.startswith("image/"):
         return False, 403, "Only image file is allowed."
     database = Database()
