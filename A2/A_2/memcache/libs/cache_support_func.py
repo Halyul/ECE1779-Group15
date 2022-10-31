@@ -138,6 +138,7 @@ def update_database_every_5s():
             my_put_metric_data(config.cache_index, 'capacity used', statistics.statistics_10min['used_size'])
             my_put_metric_data(config.cache_index, 'request served', statistics.statistics_10min['num_request_served'])
             my_put_metric_data(config.cache_index, 'GET request served', statistics.statistics_10min['num_GET_request_served'])
+            my_put_metric_data(config.cache_index, 'number of hit', statistics.statistics_10min['num_hit_cloudwatch'])
             my_put_metric_data(config.cache_index, 'cache utilization', utilization)
             if hit_rate != -1:
                 my_put_metric_data(config.cache_index, 'hit rate', hit_rate)

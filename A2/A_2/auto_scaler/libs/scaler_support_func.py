@@ -12,6 +12,7 @@ from auto_scaler import webapp
 
 from auto_scaler.libs.ec2_support_func import ec2_create, ec2_destroy, ec2_get_instance_ip
 from auto_scaler.libs.ssh_support_func import run_cache
+from auto_scaler.libs.cloudwatch_func import get_num_GET_request_served, get_num_hit
 
 def gen_failed_responce(code, message):
     json_response = {
@@ -113,6 +114,8 @@ def clear_cache_node():
 def initialization():
     add_cache_node()
 
+# will be used only for checking if the node is up
+# statistics will be fetched from CloudWatch as requirement stated
 def get_memcache_statistics(address):
     response = requests.get("http://" + address + ":" + str(config.cache_port) + "/api/cache/statistics")
     # response = requests.get("http://" + address + ":5001" + "" + "/api/cache/statistics")
@@ -129,30 +132,33 @@ def get_miss_rate(manully_triggered = False):
     if manully_triggered == False:
         total_get_request = 0
         total_hit = 0
-        # read total_get_request and total_hit
+        # read total_get_request and total_hit from CloudWatch
         for i in range(len(config.cache_pool_ids)):
             if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
-                addr = ec2_get_instance_ip(config.cache_pool_ids[i])
-                status = get_memcache_statistics(addr)
-                logging.debug("get_miss_rate - cache #{}, status = {}".format(i, status))
-                if i == 0:
-                    # the first node exist from the beginning, so the get request it served 
-                    # should be the number of total get request 
-                    total_get_request = status['num_GET_request_served']
-                total_hit += status['num_hit']
-        # update total_hit to cache node 0 so the statistics will not lost if some nodes are distroyed
-        # rest of cache nodes will have num_hit set to 0
-        for i in range(len(config.cache_pool_ids)):
-            if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
-                addr = ec2_get_instance_ip(config.cache_pool_ids[i])
-                if i == 0:
-                    response = requests.post("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', total_hit)])
-                else:
-                    response = requests.post("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', 0)])
+                cloudwatch_num_hit = get_num_hit(i)
+                if cloudwatch_num_hit != []:
+                    total_hit += cloudwatch_num_hit[0]
+        # the first node exist from the beginning, so the get request it served 
+        # should be the number of total get request 
+        cloudwatch_num_GET_request_served = get_num_GET_request_served(0)
+        if cloudwatch_num_GET_request_served != []:
+            total_get_request = cloudwatch_num_GET_request_served[0]
+
+        # cannot be done for CloudWatch, so disabled
+        # # update total_hit to cache node 0 so the statistics will not lost if some nodes are distroyed
+        # # rest of cache nodes will have num_hit set to 0
+        # for i in range(len(config.cache_pool_ids)):
+        #     if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
+        #         addr = ec2_get_instance_ip(config.cache_pool_ids[i])
+        #         if i == 0:
+        #             response = requests.post("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', total_hit)])
+        #         else:
+        #             response = requests.post("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', 0)])
+        
         # start calculating the miss rate
         if total_get_request == 0:
             return 'n/a'
-        logging.debug("get_miss_rate - total_get_request = {}, total_hit = {}".format(total_get_request, total_hit))
+        logging.info("get_miss_rate - total_get_request = {}, total_hit = {}".format(total_get_request, total_hit))
         return (total_get_request - total_hit) / total_get_request
     else: # for testing only
         return statistics.test_miss_rate
