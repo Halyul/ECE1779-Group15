@@ -1,6 +1,6 @@
-# Assigment 1
+# Assigment 2
 
-This is the source code for ECE1779 2022 Fall Assignment 1
+This is the source code for ECE1779 2022 Fall Assignment 2
 
 ## Flask
 
@@ -16,16 +16,10 @@ $ pip install --user pipenv
 $ pipenv install
 ```
 
-### Run Flask Instance 1 (Frontend API)
+### Run
 
 ```bash
-$ flask run
-```
-
-### Run Flask Instance 2 (Cache)
-
-```bash
-$ flask --app cache_app run
+$ ../start.sh
 ```
 
 ## Frontend
