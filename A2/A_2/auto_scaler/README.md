@@ -4,8 +4,8 @@
 
 URL                      |  Method  | Content Type        | Body                                               | Note
 -------------------------|----------|---------------------|----------------------------------------------------|-----------------------------
-/                        | GET      | N/A                 |                                                    | for testing only: home page
-/api/scaler/             | GET      | N/A                 |                                                    | for testing only: home page
+/                        | GET      | N/A                 | N/A                                                | for testing only: home page
+/api/scaler/             | GET      | N/A                 | N/A                                                | for testing only: home page
 /api/scaler/config       | POST     | application/json    | `max_miss_rate_threshold`, `min_miss_rate_threshold`, `expand_ratio`, `shrink_ratio`, `auto_mode` | set the auto scaler config
 /api/scaler/terminate_all| POST     | N/A                 | N/A                                                | for testing only: terminate all nodes
 /api/scaler/list         | GET/POST | N/A                 | N/A                                                | for testing only: a page listing all ec2 instancces
