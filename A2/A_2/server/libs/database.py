@@ -43,6 +43,8 @@ class Database:
     def get_status(self):
         data = self.__fetch("SELECT `cache_nums`, `used_size`, `total_request_served`, `total_GET_request_served`, `total_hit`, `utilization` "
                                 "FROM {table_name} ORDER BY `id` DESC LIMIT 120;".format(table_name=STATUS_TABLE_NAME))
+        if len(data) == 0:
+            return [None]
         (num_key_added_end, used_size_end, request_served_end, GET_request_served_end, num_hit_end, utl) = data[0]
         (num_key_added_start, used_size_start, request_served_start, GET_request_served_start, num_hit_start, _) = data[-1]
         
