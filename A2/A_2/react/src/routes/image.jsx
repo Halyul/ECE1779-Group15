@@ -123,11 +123,6 @@ export default function Image() {
 }
 
 export const ImageRoute = {
-  name: "Image",
-  path: "image",
-};
-
-export const ImageWithKeyRoute = {
   name: "Image with Key",
   path: "image/:key",
 };

@@ -33,29 +33,6 @@ class Database:
         )
         self.cursor = self.connection.cursor()
 
-    def get_config(self):
-        return self.__fetch("SELECT `key`, `value` FROM {}".format(CONFIG_TABLE_NAME))
-
-    def set_config(self, key, value):
-        self.__execute("UPDATE `{table_name}` SET `value` = %s WHERE `key` = %s".format(table_name=CONFIG_TABLE_NAME),
-                       (value, str(key)))
-
-    def get_status(self):
-        data = self.__fetch("SELECT `cache_nums`, `used_size`, `total_request_served`, `total_GET_request_served`, `total_hit`, `utilization` "
-                                "FROM {table_name} ORDER BY `id` DESC LIMIT 120;".format(table_name=STATUS_TABLE_NAME))
-        if len(data) == 0:
-            return [None]
-        (num_key_added_end, used_size_end, request_served_end, GET_request_served_end, num_hit_end, utl) = data[0]
-        (num_key_added_start, used_size_start, request_served_start, GET_request_served_start, num_hit_start, _) = data[-1]
-        
-        status_base = (num_key_added_end - num_key_added_start, \
-                       used_size_end - used_size_start, \
-                       request_served_end - request_served_start, \
-                       GET_request_served_end - GET_request_served_start, \
-                       num_hit_end - num_hit_start, \
-                       utl)
-        return status_base
-
     def create_key_image_pair(self, key, image):
         self.__execute(
             "INSERT INTO `{table_name}` (`key`, `image`) VALUES (%s, %s)".format(table_name=KEY_IMAGE_TABLE_NAME),

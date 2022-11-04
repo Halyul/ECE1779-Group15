@@ -14,12 +14,6 @@ export async function upload(requestData) {
 }
 
 export async function retrieveKeys() {
-  /*
-    {
-      "success": "true",
-      "keys": [Array of keys(strings)]
-    }
-  */
   const data = await request(
     "/api/list_keys",
     {
@@ -30,56 +24,12 @@ export async function retrieveKeys() {
 }
 
 export async function retrieveImage(key) {
-  /*
-    {
-      "success": "true", // string????
-      “content” : file contents
-    }
-   */
   const data = await request(
     `/api/key/${key}`,
     {
       method: "POST",
     },
   )
-  return responseAdapter(data);
-}
-
-export async function getConfig() {
-  // return {
-  //   success: true,
-  //   config: {
-  //     capacity: 10,
-  //     policy: "lru",
-  //   }
-  // };
-  const data = await request("/api/config")
-  return responseAdapter(data);
-}
-
-export async function setConfig(config) {
-  // return {
-  //     success: true,
-  //     config: {
-  //       capacity: 20,
-  //       policy: "rr",
-  //     }
-  //   }
-  const data = await request(
-    "/api/config",
-    {
-      method: "POST",
-      body: JSON.stringify(config),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  )
-  return responseAdapter(data);
-}
-
-export async function getStatus() {
-  const data = await request("/api/status")
   return responseAdapter(data);
 }
 

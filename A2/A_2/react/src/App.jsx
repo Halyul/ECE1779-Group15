@@ -18,7 +18,6 @@ import Upload, {
 } from "./routes/upload";
 import Image, {
   ImageRoute,
-  ImageWithKeyRoute,
   loader as imageLoader,
   action as imageAction,
 } from "./routes/image";
@@ -27,16 +26,6 @@ import Keys, {
   loader as keysLoader,
   action as keysAction,
 } from "./routes/keys";
-import Config, {
-  ConfigRoute,
-  loader as configLoader,
-  action as configAction,
-} from "./routes/config";
-import Status, {
-  StatusRoute,
-  loader as statusLoader,
-  action as statusAction,
-} from "./routes/status";
 import 'reset-css';
 import './App.css';
 
@@ -52,8 +41,6 @@ const router = createBrowserRouter(
             UploadRoute,
             ImageRoute,
             KeysRoute,
-            ConfigRoute,
-            StatusRoute
           ]}
         />
       }
@@ -69,11 +56,6 @@ const router = createBrowserRouter(
         <Route
           path={ImageRoute.path}
           element={<Image />}
-          action={imageAction}
-        />
-        <Route
-          path={ImageWithKeyRoute.path}
-          element={<Image />}
           loader={imageLoader}
           action={imageAction}
         />
@@ -82,18 +64,6 @@ const router = createBrowserRouter(
           element={<Keys />}
           loader={keysLoader}
           action={keysAction}
-        />
-        <Route
-          path={ConfigRoute.path}
-          element={<Config />}
-          loader={configLoader}
-          action={configAction}
-        />
-        <Route
-          path={StatusRoute.path}
-          element={<Status />}
-          loader={statusLoader}
-          action={statusAction}
         />
       </Route>
     </Route>

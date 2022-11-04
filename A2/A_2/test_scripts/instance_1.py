@@ -6,50 +6,30 @@ import json
 CONFIG = yaml.safe_load(open(pathlib.Path(__file__).parent.absolute().joinpath("..", "config.yaml"), "r"))
 BASE_URL = "http://localhost:" + str(CONFIG["server"]["port"])
 
-def get_config():
-    r = requests.get(BASE_URL + "/api/config")
-    return r.json()
-
-def get_status():
-    r = requests.get(BASE_URL + "/api/status")
-    return r.json()
 
 def upload():
-    payload = {
+    # files = {
+    #     "file": ("test.svg", open(pathlib.Path(__file__).parent.absolute().joinpath("src", "test.svg"), "rb"), "image/svg+xml")
+    # }
+    files = {
         "file": open(pathlib.Path(__file__).parent.absolute().joinpath("src", "test.svg"), "rb")
     }
     data = {
         "key": "123"
     }
-    r = requests.post(BASE_URL + "/api/upload", files=payload, data=data)
+    # print(requests.Request('POST', BASE_URL + "/api/upload", files=files, data=data).prepare().body.decode('utf8'))
+    r = requests.post(BASE_URL + "/api/upload", files=files, data=data)
     return r.json()
 
 def list_keys():
     r = requests.post(BASE_URL + "/api/list_keys")
     return r.json()
 
-def set_config():
-    original = get_config()["config"]
-    r = requests.post(BASE_URL + "/api/config", 
-                    json=dict(
-                        policy="lru",
-                        capacity=200
-                    )
-                )
-    output = r.json()
-    r = requests.post(BASE_URL + "/api/config",
-                    json=original
-                )
-    return output
-
 def get_key_image():
     r = requests.post(BASE_URL + "/api/key/123")
     return r.json()
 
 if __name__ == "__main__":
-    print(get_config())
-    print(get_status())
     print(upload())
     print(list_keys())
-    print(set_config())
     print(get_key_image())
