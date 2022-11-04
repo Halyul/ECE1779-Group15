@@ -39,7 +39,6 @@ const router = createBrowserRouter(
           destinations={[
             IndexRoute,
             UploadRoute,
-            ImageRoute,
             KeysRoute,
           ]}
         />

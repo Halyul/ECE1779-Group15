@@ -14,6 +14,12 @@ import SubmissionPrompt from "../components/submission-prompt";
 
 export async function loader({ params }) {
   const response = await retrieveKeys();
+  if (response.status !== 200) {
+    return {
+      status: response.status,
+      statusText: response.statusText
+    }
+  }
   return response;
 }
 
@@ -23,12 +29,12 @@ export async function action({ request, params }) {
 
 export default function Keys() {
   const loaderResponse = useLoaderData();
-  const [keyList, setKeyList] = useState(loaderResponse.data.keys);
+  const [keyList, setKeyList] = useState(loaderResponse.data?.keys);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     setIsRefreshing(false);
-    setKeyList(loaderResponse.data.keys);
+    setKeyList(loaderResponse.data?.keys);
   }, [loaderResponse]);
 
   return (
@@ -36,7 +42,7 @@ export default function Keys() {
       <RefreshCard
         title="Keys"
         body={
-          keyList.length > 0 ? (
+          keyList && keyList.length > 0 ? (
             <List>
             {keyList.map((key) => (
               <ListItem

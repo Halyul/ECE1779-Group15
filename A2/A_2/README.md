@@ -27,17 +27,17 @@ $ ../start.sh
 ### Install Dependencies
 
 ```bash
-$ yarn install
+$ pnpm install
 ```
 
 ### Run Development Server
 
 ```bash
-$ yarn run dev
+$ pnpm run dev
 ```
 
 ### Generate Static Files
 
 ```bash
-$ yarn run build
+$ pnpm run build
 ```

@@ -68,6 +68,16 @@ async function request(
           statusText: error.message,
         }
       }
+      if (typeof error === "object") {
+        return {
+          data: {
+            success: false,
+            message: error.statusText,
+          },
+          status: error.status,
+          statusText: error.statusText,
+        }
+      }
       return error.json().then((data) => {
         return {
           data: {
