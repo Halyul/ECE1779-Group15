@@ -1,4 +1,3 @@
-import ec2_helper_functions
 import services
 from manager_app import webapp
 
@@ -13,18 +12,18 @@ def get_aggregate_stats():
     return
 
 
-@webapp.route('/api/manager/poolsize/increase', methods=['POST'])
-def increase_pool_size():
-    return services.increase_pool_size()
+@webapp.route('/api/manager/config', methods=['POST'])
+def set_cache_configurations():
+    return services.set_cache_configurations()
 
 
-@webapp.route('/api/manager/poolsize/decrease', methods=['DELETE'])
-def decrease_pool_size():
-    return services.decrease_pool_size()
+@webapp.route('/api/manager/poolsize/manual', methods=['POST'])
+def change_pool_size_manual():
+    return services.change_pool_size_manual()
 
 
 @webapp.route('/api/manager/poolsize/automatic', methods=['POST'])
-def decrease_pool_size():
+def change_pool_size_auto():
     return services.set_auto_scaler_parameters()
 
 

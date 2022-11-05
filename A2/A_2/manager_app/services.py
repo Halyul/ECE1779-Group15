@@ -7,7 +7,6 @@ from manager_app.responses import success_response, failed_response
 from manager_app.s3_helper_functions import s3_list, s3_clear
 from server.config import Config
 from manager_app import data
-from db_operations import get_stats_from_db
 
 CONFIG = Config().fetch()
 AUTO_SCALAR_URL = "http://{host}:{port}".format(**CONFIG["auto_scalar"])
@@ -27,28 +26,33 @@ def get_30_min_data():
 
 
 def set_cache_configurations():
-    response = requests.post(CACHE_URL + "/api/cache/config")
+    capacity = request.form.get('capacity')
+    replacement_policy = request.form.get('replacement_policy')
+    response = requests.post(CACHE_URL + "/api/cache/config",
+                             data={'capacity': capacity,
+                                   'replacement_policy': replacement_policy})
     content = response["content"]
     return success_response(content)
 
 
-def increase_pool_size():
+def change_pool_size_manual():
+    change = request.form.get('change')
     instances = ec2_get_instance()
-    if instances.size() == 8:
-        return failed_response(400, "The size of memcache pool has been reached to maximum")
+    if change == 'increase':
+        if instances.size() == 8:
+            return failed_response(400, "The size of memcache pool has been reached to maximum")
+        else:
+            ec2_create()
+            return success_response("Memcache pool size increases")
+    elif change == 'decrease':
+        if not instances:
+            return failed_response(400, "The size of memcache pool has been reached to minimum")
+        else:
+            instance = instances[0]
+            ec2_destroy(instance.id)
+            return success_response("Memcache pool size decreases")
     else:
-        ec2_create()
-        return success_response("Memcache pool size increases")
-
-
-def decrease_pool_size():
-    instances = ec2_get_instance()
-    if not instances:
-        return 400, "The size of memcache pool has been reached to minimum"
-    else:
-        instance = instances[0]
-        ec2_destroy(instance.id)
-        return success_response("Memcache pool size decreases")
+        return failed_response(400, "Parameter change can only be increase or decrease")
 
 
 def set_auto_scaler_parameters():
@@ -61,7 +65,8 @@ def set_auto_scaler_parameters():
                              data={'max_miss_rate_threshold': max_miss_rate_threshold,
                                    'min_miss_rate_threshold': min_miss_rate_threshold,
                                    'ratio_expand_pool': ratio_expand_pool,
-                                   'ratio_shrink_pool': ratio_shrink_pool})
+                                   'ratio_shrink_pool': ratio_shrink_pool,
+                                   'auto_mode': 'True'})
     content = response["content"]
     return success_response(content)
 

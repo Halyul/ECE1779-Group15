@@ -2,15 +2,15 @@
 
 ## Endpoints
 
-URL                    		     | Method | Content Type     | Body                                               | Note
----------------------------------|--------|------------------|----------------------------------------------------|-----------------------------
-/api/manager/node_num            | GET    | N/A              | N/A                                                | 
-/api/manager/aggregate_stats     | GET    | N/A              | N/A                                                | 
-/api/manager/poolsize/increase   | POST   | N/A              | N/A  |
-/api/manager/poolsize/decrease   | POST   | N/A              | N/A                                                | 
+URL                    		     | Method | Content Type    | Body                                                                                 | Note
+---------------------------------|--------|-----------------|--------------------------------------------------------------------------------------|-----------------------------
+/api/manager/node_num            | GET    | N/A             | N/A                                                                                  | 
+/api/manager/aggregate_stats     | GET    | N/A             | N/A                                                                                  | 
+/api/manager/config     | POST   | N/A             | N/A                                                                                  |
+/api/manager/poolsize/manual  | POST   | application/json          | `change` (accepted value:  `increase`,  `decrease`)                                  |
 /api/manager/poolsize/automatic  | POST   | application/json | `max_miss_rate_threshold`, `min_miss_rate_threshold`, `expand_ratio`, `shrink_ratio` | 
-/api/manager/cache/clear         | DELETE | N/A              | N/A                                   |
-/api/manager/data/clear          | DELETE | N/A              | N/A                                   |
+/api/manager/cache/clear         | DELETE | N/A             | N/A                                                                                  |
+/api/manager/data/clear          | DELETE | N/A             | N/A                                                                                  |
                    
 
 ## TODO
