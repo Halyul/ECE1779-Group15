@@ -1,36 +1,69 @@
-export async function upload(requestData) {
-  const formData = new FormData();
-  for (const name in requestData) {
-    formData.append(name, requestData[name]);
-  }
+export async function setModeParam(mode, config) {
   const data = await request(
-    "/api/upload",
+    `/api/manager/poolsize/${mode}`,
     {
       method: "POST",
-      body: formData
-    }
-  )
-  return responseAdapter(data);
-}
-
-export async function retrieveKeys() {
-  const data = await request(
-    "/api/list_keys",
-    {
-      method: "POST",
-    }
-  )
-  return responseAdapter(data);
-}
-
-export async function retrieveImage(key) {
-  const data = await request(
-    `/api/key/${key}`,
-    {
-      method: "POST",
+      body: JSON.stringify(config),
+      headers: {
+        "Content-Type": "application/json",
+      },
     },
   )
+  // return responseAdapter(data);
+  console.log(`Pool updated in ${mode}: ${JSON.stringify(config)}`);
+  return {
+    status: 200,
+    statusText: "OK",
+  };
+}
+
+export async function getStatus(mode) {
+  const data = await request(`/api/manager/${mode}`)
   return responseAdapter(data);
+}
+
+export async function clear(mode) {
+  const data = await request(
+    `/api/manager/${mode}/clear`,
+    {
+      method: "DELETE",
+    },
+  )
+  // return responseAdapter(data);
+  console.log(`Cleared: ${mode}`);
+  return {
+    status: 200,
+    statusText: "OK",
+  };
+}
+
+export async function getPoolConfig() {
+  const data = await request("/api/manager/config")
+  return responseAdapter(data);
+}
+
+export async function getNodeConfig() {
+  const data = await request("/api/manager/config")
+  return responseAdapter(data);
+}
+
+export async function setNodeConfig(config) {
+  const data = await request(
+    "/api/manager/config",
+    {
+      method: "POST",
+      body: JSON.stringify(config),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  )
+  // return responseAdapter(data);
+  console.log(`Node updated: ${JSON.stringify(config)}`);
+  return {
+    status: 200,
+    statusText: "OK",
+  };
 }
 
 function responseAdapter(response) {
@@ -40,7 +73,7 @@ function responseAdapter(response) {
 }
 
 async function request(
-  url = "",
+  url,
   options = {},
 ) {
   return fetch(url, options)

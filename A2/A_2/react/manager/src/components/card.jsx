@@ -51,3 +51,23 @@ export function RefreshCard(props) {
     </Card>
   );
 }
+
+export function ConfigCard(props) {
+  return (
+    <Card sx={{ marginBottom: "1rem" }}>
+      <CardHeader title={props.title} />
+        <Form
+          id={props.id}
+          method={props.method}
+          onSubmit={props.onSubmit}
+        >
+          <CardContent>
+            {props.content}
+          </CardContent>
+          <CardActions disableSpacing>
+            {props.actions}
+          </CardActions>
+        </Form>
+      </Card>
+  );
+}
