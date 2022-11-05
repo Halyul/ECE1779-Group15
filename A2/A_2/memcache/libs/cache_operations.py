@@ -132,6 +132,13 @@ def send_stats_service():
     response = gen_success_responce(json.dumps(data))
     return response
 
+def clear_stats_service():
+    statistics.num_GET_request_served = 0
+    statistics.num_hit = 0
+    statistics.num_hit_cloudwatch = 0
+    response = gen_success_responce("")
+    return response
+
 # for testing only
 def show_info_service():
     num_key_added_10min = statistics.statistics_10min['num_item_in_cache']
