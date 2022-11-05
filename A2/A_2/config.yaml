@@ -19,7 +19,11 @@ database:
 cache:
   host: 127.0.0.1
   port: 5001
-  
+
+manager:
+  host: 127.0.0.1
+  port: 5004
+
 aws:
   private_key_file: ./ece1779_assignment1_keypair.secret.pem
   credential_file: ./credentials.secret
