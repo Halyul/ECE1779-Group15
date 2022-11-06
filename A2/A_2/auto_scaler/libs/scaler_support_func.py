@@ -10,7 +10,7 @@ import auto_scaler.config as config
 import auto_scaler.statistics as statistics
 from auto_scaler import webapp
 
-from auto_scaler.libs.ec2_support_func import ec2_create, ec2_destroy, ec2_get_instance_ip
+from auto_scaler.libs.ec2_support_func import ec2_create, ec2_destroy, ec2_get_instance_ip, ec2_get_cache_ec2_object_list
 from auto_scaler.libs.ssh_support_func import run_cache
 from auto_scaler.libs.cloudwatch_func import get_num_GET_request_served, get_num_hit
 
@@ -69,6 +69,10 @@ def run_cache_update_status(id):
             continue
     
     time.sleep(10)
+    check_if_node_is_up(id, address)
+    return
+
+def check_if_node_is_up(id, address):
     response = -1
     error_count = 0
     while True:
@@ -92,7 +96,7 @@ def run_cache_update_status(id):
             else:
                 logging.error("run_cache_update_status - node with ip {} access timeout! {}".format(address, error))
                 return
-    return
+    return 
 
 def get_cache_index_from_id(id):
     index = config.cache_pool_ids.index(id)
@@ -163,10 +167,38 @@ def get_miss_rate(manully_triggered = False):
     else: # for testing only
         return statistics.test_miss_rate
 
+def update_pool_size_use_ec2():
+    if config.auto_mode == True:
+        # if this is auto mode, cache_pool_size, cache_pool_ids and node_running should be updated every time
+        # a node is brought up or destroy, so don't need to update explicitly
+        return
+    else:
+        # get_cache_pool_size() will update config.cache_pool_ids and statistics.node_running in manual mode
+        config.cache_pool_size = get_cache_pool_size()
+        return 
+
 def get_cache_pool_size():
     if config.auto_mode == True:
         return config.cache_pool_size
-    else: # get the list of IDs of nodes from the manager-app
-        # TODO: need to get it from the manager-app
-        logging.error("get_cache_pool_size - config.auto_mode == True case not yet supported!")
+    else: 
+        # # get the list of IDs of nodes from the manager-app
+        # cache_ec2_object_list = ec2_get_cache_ec2_object_list()
+        # for cache_ec2_object in cache_ec2_object_list:
+        #     # if this is an unknow node
+        #     if cache_ec2_object.id not in config.cache_pool_ids:
+        #         # update config.cache_pool_ids
+        #         config.cache_pool_ids.append(cache_ec2_object.id)
+        #         # TODO: update statistics.node_running
+        #         address = cache_ec2_object.public_ip_address
+        #         statistics.node_running[cache_ec2_object.id] = False
+        # return len(cache_ec2_object_list)
+        
+        # TODO: get the node list from manager
         return config.cache_pool_size
+
+def clear_all_cache_stats():
+    for node_id in statistics.node_running:
+        if statistics.node_running[node_id] == True:
+            address = ec2_get_instance_ip(node_id)
+            response = requests.delete("http://" + address + ":" + str(config.cache_port) + "/api/cache/statistics")
+    return 

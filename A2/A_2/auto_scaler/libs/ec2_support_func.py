@@ -7,6 +7,8 @@ import sys
 sys.path.append("../..") 
 import auto_scaler.config as config
 
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html
+
 # Display an HTML list of all ec2 instances
 def ec2_list(status):
     # create connection to ec2
@@ -138,3 +140,17 @@ def ec2_get_instance_ip(id):
         instance = item
         break
     return instance.public_ip_address
+
+def ec2_get_cache_ec2_object_list():
+    ec2 = boto3.resource('ec2')
+    instances = ec2.instances.filter(
+            Filters=[
+                {
+                    'Name': 'network-interface.subnet-id',
+                    'Values': [config.subnet_id]
+                }
+            ])
+    cache_ec2_object_list = []
+    for item in instances:
+        cache_ec2_object_list.append(item)
+    return cache_ec2_object_list
