@@ -1,14 +1,19 @@
 from flask import render_template, request, redirect, url_for
 import logging
 import time
+import requests
+import threading
 import numpy as np
+import json
 
 import sys
 sys.path.append("../..") 
 import auto_scaler.config as config
+import auto_scaler.statistics as statistics
 
 from auto_scaler.libs.scaler_support_func import gen_failed_responce, gen_success_responce, get_miss_rate, \
-    get_cache_pool_size, remove_cache_node, add_cache_node, clear_cache_node, clear_all_cache_stats, update_pool_size_use_ec2
+    get_cache_pool_size, remove_cache_node, add_cache_node, clear_cache_node, clear_all_cache_stats, \
+    notify_while_bring_up_node, check_if_node_is_up
 from auto_scaler.libs.ec2_support_func import ec2_list, ec2_get_instance_ip
 
 def responce_main():
@@ -54,6 +59,8 @@ def responce_refresh_config():
         return gen_failed_responce(400, error)
     
 def check_miss_rate_every_min(manully_triggered = False):
+    notify_info = {'action' : '', 'ip' : []}
+    changed_id = []
     try:
         while True:
             miss_rate = get_miss_rate(manully_triggered = manully_triggered)
@@ -67,13 +74,34 @@ def check_miss_rate_every_min(manully_triggered = False):
                 
                 expected_pool_size = np.clip(round(expected_pool_size), 1, 8)
                 logging.info("check_miss_rate_every_min - adjusting pool size: miss_rate = {}, expected_pool_size = {}, curr_pool_size = {}".format(miss_rate, expected_pool_size, get_cache_pool_size()))
-                if expected_pool_size != get_cache_pool_size():
-                    clear_all_cache_stats() # clear cache num_GET_request_served and num_hit if pool size needs adjustment
-                while expected_pool_size != get_cache_pool_size():
+                original_pool_size = get_cache_pool_size()
+                # temtitive_pool_size is used since delete node will need to send request to other flask instance
+                temtitive_pool_size = get_cache_pool_size()
+                while expected_pool_size != temtitive_pool_size:
                     if expected_pool_size > get_cache_pool_size():
+                        # TODO: need to match the API with A1
                         add_cache_node()
+                        temtitive_pool_size += 1
+                        notify_info['action'] = 'add'
+                        changed_id.append(config.cache_pool_ids[-1])
                     else:
-                        remove_cache_node(config.cache_pool_ids[-1])
+                        # TODO: need to match the API with A1
+                        temtitive_pool_size -= 1
+                        notify_info['action'] = 'delete'
+                        notify_info['ip'].append(ec2_get_instance_ip(config.cache_pool_ids[-1]))
+                if expected_pool_size != original_pool_size:
+                    # clear cache num_GET_request_served and num_hit if pool size needs adjustment
+                    clear_all_cache_stats()
+                    # TODO: need to match the API with A1
+                    if notify_info['action'] == 'delete':
+                        logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
+                        logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
+                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('id', notify_info)])
+                    else:
+                        # TODO: wait for nodes bring up
+                        thread = threading.Thread(target = notify_while_bring_up_node, args=(notify_info, changed_id,), daemon = True)
+                        thread.start()
+                        
             elif config.auto_mode == False:
                 # TODO: need to get it from manager
                 pass
@@ -85,6 +113,54 @@ def check_miss_rate_every_min(manully_triggered = False):
     except Exception as error:
         logging.error("background update terminated! {}".format(error))
     return
+
+def responce_do_node_delete():
+    if len(config.cache_pool_ids) > 1:
+        cache_ip = request.form.get('cache_ip')
+        cache_id = ''
+        for id in config.cache_pool_ids:
+            if cache_ip == ec2_get_instance_ip(id):
+                cache_id = id
+                break
+        
+        if cache_id == '':
+            logging.error('responce_do_node_delete - No node with ip {}'.format(cache_ip))
+            return gen_failed_responce(400, 'responce_do_node_delete - No node with ip {}'.format(cache_ip))
+        elif cache_id == config.cache_pool_ids[0]:
+            logging.error('responce_do_node_delete - Node with ip {} is the first node, and should never be deleted'.format(cache_ip))
+            return gen_failed_responce(400, 'responce_do_node_delete - Node with ip {} is the first node, and should never be deleted'.format(cache_ip))
+        else:
+            remove_cache_node(cache_id)
+            return gen_success_responce("")
+    else:
+        logging.error("responce_do_node_delete - pool size = {} so no nodes can be deleted".format(config.cache_pool_size))
+        return gen_failed_responce(400, "responce_do_node_delete - pool size = {} so no nodes can be deleted".format(config.cache_pool_size))
+
+def responce_get_node_list():
+    return json.dumps(config.cache_pool_ids)
+
+def responce_set_node_list():
+    if config.auto_mode == False:
+        node_list = json.loads(request.form.get('cache_pool_ids'))
+        config.cache_pool_ids = node_list
+        config.cache_pool_size = len(config.cache_pool_ids)
+        # refresh the statistics.node_running
+        statistics.node_running = {}
+        unrunning_node = []
+        for node_id in node_list:
+            statistics.node_running[node_id] = False
+            addr = ec2_get_instance_ip(node_id)
+            is_running =  check_if_node_is_up(node_id, addr)
+            if is_running == -1:
+                unrunning_node.append(node_id)
+        if len(unrunning_node) == 0:
+            return gen_success_responce("")
+        else:
+            logging.error("Some nodes are not running! {}".format(json.dumps(unrunning_node)))
+            return gen_failed_responce(400, "Some nodes are not running! {}".format(json.dumps(unrunning_node)))
+    else:
+        logging.error("Should not set node_list from outside while auto mode!")
+        return gen_failed_responce(400, "Should not set node_list from outside while auto mode!")
 
 # for testing
 def responce_terminate_all():

@@ -3,6 +3,7 @@ import requests
 import threading
 import logging
 import time
+from datetime import datetime, timedelta
 
 import sys
 sys.path.append("../..") 
@@ -53,12 +54,12 @@ def add_cache_node():
 
 def run_cache_update_status(id):
     time.sleep(1) # add small delay so the 'ec2.instances.filter' can find the newly created instance
-    address = ec2_get_instance_ip(id)
-    
+
     error_count = 0
     while True:
         try:
             time.sleep(10)
+            address = ec2_get_instance_ip(id)
             run_cache(address)
             break
         except Exception as error:
@@ -75,15 +76,26 @@ def run_cache_update_status(id):
 def check_if_node_is_up(id, address):
     response = -1
     error_count = 0
+
+    # if the address from input is incorrect, re-get the address (may due to node is not fully running while getting the address)
+    # if it is still 'None', return -1
+    if address is None or len(address) > 15:
+        address = ec2_get_instance_ip(id)
+        if address is None or len(address) > 15:
+            logging.error("check_if_node_is_up - ip incorrect! id = {}, ip = {}".format(id, address))
+            return -1
+
     while True:
         try:
             time.sleep(1)
             response = get_memcache_statistics(address)
             if response == -1:
-                logging.error("run_cache_update_status - node with ip {} access failed!".format(address))
+                logging.error("check_if_node_is_up - node with ip {} access failed!".format(address))
+                return -1
             else:
-                logging.info("run_cache_update_status - node with ip {} successfully brought up!".format(address))
-                statistics.node_running[id] = True
+                logging.info("check_if_node_is_up - node with ip {} successfully brought up!".format(address))
+                if statistics.node_running[id] == False:
+                    statistics.node_running[id] = True
                 # once the cache node is up, refresh config and assign the node index
                 response = requests.post("http://" + address + ":" + str(config.cache_port) + "/api/cache/config", \
                     data=[('capacity', config.capacity), ('replacement_policy', config.replacement_policy), ('cache_index', get_cache_index_from_id(id))])
@@ -91,12 +103,12 @@ def check_if_node_is_up(id, address):
         except Exception as error:
             # cache is not responding
             error_count += 1
-            if error_count < 10:
+            if error_count < 20:
                 continue
             else:
-                logging.error("run_cache_update_status - node with ip {} access timeout! {}".format(address, error))
-                return
-    return 
+                logging.error("check_if_node_is_up - node with ip {} access timeout! {}".format(address, error))
+                return -1
+    return 0
 
 def get_cache_index_from_id(id):
     index = config.cache_pool_ids.index(id)
@@ -142,6 +154,12 @@ def get_miss_rate(manully_triggered = False):
                 cloudwatch_num_hit = get_num_hit(i)
                 if cloudwatch_num_hit != []:
                     total_hit += cloudwatch_num_hit[0]
+            # elif config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == False:
+            #     # if this node is in the list but not running, check again if it is running
+            #     addr = ec2_get_instance_ip(config.cache_pool_ids[i])
+            #     thread = threading.Thread(target = check_if_node_is_up, args=(config.cache_pool_ids[i], addr), daemon = True)
+            #     thread.start()
+        
         # the first node exist from the beginning, so the get request it served 
         # should be the number of total get request 
         cloudwatch_num_GET_request_served = get_num_GET_request_served(0)
@@ -167,33 +185,11 @@ def get_miss_rate(manully_triggered = False):
     else: # for testing only
         return statistics.test_miss_rate
 
-def update_pool_size_use_ec2():
-    if config.auto_mode == True:
-        # if this is auto mode, cache_pool_size, cache_pool_ids and node_running should be updated every time
-        # a node is brought up or destroy, so don't need to update explicitly
-        return
-    else:
-        # get_cache_pool_size() will update config.cache_pool_ids and statistics.node_running in manual mode
-        config.cache_pool_size = get_cache_pool_size()
-        return 
-
 def get_cache_pool_size():
     if config.auto_mode == True:
         return config.cache_pool_size
     else: 
-        # # get the list of IDs of nodes from the manager-app
-        # cache_ec2_object_list = ec2_get_cache_ec2_object_list()
-        # for cache_ec2_object in cache_ec2_object_list:
-        #     # if this is an unknow node
-        #     if cache_ec2_object.id not in config.cache_pool_ids:
-        #         # update config.cache_pool_ids
-        #         config.cache_pool_ids.append(cache_ec2_object.id)
-        #         # TODO: update statistics.node_running
-        #         address = cache_ec2_object.public_ip_address
-        #         statistics.node_running[cache_ec2_object.id] = False
-        # return len(cache_ec2_object_list)
-        
-        # TODO: get the node list from manager
+        # TODO: get the node list from manager, or manager need to send the list every time list updated
         return config.cache_pool_size
 
 def clear_all_cache_stats():
@@ -201,4 +197,33 @@ def clear_all_cache_stats():
         if statistics.node_running[node_id] == True:
             address = ec2_get_instance_ip(node_id)
             response = requests.delete("http://" + address + ":" + str(config.cache_port) + "/api/cache/statistics")
+        # else:
+        #     # if this node is in the list but not running, check again if it is running
+        #     addr = ec2_get_instance_ip(node_id)
+        #     thread = threading.Thread(target = check_if_node_is_up, args=(node_id, addr), daemon = True)
+        #     thread.start()
     return 
+
+def notify_while_bring_up_node(notify_info, changed_id):
+    start_time = datetime.now()
+    all_running = False
+    while all_running == False:
+        time.sleep(1)
+        if datetime.now() > (start_time + timedelta(minutes=2)):
+            logging.error("notify_while_bring_up_node - node {} not responding!".format(id))
+            return
+        # wait until all nodes are running or a timeout after 2mins
+        all_running = True
+        for id in changed_id:
+            if statistics.node_running[id] == False:
+                all_running = False
+                break
+            else:
+                ip = ec2_get_instance_ip(id)
+                if ip not in notify_info['ip']:
+                    notify_info['ip'].append(ip)
+    logging.info("notify_while_bring_up_node - all new nodes are up, sending request to notify A1")
+    logging.info("notify_while_bring_up_node - notify_info = {}".format(json.dumps(notify_info)))
+    # TODO: enable this line and makes sure format matches with A1
+    # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('id', notify_info)])
+    return

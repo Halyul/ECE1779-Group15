@@ -25,6 +25,7 @@ replacement_policy = 'rr'
 setup_config = server.config.Config()
 config_info = setup_config.fetch()
 cache_port = config_info['cache']['port']
+server_port = config_info['server']['port']
 auto_scaler_port = config_info['auto_scaler']['port']
 
 # aws configs

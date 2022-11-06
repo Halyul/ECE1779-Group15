@@ -5,7 +5,8 @@ from auto_scaler import webapp
 import auto_scaler.config as config
 import auto_scaler.statistics as statistics
 from auto_scaler.libs.scaler_operations import responce_main, responce_refresh_config, \
-    responce_terminate_all, responce_list_cache, check_miss_rate_every_min
+    responce_terminate_all, responce_list_cache, check_miss_rate_every_min, responce_get_node_list, \
+    responce_set_node_list, responce_do_node_delete
 from auto_scaler.libs.scaler_support_func import initialization
 
 @webapp.route('/',methods=['GET'])
@@ -19,6 +20,18 @@ def main():
 @webapp.route('/api/scaler/config',methods=['POST'])
 def refresh_config():
     return responce_refresh_config()
+
+@webapp.route('/api/scaler/cache_list',methods=['GET'])
+def get_node_list():
+    return responce_get_node_list()
+
+@webapp.route('/api/scaler/cache_list',methods=['POST'])
+def set_node_list():
+    return responce_set_node_list()
+
+@webapp.route('/api/poolsize/change',methods=['POST'])
+def do_node_delete():
+    return responce_do_node_delete()
 
 # for testing
 @webapp.route('/api/scaler/terminate_all',methods=['POST'])
