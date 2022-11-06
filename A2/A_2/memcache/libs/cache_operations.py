@@ -177,19 +177,24 @@ def move_keys_to_other_nodes_service():
     dict = json.loads(dict)
     manager = dict['manager']
     dest = dict['dest']
+    response_out = ''
     for node_ip in dest:
         for key in dest[node_ip]:
             if key in config.memcache:
                 result = send_key_to_node(node_ip, key, config.memcache[key])
                 if result == -1:
-                    return gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to end key {}".format(key))
+                    response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to send key {}".format(key))
                 invalidateKey(key)
             else:
                 logging.error("move_keys_to_other_nodes_service - key {} does not exist".format(key))
-                return gen_failed_responce(400, "move_keys_to_other_nodes_service - key {} does not exist".format(key))
+                response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - key {} does not exist".format(key))
     if manager != "":
         response = requests.post('http://' + manager + '/api/poolsize/change')
         if response.status_code != 200:
             logging.error("move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
-            return gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
-    return gen_success_responce("")
+            response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
+    
+    if response_out == '':
+        return gen_success_responce("")
+    else:
+        return response_out
