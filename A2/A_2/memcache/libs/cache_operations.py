@@ -1,6 +1,7 @@
 from flask import render_template, request
 import logging
 import json
+import requests
 
 import sys
 sys.path.append("../..") 
@@ -8,7 +9,7 @@ import memcache.config as config
 import memcache.statistics as statistics
 
 from memcache.libs.cache_support_func import gen_failed_responce, invalidateKey, remove_element, \
-    set_parameters, gen_success_responce, file_size
+    set_parameters, gen_success_responce, file_size, send_key_to_node
 
 def get_service():
     key = request.form.get('key')
@@ -170,3 +171,25 @@ def show_info_service():
                     num_key_added_10min = num_key_added_10min, used_size_10min = used_size_10min, \
                         request_served_10min = request_served_10min, miss_rate_10min = miss_rate_10min, \
                             hit_rate_10min = hit_rate_10min)
+
+def move_keys_to_other_nodes_service():
+    dict = request.form.get('dict')
+    dict = json.loads(dict)
+    manager = dict['manager']
+    dest = dict['dest']
+    for node_ip in dest:
+        for key in dest[node_ip]:
+            if key in config.memcache:
+                result = send_key_to_node(node_ip, key, config.memcache[key])
+                if result == -1:
+                    return gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to end key {}".format(key))
+                invalidateKey(key)
+            else:
+                logging.error("move_keys_to_other_nodes_service - key {} does not exist".format(key))
+                return gen_failed_responce(400, "move_keys_to_other_nodes_service - key {} does not exist".format(key))
+    if manager != "":
+        response = requests.post('http://' + manager + '/api/poolsize/change')
+        if response.status_code != 200:
+            logging.error("move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
+            return gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
+    return gen_success_responce("")

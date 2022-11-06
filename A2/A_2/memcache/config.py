@@ -1,6 +1,8 @@
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, filemode='w', filename='cache.log')
+# logging.basicConfig(level=logging.INFO)
+
 # capacity = 1024 * 1024 # default to 1MB
 capacity = 3
 replace = 'lru'

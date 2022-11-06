@@ -3,6 +3,7 @@ import logging
 import random
 from datetime import datetime, timedelta
 import time
+import requests
 
 import sys
 sys.path.append("../..") 
@@ -158,3 +159,11 @@ def file_size(string):
     else:
         logging.error("file_size - invalid content type: 'base64,' not found, PUT failed")
         return -1
+
+def send_key_to_node(node_ip, key, value):
+    passed_data = [('key', key), ('value', value)]
+    response = requests.post('http://' + node_ip + ':5001' + '/api/cache/content', data=passed_data)
+    if response.status_code != 200:
+        logging.error("send_key_to_node failed - {}".format(response._content))
+        return -1
+    return 0
