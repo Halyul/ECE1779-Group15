@@ -19,4 +19,5 @@ URL                      |  Method  | Content Type        | Body                
 ## TODO
 - [x] Store memcache statistic every 5 seconds using CloudWatch Custom Metrics instead of the database as was done in A1
 - [x] Add 'cache_index' to config so as to separate the data send to CloudWatch Custom Metrics
-- [ ] Remove the use of SQL
+- [x] Remove the use of SQL
+- [ ] add an API to handle 1) moving key-value pair to other nodes 2) initiate the node delete if this is the node that needs to be deleted
