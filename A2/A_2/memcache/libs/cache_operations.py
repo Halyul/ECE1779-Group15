@@ -177,6 +177,7 @@ def move_keys_to_other_nodes_service():
     dict = json.loads(dict)
     manager = dict['manager']
     dest = dict['dest']
+    curr_ip = dict['cache_ip']
     response_out = ''
     for node_ip in dest:
         for key in dest[node_ip]:
@@ -189,7 +190,8 @@ def move_keys_to_other_nodes_service():
                 logging.error("move_keys_to_other_nodes_service - key {} does not exist".format(key))
                 response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - key {} does not exist".format(key))
     if manager != "":
-        response = requests.post('http://' + manager + '/api/poolsize/change')
+        passed_data=[('cache_ip', curr_ip)]
+        response = requests.post('http://' + manager + '/api/poolsize/change', data=passed_data)
         if response.status_code != 200:
             logging.error("move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
             response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
