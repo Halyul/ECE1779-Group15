@@ -12,6 +12,7 @@ URL                      |  Method  | Content Type        | Body                
 /api/scaler/set_test_miss_rate | POST | N/A               | `test_miss_rate`                                   | for testing only: send a test_miss_rate and then force a pool size adjustment
 /api/scaler/cache_list   | GET      | N/A                 | N/A                                                | to get the current list of nodes' ids
 /api/scaler/cache_list   | POST     | application/json    | `cache_pool_ids`                                   | to change the current list of nodes' ids
+/api/poolsize/change     | POST     | application/json    | N/A                                                | to actually do the node deletion
                              
 
 ## TODO
