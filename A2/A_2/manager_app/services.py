@@ -1,54 +1,71 @@
 import boto3
 import requests
-from flask import request
+from flask import request, jsonify
 
+import manager_app
 from manager_app.ec2_helper_functions import ec2_get_instance, ec2_create, ec2_destroy, ec2_destroy_all
 from manager_app.responses import success_response, failed_response
 from manager_app.s3_helper_functions import s3_list, s3_clear
 from server.config import Config
-from manager_app import data
-from db_operations import get_stats_from_db
 
 CONFIG = Config().fetch()
 AUTO_SCALAR_URL = "http://{host}:{port}".format(**CONFIG["auto_scalar"])
 CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
 
 
-def get_node_num():
+def get_pool_size():
     instances = ec2_get_instance()
     node_num = instances.size()
     return success_response(node_num)
 
 
 def get_30_min_data():
-    if data.size >= 30:
-        data.pop(0)
-    data.append(get_stats_from_db())
+    if manager_app.data_30_min.size >= 30:
+        manager_app.data_30_min.pop(0)
+    manager_app.data_30_min.append(get_stats_from_db())
 
 
 def set_cache_configurations():
-    response = requests.post(CACHE_URL + "/api/cache/config")
+    capacity = request.form.get('capacity')
+    replacement_policy = request.form.get('replacement_policy')
+    response = requests.post(CACHE_URL + "/api/cache/config",
+                             data={'capacity': capacity,
+                                   'replacement_policy': replacement_policy})
     content = response["content"]
     return success_response(content)
 
 
-def increase_pool_size():
-    instances = ec2_get_instance()
-    if instances.size() == 8:
-        return failed_response(400, "The size of memcache pool has been reached to maximum")
-    else:
-        ec2_create()
-        return success_response("Memcache pool size increases")
+def get_resize_pool_config():
+    content = jsonify(
+        resize_pool_option=manager_app.resize_pool_option,
+        resize_pool_parameters=manager_app.resize_pool_parameters
+    )
+    return success_response(content)
 
 
-def decrease_pool_size():
+def change_pool_size_manual():
+    change = request.form.get('change')
+    manager_app.resize_pool_option = 'manual'
+    manager_app.resize_pool_parameters = {}
     instances = ec2_get_instance()
-    if not instances:
-        return 400, "The size of memcache pool has been reached to minimum"
+
+    if change == 'increase':
+        if instances.size() == 8:
+            return failed_response(400, "The size of memcache pool has been reached to maximum")
+        else:
+            ec2_create()
+            return success_response("Memcache pool size increases")
+
+    elif change == 'decrease':
+        if not instances:
+            return failed_response(400, "The size of memcache pool has been reached to minimum")
+        else:
+            instance = instances[0]
+            ec2_destroy(instance.id)
+            return success_response("Memcache pool size decreases")
+
     else:
-        instance = instances[0]
-        ec2_destroy(instance.id)
-        return success_response("Memcache pool size decreases")
+        return failed_response(400, "Parameter change can only be increase or decrease")
 
 
 def set_auto_scaler_parameters():
@@ -56,12 +73,16 @@ def set_auto_scaler_parameters():
     min_miss_rate_threshold = request.form.get('min_miss_rate_threshold')
     ratio_expand_pool = request.form.get('ratio_expand_pool')
     ratio_shrink_pool = request.form.get('ratio_shrink_pool')
+    parameters = {'max_miss_rate_threshold': max_miss_rate_threshold,
+                  'min_miss_rate_threshold': min_miss_rate_threshold,
+                  'ratio_expand_pool': ratio_expand_pool,
+                  'ratio_shrink_pool': ratio_shrink_pool,
+                  'auto_mode': 'True'}
+    manager_app.resize_pool_option = 'automatic'
+    manager_app.resize_pool_parameters = parameters
 
     response = requests.post(AUTO_SCALAR_URL + "/api/scaler/config",
-                             data={'max_miss_rate_threshold': max_miss_rate_threshold,
-                                   'min_miss_rate_threshold': min_miss_rate_threshold,
-                                   'ratio_expand_pool': ratio_expand_pool,
-                                   'ratio_shrink_pool': ratio_shrink_pool})
+                             data=parameters)
     content = response["content"]
     return success_response(content)
 

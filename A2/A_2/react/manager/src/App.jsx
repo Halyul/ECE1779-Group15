@@ -12,20 +12,16 @@ import ErrorPage from "./routes/error-page";
 import Index, {
   IndexRoute
 } from "./routes/index";
-import Upload, {
-  UploadRoute,
-  action as uploadAction,
-} from "./routes/upload";
-import Image, {
-  ImageRoute,
-  loader as imageLoader,
-  action as imageAction,
-} from "./routes/image";
-import Keys, {
-  KeysRoute,
-  loader as keysLoader,
-  action as keysAction,
-} from "./routes/keys";
+import Status, {
+  StatusRoute,
+  loader as statusLoader,
+  action as statusAction,
+} from "./routes/status";
+import Config, {
+  ConfigRoute,
+  loader as configLoader,
+  action as configAction,
+} from "./routes/config";
 import 'reset-css';
 import './App.css';
 
@@ -35,11 +31,11 @@ const router = createBrowserRouter(
       path="/"
       element={
         <Root
-          title="ECE1779 Group 15"
+          title="Manager UI"
           destinations={[
             IndexRoute,
-            UploadRoute,
-            KeysRoute,
+            ConfigRoute,
+            StatusRoute,
           ]}
         />
       }
@@ -48,21 +44,16 @@ const router = createBrowserRouter(
       <Route errorElement={<ErrorPage />}>
         <Route index element={<Index />} />
         <Route
-          path={UploadRoute.path}
-          element={<Upload />}
-          action={uploadAction}
+          path={ConfigRoute.path}
+          element={<Config />}
+          loader={configLoader}
+          action={configAction}
         />
         <Route
-          path={ImageRoute.path}
-          element={<Image />}
-          loader={imageLoader}
-          action={imageAction}
-        />
-        <Route
-          path={KeysRoute.path}
-          element={<Keys />}
-          loader={keysLoader}
-          action={keysAction}
+          path={StatusRoute.path}
+          element={<Status />}
+          loader={statusLoader}
+          action={statusAction}
         />
       </Route>
     </Route>

@@ -35,7 +35,7 @@ const router = createBrowserRouter(
       path="/"
       element={
         <Root
-          title="ECE1779 Group 15"
+          title="User UI"
           destinations={[
             IndexRoute,
             UploadRoute,
