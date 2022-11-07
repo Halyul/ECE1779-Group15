@@ -12,7 +12,7 @@ URL                      |  Method  | Content Type        | Body                
 /api/scaler/set_test_miss_rate | POST | N/A               | `test_miss_rate`                                   | for testing only: send a test_miss_rate and then force a pool size adjustment
 /api/scaler/cache_list   | GET      | N/A                 | N/A                                                | to get the current list of nodes' ids
 /api/scaler/cache_list   | POST     | application/json    | `cache_pool_ids`                                   | to change the current list of nodes' ids
-/api/poolsize/change     | POST     | application/json    | N/A                                                | to actually do the node deletion
+/api/poolsize/change     | POST     | application/json    | `cache_ip`                                         | to actually do the node deletion
                              
 
 ## TODO
@@ -26,7 +26,7 @@ URL                      |  Method  | Content Type        | Body                
 - [x] Limit the maximum size of the memcache node pool set by auto-scaler to 8 and the minimum to 1. 
 - [x] cache nodes need to be brought up by code
 - [x] cache nodes need to be destroyed by code
-- [ ] a new API to get cache id list from elsewhere
-- [ ] a new API to send cache id list
+- [x] a new API to get cache id list from elsewhere
+- [x] a new API to send cache id list
 - [ ] tell A1 there are nodes to be removed
-- [ ] a new API to actually remove the node
+- [x] a new API to actually remove the node
