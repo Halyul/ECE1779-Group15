@@ -3,7 +3,8 @@ server:
   host: 0.0.0.0
   debug: true
   static_folder: ./react/user/dist
-  upload_location: ./uploads
+  bucket:
+    name: "ece1779assignment2group15"
 
 database:
   host: 127.0.0.1

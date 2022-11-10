@@ -1,8 +1,8 @@
-import mimetypes
-import pathlib, base64, time
+import base64, time
 from server.config import Config
 from server.libs.database import Database
 from server.libs.thread_task import ThreadTask
+from server.aws.s3 import Bucket
 import requests
 
 CONFIG = Config().fetch()
@@ -23,14 +23,10 @@ def create_key(args):
     database.lock(table=KEY_IMAGE_TABLE_NAME)
     file_entry = database.get_key_image_pair(args["key"])
     if not file_entry:
-        filepath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"])
-        filepath.mkdir(parents=True, exist_ok=True)
-        file_ext = file.filename.split(".")[-1]
-        filename = "{}.{}".format(str(int(time.time() * 1000)), file_ext)
-        file_fullpath = filepath.joinpath(filename)
+        filename = "{}.{}".format(str(int(time.time() * 1000)), "s3")
         database.create_key_image_pair(args["key"], filename)
     else:
-        file_fullpath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], file_entry[0])
+        filename = file_entry[0]
         # invalidate the key in the memcache
         ThreadTask(
             requests.delete, 
@@ -39,7 +35,8 @@ def create_key(args):
                 data=[("key", args["key"])]
             )
         ).start()
-    file.save(file_fullpath)
+    file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
+    Bucket(CONFIG["server"]["bucket"]["name"]).object.upload(file_base64, filename)
     database.unlock()
     return True, 200, None
 
@@ -67,12 +64,11 @@ def get_key(key):
             database.unlock()
             return False, 404, "No such key."
         content = None
-        filepath = pathlib.Path.cwd().joinpath(CONFIG["server"]["upload_location"], key_image_pair[0])
-        with open(filepath, "rb") as f:
-            image_content = f.read()
-            encoded_bytes = base64.b64encode(image_content)
-            humanreadable_data = encoded_bytes.decode("utf-8")
-            content = "data:{};base64,".format(mimetypes.guess_type(filepath)[0]) + humanreadable_data
+        key = key_image_pair[0]
+        flag, content = Bucket(CONFIG["server"]["bucket"]["name"]).object.get(key)
+        if not flag:
+            database.unlock()
+            return False, 500, "Failed to retrieve the image."
         ThreadTask(
             requests.post,
             kwargs=dict(
