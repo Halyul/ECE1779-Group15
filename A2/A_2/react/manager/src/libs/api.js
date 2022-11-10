@@ -45,14 +45,9 @@ export async function clear(mode) {
 }
 
 // Path: react/manager/src/routes/config.jsx
-export async function getPoolConfig() {
-  const data = await request("/api/manager/poolsize/config")
-  return responseAdapter(data);
-}
-
-// Path: react/manager/src/routes/config.jsx
-export async function getNodeConfig() {
-  const data = await request("/api/manager/config")
+export async function getConfig(mode) {
+  // mode =   "poolsize" | "cache"
+  const data = await request(`/api/manager/${mode}/config`)
   return responseAdapter(data);
 }
 
@@ -66,7 +61,7 @@ export async function getPoolSize() {
 // Path: react/manager/src/routes/config.jsx
 export async function setNodeConfig(config) {
   const data = await request(
-    "/api/manager/config",
+    "/api/manager/cache/config",
     {
       method: "POST",
       body: JSON.stringify(config),

@@ -8,6 +8,7 @@ specifiers:
   '@types/react': ^18.0.22
   '@types/react-dom': ^18.0.7
   '@vitejs/plugin-react': ^2.2.0
+  echarts: ^5.4.0
   echarts-for-react: ^3.0.2
   react: ^18.2.0
   react-dom: ^18.2.0
@@ -20,6 +21,7 @@ dependencies:
   '@emotion/styled': 11.10.5_z7x6wqqd37fzu777gq3gq2bxru
   '@mui/icons-material': 5.10.9_5n7l3nqogz2ltkpvtlyqobxizm
   '@mui/material': 5.10.12_gs4twfomdgooimayvnfrqgiwam
+  echarts: 5.4.0
   echarts-for-react: 3.0.2_echarts@5.4.0+react@18.2.0
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0

@@ -32,7 +32,6 @@ export default function Status() {
           <>
             <ECharts
               title="Hit and Miss Rate"
-              magicTypes={['line', 'bar']}
               xAxis={[
                 {
                   type: 'category',
@@ -49,14 +48,21 @@ export default function Status() {
               }
               series={[
                 {
+                  name: 'Hit Rate',
                   data: [4168, 12441, 3297, 2801, 5465, 5609, 3907, 3487, 2967, 4988, 3620, 3648, 3635, 7262, 2138, 2177, 3431, 3424, 5990, 5262, 3882, 10322, 4370, 2621, 4715, 2951, 8873, 7002, 3711, 2692, 3106, 5574, 3381, 3430, 3492, 4225, 2738, 2048, 4196, 6041, 2918, 2366, 3848, 7078, 3129, 2387, 3252, 2626, 6399],
-                  type: 'line'
+                  type: 'line',
+                  smooth: true,
+                },
+                {
+                  name: 'Miss Rate',
+                  data: [168, 1241, 327, 281, 565, 569, 307, 387, 267, 988, 320, 348, 335, 722, 238, 217, 331, 344, 590, 262, 382, 122, 430, 221, 415, 251, 873, 702, 371, 292, 316, 554, 381, 340, 392, 425, 238, 48, 416, 61, 218, 236, 3848, 78, 319, 287, 3252, 2626, 699],
+                  type: 'line',
+                  smooth: true,
                 }
               ]}
             />
             <ECharts
               title="Number of Items in Cache"
-              magicTypes={['line', 'bar']}
               xAxis={[
                 {
                   type: 'category',
@@ -77,7 +83,6 @@ export default function Status() {
             />
             <ECharts
               title="Total Size of Items"
-              magicTypes={['line', 'bar']}
               xAxis={[
                 {
                   type: 'category',
@@ -101,7 +106,6 @@ export default function Status() {
             />
             <ECharts
               title="Number of Requests Served"
-              magicTypes={['line', 'bar']}
               xAxis={[
                 {
                   type: 'category',
