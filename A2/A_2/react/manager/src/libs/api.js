@@ -1,3 +1,4 @@
+// Path: react/manager/src/routes/config.jsx
 export async function setModeParam(mode, config) {
   const data = await request(
     `/api/manager/poolsize/${mode}`,
@@ -17,11 +18,17 @@ export async function setModeParam(mode, config) {
   };
 }
 
-export async function getStatus(mode) {
-  const data = await request(`/api/manager/${mode}`)
-  return responseAdapter(data);
+// Path: react/manager/src/routes/status.jsx
+export async function getStatus() {
+  const data = await request(`/api/manager/aggregate_stats`)
+  // return responseAdapter(data);
+  return {
+    status: 200,
+    statusText: "OK",
+  };
 }
 
+// Path: react/manager/src/routes/config.jsx
 export async function clear(mode) {
   const data = await request(
     `/api/manager/${mode}/clear`,
@@ -37,16 +44,19 @@ export async function clear(mode) {
   };
 }
 
+// Path: react/manager/src/routes/config.jsx
 export async function getPoolConfig() {
-  const data = await request("/api/manager/config")
+  const data = await request("/api/manager/poolsize/config")
   return responseAdapter(data);
 }
 
+// Path: react/manager/src/routes/config.jsx
 export async function getNodeConfig() {
   const data = await request("/api/manager/config")
   return responseAdapter(data);
 }
 
+// Path: react/manager/src/routes/config.jsx
 export async function setNodeConfig(config) {
   const data = await request(
     "/api/manager/config",

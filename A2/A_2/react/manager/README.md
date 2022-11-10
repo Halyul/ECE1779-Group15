@@ -7,10 +7,11 @@ URL            |  Method | Content Type        | Body
                             
 
 ## TODO
-- [ ] Use charts to show the number of nodes as well as to aggregate statistics for the memcache pool including miss rate, hit rate, number of items in cache, total size of items in cache, number of requests served per minute. The charts should display data for the last 30 minutes at 1-minute granularity
-- [ ] Get current configs
-    - [ ] Pool
-    - [ ] Node
+- [x] Use charts to show the number of nodes as well as to aggregate statistics for the memcache pool including miss rate, hit rate, number of items in cache, total size of items in cache, number of requests served per minute. The charts should display data for the last 30 minutes at 1-minute granularity
+    - [ ] Chart adjustments
+- [x] Get current configs
+    - [x] Pool /api/manager/poolsize/config
+    - [x] Node /api/manager/config
 - [x] Configure the capacity and replacement policy used by memcache nodes. All memcache nodes in the pool will operate with the same configuration.
 - [x] Selecting between two mutually-exclusive options for resizing the memcache pool:
     - [x] Manual mode. There should be two buttons for manually growing the pool size by one node and shrinking the pool size by one node The maximum and minimum sizes should be 1 and shrinking the pool size by one node. The maximum and minimum sizes should be 1 and 8, respectively.
