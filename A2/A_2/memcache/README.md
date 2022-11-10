@@ -21,7 +21,7 @@ URL                      |  Method  | Content Type        | Body                
 - [x] Store memcache statistic every 5 seconds using CloudWatch Custom Metrics instead of the database as was done in A1
 - [x] Add 'cache_index' to config so as to separate the data send to CloudWatch Custom Metrics
 - [x] Remove the use of SQL
-- [ ] add an API to handle 1) moving key-value pair to other nodes 2) initiate the node delete if this is the node that needs to be deleted
+- [x] add an API to handle 1) moving key-value pair to other nodes 2) initiate the node delete if this is the node that needs to be deleted
   - dict['manager'] should be `ip:port` if this node needs to be deleted, or "" if this node is not
   - dict['dest'] should be a dict in format of `{node_ip : [keys]}`
   - dict['cache_ip'] should be the ipv4 address of this cache, this will eventually send to the manager and auto_scaler to remove a specific cache node
