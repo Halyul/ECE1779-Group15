@@ -12,6 +12,8 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import {
   getNodeConfig,
+  getPoolConfig,
+  getPoolSize,
   setNodeConfig,
   setModeParam,
   clear
@@ -74,13 +76,15 @@ export default function Config() {
   const actionResponse = useActionData();
   const [submitted, setSubmitted] = useState(false);
 
-  // const [capacity, setCapacity] = useState(loaderResponse.config.node.capacity);
   const [capacity, setCapacity] = useState(100);
+  // const [capacity, setCapacity] = useState(loaderResponse.config.node.capacity);
   const [capacityError, setCapacityError] = useState(false);
   const [policy, setPolicy] = useState("lru");
   // const [policy, setPolicy] = useState(loaderResponse.config.node.policy);
   const [clearCache, setClearCache] = useState(false);
 
+  const [poolSize, setPoolSize] = useState(1);
+  // const [poolSize, setPoolSize] = useState(loaderResponse.config.pool.size);
   const [resizingMode, setResizingMode] = useState("automatic");
   // const [resizingMode, setResizingMode] = useState(loaderResponse.config.pool.mode);
   const [missRateThreshold, setMissRateThreshold] = useState([0, 100]);
@@ -204,6 +208,7 @@ export default function Config() {
       />
       <ConfigCard
         title="Configuration for the memcache pool"
+        subtitle={`Current Pool Size: ${poolSize}`}
         id="config-pool-form"
         method="POST"
         onSubmit={(e) => {

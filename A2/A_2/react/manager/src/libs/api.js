@@ -57,6 +57,13 @@ export async function getNodeConfig() {
 }
 
 // Path: react/manager/src/routes/config.jsx
+export async function getPoolSize() {
+  const data = await request("/api/manager/poolsize")
+  // return responseAdapter(data);
+  return 10
+}
+
+// Path: react/manager/src/routes/config.jsx
 export async function setNodeConfig(config) {
   const data = await request(
     "/api/manager/config",
