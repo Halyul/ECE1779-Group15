@@ -151,32 +151,14 @@ def get_miss_rate(manully_triggered = False):
         # read total_get_request and total_hit from CloudWatch
         for i in range(len(config.cache_pool_ids)):
             if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
+                # logging.info("reading statistics from cloudwatch, i = {}".format(i))
                 cloudwatch_num_hit = get_num_hit(i)
                 if cloudwatch_num_hit != []:
                     total_hit += cloudwatch_num_hit[0]
-            # elif config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == False:
-            #     # if this node is in the list but not running, check again if it is running
-            #     addr = ec2_get_instance_ip(config.cache_pool_ids[i])
-            #     thread = threading.Thread(target = check_if_node_is_up, args=(config.cache_pool_ids[i], addr), daemon = True)
-            #     thread.start()
-        
-        # the first node exist from the beginning, so the get request it served 
-        # should be the number of total get request 
-        cloudwatch_num_GET_request_served = get_num_GET_request_served(0)
-        if cloudwatch_num_GET_request_served != []:
-            total_get_request = cloudwatch_num_GET_request_served[0]
-
-        # cannot be done for CloudWatch, so disabled
-        # # update total_hit to cache node 0 so the statistics will not lost if some nodes are distroyed
-        # # rest of cache nodes will have num_hit set to 0
-        # for i in range(len(config.cache_pool_ids)):
-        #     if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
-        #         addr = ec2_get_instance_ip(config.cache_pool_ids[i])
-        #         if i == 0:
-        #             response = requests.post("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', total_hit)])
-        #         else:
-        #             response = requests.post("http://" + addr + ":" + str(config.cache_port) + "/api/cache/set_num_hit", data=[('num_hit', 0)])
-        
+                cloudwatch_num_GET_request_served = get_num_GET_request_served(i)
+                if cloudwatch_num_GET_request_served != []:
+                    total_get_request += cloudwatch_num_GET_request_served[0]
+                # logging.info("statistics: total_hit = {}, total_get_request = {}".format(total_hit, total_get_request))
         # start calculating the miss rate
         if total_get_request == 0:
             return 'n/a'
@@ -225,5 +207,5 @@ def notify_while_bring_up_node(notify_info, changed_id):
     logging.info("notify_while_bring_up_node - all new nodes are up, sending request to notify A1")
     logging.info("notify_while_bring_up_node - notify_info = {}".format(json.dumps(notify_info)))
     # TODO: enable this line and makes sure format matches with A1
-    # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('id', notify_info)])
+    # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip'])])
     return

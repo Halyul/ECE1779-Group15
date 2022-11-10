@@ -10,6 +10,11 @@ def set_scaler_config(max_miss_rate_threshold, min_miss_rate_threshold, expand_r
     response = requests.post('http://127.0.0.1:' + str(port) + '/api/scaler/config', data=passed_data)
     return response.content
 
+def set_scaler_cache_config(capacity, replacement_policy):
+    passed_data=[('capacity', capacity), ('replacement_policy', replacement_policy)]
+    response = requests.post('http://127.0.0.1:' + str(port) + '/api/scaler/cache_config', data=passed_data)
+    return response.content
+
 def set_test_miss_rate(test_miss_rate):
     passed_data=[('test_miss_rate', test_miss_rate)]
     response = requests.post('http://127.0.0.1:' + str(port) + '/api/scaler/set_test_miss_rate', data=passed_data)
