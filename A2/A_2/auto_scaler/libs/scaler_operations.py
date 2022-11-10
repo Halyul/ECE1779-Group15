@@ -25,6 +25,8 @@ def responce_main():
     data['min_miss_rate_threshold'] = config.min_miss_rate_threshold
     data['expand_ratio'] = config.expand_ratio
     data['shrink_ratio'] = config.shrink_ratio
+    data['capacity'] = config.capacity
+    data['replacement_policy'] = config.replacement_policy
     
     instances = []
     for instance_id in config.cache_pool_ids:
@@ -38,32 +40,62 @@ def responce_refresh_config():
     try:
         # max_miss_rate_threshold and min_miss_rate_threshold should between in range [0,1]
         if float(request.form.get('max_miss_rate_threshold')) < 0 or float(request.form.get('max_miss_rate_threshold')) > 1:
-            gen_failed_responce(400, "max_miss_rate_threshold = {} which is not valid".format(float(request.form.get('max_miss_rate_threshold'))))
+            return gen_failed_responce(400, "max_miss_rate_threshold = {} which is not valid".format(float(request.form.get('max_miss_rate_threshold'))))
         if float(request.form.get('min_miss_rate_threshold')) < 0 or float(request.form.get('min_miss_rate_threshold')) > 1:
-            gen_failed_responce(400, "min_miss_rate_threshold = {} which is not valid".format(float(request.form.get('min_miss_rate_threshold'))))
+            return gen_failed_responce(400, "min_miss_rate_threshold = {} which is not valid".format(float(request.form.get('min_miss_rate_threshold'))))
         config.max_miss_rate_threshold = float(request.form.get('max_miss_rate_threshold'))
         config.min_miss_rate_threshold = float(request.form.get('min_miss_rate_threshold'))
         # expand_ratio should be in range (1, inf)
         if float(request.form.get('expand_ratio')) <= 1:
-            gen_failed_responce(400, "expand_ratio = {} which is not valid".format(float(request.form.get('expand_ratio'))))
+            return gen_failed_responce(400, "expand_ratio = {} which is not valid".format(float(request.form.get('expand_ratio'))))
         config.expand_ratio = float(request.form.get('expand_ratio'))
         # shrink_ratio should be in range (0, 1)
         if float(request.form.get('shrink_ratio')) >= 1 or float(request.form.get('shrink_ratio')) <= 0:
-            gen_failed_responce(400, "shrink_ratio = {} which is not valid".format(float(request.form.get('shrink_ratio'))))
+            return gen_failed_responce(400, "shrink_ratio = {} which is not valid".format(float(request.form.get('shrink_ratio'))))
         config.shrink_ratio = float(request.form.get('shrink_ratio'))
         config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
-        
+
         return gen_success_responce("")
     except Exception as error:
         logging.error('responce_refresh_config - ' + error)
         return gen_failed_responce(400, error)
     
+def responce_refresh_cache_config():
+    try:
+        if int(request.form.get('capacity')) < 0:
+            return gen_failed_responce(400, "capacity = {} which is not valid".format(int(request.form.get('capacity'))))
+        if request.form.get('replacement_policy') not in ['rr', 'lru']:
+            return gen_failed_responce(400, "replacement_policy = {} which is not valid".format(request.form.get('replacement_policy')))
+        config.capacity = int(request.form.get('capacity'))
+        config.replacement_policy = request.form.get('replacement_policy')
+
+        # refresh nodes running status
+        for node_id in statistics.node_running:
+            if statistics.node_running[node_id] == False:
+                node_addr = ec2_get_instance_ip(node_id)
+                check_if_node_is_up(node_id, node_addr)
+        # refresh config for all nodes that are running if auto_mode is on
+        if config.auto_mode == True:
+            for node_id in statistics.node_running:
+                if statistics.node_running[node_id] == True:
+                    node_addr = ec2_get_instance_ip(node_id)
+                    response = requests.post("http://" + node_addr + ":" + str(config.cache_port) + "/api/cache/config", \
+                        data=[('capacity', config.capacity), ('replacement_policy', config.replacement_policy)])
+
+        return gen_success_responce("")
+    except Exception as error:
+        logging.error('responce_refresh_cache_config - ' + error)
+        return gen_failed_responce(400, error)
+
 def check_miss_rate_every_min(manully_triggered = False):
-    notify_info = {'action' : '', 'ip' : []}
-    changed_id = []
     try:
         while True:
+            notify_info = {'action' : '', 'ip' : []}
+            changed_id = []
             miss_rate = get_miss_rate(manully_triggered = manully_triggered)
+            # if miss_rate is 'n/a', means no one is using any of the cache, so to decrease the pool size
+            if miss_rate == 'n/a':
+                miss_rate = 0
             
             if config.auto_mode == True and miss_rate != 'n/a':
                 expected_pool_size = get_cache_pool_size()
@@ -96,14 +128,14 @@ def check_miss_rate_every_min(manully_triggered = False):
                     if notify_info['action'] == 'delete':
                         logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
                         logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
-                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('id', notify_info)])
+                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip'])])
                     else:
-                        # TODO: wait for nodes bring up
+                        # wait for nodes bring up, notify_while_bring_up_node will also notify A1 these new nodes
                         thread = threading.Thread(target = notify_while_bring_up_node, args=(notify_info, changed_id,), daemon = True)
                         thread.start()
                         
             elif config.auto_mode == False:
-                # TODO: need to get it from manager
+                # TODO: need to get the node_id list from manager
                 pass
 
             # if this update of num cache nodes is manully triggered, will return after one round of pool size update
@@ -139,9 +171,11 @@ def responce_do_node_delete():
 def responce_get_node_list():
     return json.dumps(config.cache_pool_ids)
 
-def responce_set_node_list():
+def responce_set_node_list(node_list = []):
     if config.auto_mode == False:
-        node_list = json.loads(request.form.get('cache_pool_ids'))
+        # if function called without set node_list, this function used to serve http response
+        if node_list == []:
+            node_list = json.loads(request.form.get('cache_pool_ids'))
         config.cache_pool_ids = node_list
         config.cache_pool_size = len(config.cache_pool_ids)
         # refresh the statistics.node_running

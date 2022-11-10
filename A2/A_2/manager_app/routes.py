@@ -44,6 +44,11 @@ def get_pool_size():
     return services.get_pool_size()
 
 
+@webapp.route('/api/manager/cache/config', methods=['GET'])
+def set_cache_configurations():
+    return services.get_cache_configurations()
+
+
 @webapp.route('/api/manager/poolsize/manual', methods=['POST'])
 def notify_pool_size_change():
     return services.notify_pool_size_change()

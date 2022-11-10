@@ -105,7 +105,6 @@ def update_database_every_5s():
             curr_statistics['num_request_served'] = statistics.num_request_served
             curr_statistics['num_GET_request_served'] = statistics.num_GET_request_served
             curr_statistics['num_hit'] = statistics.num_hit
-            curr_statistics['num_hit_cloudwatch'] = statistics.num_hit_cloudwatch
 
             if len(statistics.prev_statistics_every_5s) < 120:
                 statistics.prev_statistics_every_5s.append(curr_statistics)
@@ -119,16 +118,15 @@ def update_database_every_5s():
                 'num_request_served' : curr_statistics['num_request_served'] - statistics.prev_statistics_every_5s[0]['num_request_served'],
                 'num_GET_request_served' : curr_statistics['num_GET_request_served'] - statistics.prev_statistics_every_5s[0]['num_GET_request_served'],
                 'num_hit' : curr_statistics['num_hit'] - statistics.prev_statistics_every_5s[0]['num_hit'],
-                'num_hit_cloudwatch' : curr_statistics['num_hit_cloudwatch'] - statistics.prev_statistics_every_5s[0]['num_hit_cloudwatch'],
                 'utilization' : utilization
             }
-            statistics.statistics_10min['num_miss'] = statistics.statistics_10min['num_GET_request_served'] - statistics.statistics_10min['num_hit_cloudwatch']
+            statistics.statistics_10min['num_miss'] = statistics.statistics_10min['num_GET_request_served'] - statistics.statistics_10min['num_hit']
 
             if statistics.statistics_10min['num_GET_request_served'] == 0:
                 hit_rate = -1
                 miss_rate = -1
             else:
-                hit_rate = (statistics.statistics_10min['num_hit_cloudwatch'] / statistics.statistics_10min['num_GET_request_served']) * 100
+                hit_rate = (statistics.statistics_10min['num_hit'] / statistics.statistics_10min['num_GET_request_served']) * 100
                 miss_rate = 100 - hit_rate
 
             # insert_5s_statistics_to_db(statistics.statistics_10min['num_item_in_cache'], statistics.statistics_10min['used_size'], \
@@ -139,7 +137,7 @@ def update_database_every_5s():
             my_put_metric_data(config.cache_index, 'capacity used', statistics.statistics_10min['used_size'])
             my_put_metric_data(config.cache_index, 'request served', statistics.statistics_10min['num_request_served'])
             my_put_metric_data(config.cache_index, 'GET request served', statistics.statistics_10min['num_GET_request_served'])
-            my_put_metric_data(config.cache_index, 'number of hit', statistics.statistics_10min['num_hit_cloudwatch'])
+            my_put_metric_data(config.cache_index, 'number of hit', statistics.statistics_10min['num_hit'])
             my_put_metric_data(config.cache_index, 'cache utilization', utilization)
             if hit_rate != -1:
                 my_put_metric_data(config.cache_index, 'hit rate', hit_rate)
