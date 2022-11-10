@@ -4,7 +4,15 @@
 
 URL            |  Method | Content Type        | Body      
 ---------------|---------|---------------------|-------------
-                            
+/api/manager/poolsize/automatic | POST | application/json | `max_miss_rate_threshold`, `min_miss_rate_threshold`, `expand_ratio`, `shrink_ratio`
+/api/manager/poolsize/manual | POST | application/json | `change`
+/api/manager/aggregate_stats | GET | N/A | N/A
+/api/manager/data/clear | DELETE | N/A | N/A
+/api/manager/cache/clear | DELETE | N/A | N/A
+/api/manager/poolsize/config | GET | N/A | N/A
+/api/manager/cache/config | GET | N/A | N/A
+/api/manager/poolsize | GET | N/A | N/A
+/api/manager/cache/config | POST | application/json | `capacity`, `policy`
 
 ## TODO
 - [x] Use charts to show the number of nodes as well as to aggregate statistics for the memcache pool including miss rate, hit rate, number of items in cache, total size of items in cache, number of requests served per minute. The charts should display data for the last 30 minutes at 1-minute granularity
