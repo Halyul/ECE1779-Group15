@@ -108,13 +108,24 @@ def set_auto_scaler_parameters():
     return success_response(content)
 
 
+def get_cache_configurations():
+    content = jsonify(
+        capacity=variables.memcache_capacity,
+        replacement_policy=variables.memcache_replacement_policy
+    )
+    return content
+
+
 def set_cache_configurations():
     """
     1. Get running node ip
-    2. For each ip, call instance 2 set cache config
+    2. Store cache configs to local
+    3. For each ip, call instance 2 set cache config
     """
     capacity = request.form.get('capacity')
     replacement_policy = request.form.get('replacement_policy')
+    variables.memcache_capacity = capacity
+    variables.memcache_replacement_policy = replacement_policy
 
     content = []
     ip_list = generate_node_ip_list()
