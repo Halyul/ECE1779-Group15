@@ -8,6 +8,7 @@ auto_scaler_port = config_info['auto_scaler']['port']
 manager_port = config_info['manager']['port']
 AUTO_SCALAR_URL = "http://127.0.0.1:" + auto_scaler_port
 SERVER_URL = "http://127.0.0.1:" + server_port
+STATIC_FOLDER = config_info["manager"]["static_folder"]
 
 # aws configs
 ami_id = config_info['aws']['ami_id']

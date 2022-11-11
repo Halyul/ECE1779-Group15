@@ -3,9 +3,7 @@ import mysql.connector
 from server.config import Config
 
 CONFIG = Config().fetch()["database"]
-CONFIG_TABLE_NAME = CONFIG["table_names"]["config"]
 KEY_IMAGE_TABLE_NAME = CONFIG["table_names"]["key_image"]
-STATUS_TABLE_NAME = CONFIG["table_names"]["status"]
 
 class Mode(Enum):
     WRITE = 1

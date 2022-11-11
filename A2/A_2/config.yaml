@@ -3,18 +3,17 @@ server:
   host: 0.0.0.0
   debug: true
   static_folder: ./react/user/dist
-  upload_location: ./uploads
+  bucket:
+    name: "ece1779assignment2group15"
 
 database:
-  host: 127.0.0.1
+  host: ece1779assignment2group15.co0mwaevj3y4.us-east-1.rds.amazonaws.com
   port: 3306
   user: root
   password: ece1779pass
   name: ece1779_memcache
   table_names:
     key_image: key_image
-    config: config
-    status: status
 
 cache:
   host: 127.0.0.1
@@ -23,9 +22,11 @@ cache:
 manager:
   host: 127.0.0.1
   port: 5004
+  static_folder: ./react/manager/dist
   
 auto_scaler:
   port: 5010
+
 aws:
   private_key_file: C:/Users/13698/.ssh/ece1779_assignment1_keypair.pem
   credential_file: C:/Users/13698/.aws/credentials

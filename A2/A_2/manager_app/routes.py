@@ -1,6 +1,28 @@
+import os
+from flask import send_from_directory
 import services
 from manager_app import webapp
 
+
+@webapp.route("/", defaults={"path": ""})
+@webapp.route("/<path:path>")
+def serve(path):
+    def set_mimetype(filename: str):
+        if filename.endswith("js"):
+            return "text/javascript"
+        elif filename.endswith("css"):
+            return "text/css"
+        elif filename.endswith("svg"):
+            return "image/svg+xml"
+
+    if path != "" and os.path.exists(webapp.static_folder + "/" + path):
+        return send_from_directory(
+            webapp.static_folder, 
+            path,
+            mimetype=set_mimetype(path)
+        )
+    else:
+        return send_from_directory(webapp.static_folder, "index.html")
 
 @webapp.route('/api/manager/pool_node_list', methods=['GET'])
 def get_pool_size():

@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { useLoaderData } from "react-router-dom";
+import {
+  useLoaderData,
+  useActionData
+} from "react-router-dom";
 import { RefreshCard } from "../components/card";
 import SubmissionPrompt from "../components/submission-prompt";
 import { getStatus } from "../libs/api";
@@ -7,6 +10,12 @@ import ECharts from "../components/echarts";
 
 export async function loader({ params }) {
   const response = await getStatus();
+  if (response.status !== 200) {
+    throw new Response(response.data.message, {
+      status: response.status,
+      statusText: response.statusText,
+    });
+  }
   return response;
 }
 
@@ -15,14 +24,17 @@ export async function action({ request, params }) {
 }
 
 export default function Status() {
-  // const loaderResponse = useLoaderData();
-  // const [statusList, setStatusList] = useState(loaderResponse.data.status);
+  const loaderResponse = useLoaderData();
+  const [statusList, setStatusList] = useState(loaderResponse.data.content);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // useEffect(() => {
-  //   setIsRefreshing(false);
-  //   setStatusList(loaderResponse.data.status);
-  // }, [loaderResponse]);
+  useEffect(() => {
+    setIsRefreshing(false);
+    setStatusList(loaderResponse.data.content);
+  }, [loaderResponse]);
+
+  const generateXAxis = (length) => {return Array.from(Array(length).keys()).map((i) => {return i + 1}).reverse()}
+
   return (
     <>
       <RefreshCard
@@ -35,7 +47,8 @@ export default function Status() {
               xAxis={[
                 {
                   type: 'category',
-                  data: ['2021-10-09', '2021-10-10', '2021-10-11', '2021-10-12', '2021-10-13', '2021-10-14', '2021-10-15', '2021-10-16', '2021-10-17', '2021-10-18', '2021-10-19', '2021-10-20', '2021-10-21', '2021-10-22', '2021-10-23', '2021-10-24', '2021-10-25', '2021-10-26', '2021-10-27', '2021-10-28', '2021-10-29', '2021-10-30', '2021-10-31', '2021-11-01', '2021-11-02', '2021-11-03', '2021-11-04', '2021-11-05', '2021-11-06', '2021-11-07', '2021-11-08', '2021-11-09', '2021-11-10', '2021-11-11', '2021-11-12', '2021-11-13', '2021-11-14', '2021-11-15', '2021-11-16', '2021-11-17', '2021-11-18', '2021-11-19', '2021-11-20', '2021-11-21', '2021-11-22', '2021-11-23', '2021-11-24', '2021-11-25', '2021-11-26']
+                  boundaryGap: false,
+                  data: generateXAxis(statusList.hit_rate.length),
                 }
               ]}
               yAxis={[
@@ -49,13 +62,13 @@ export default function Status() {
               series={[
                 {
                   name: 'Hit Rate',
-                  data: [4168, 12441, 3297, 2801, 5465, 5609, 3907, 3487, 2967, 4988, 3620, 3648, 3635, 7262, 2138, 2177, 3431, 3424, 5990, 5262, 3882, 10322, 4370, 2621, 4715, 2951, 8873, 7002, 3711, 2692, 3106, 5574, 3381, 3430, 3492, 4225, 2738, 2048, 4196, 6041, 2918, 2366, 3848, 7078, 3129, 2387, 3252, 2626, 6399],
+                  data: statusList.hit_rate,
                   type: 'line',
                   smooth: true,
                 },
                 {
                   name: 'Miss Rate',
-                  data: [168, 1241, 327, 281, 565, 569, 307, 387, 267, 988, 320, 348, 335, 722, 238, 217, 331, 344, 590, 262, 382, 122, 430, 221, 415, 251, 873, 702, 371, 292, 316, 554, 381, 340, 392, 425, 238, 48, 416, 61, 218, 236, 3848, 78, 319, 287, 3252, 2626, 699],
+                  data: statusList.miss_rate,
                   type: 'line',
                   smooth: true,
                 }
@@ -66,7 +79,8 @@ export default function Status() {
               xAxis={[
                 {
                   type: 'category',
-                  data: ['2021-10-09', '2021-10-10', '2021-10-11', '2021-10-12', '2021-10-13', '2021-10-14', '2021-10-15', '2021-10-16', '2021-10-17', '2021-10-18', '2021-10-19', '2021-10-20', '2021-10-21', '2021-10-22', '2021-10-23', '2021-10-24', '2021-10-25', '2021-10-26', '2021-10-27', '2021-10-28', '2021-10-29', '2021-10-30', '2021-10-31', '2021-11-01', '2021-11-02', '2021-11-03', '2021-11-04', '2021-11-05', '2021-11-06', '2021-11-07', '2021-11-08', '2021-11-09', '2021-11-10', '2021-11-11', '2021-11-12', '2021-11-13', '2021-11-14', '2021-11-15', '2021-11-16', '2021-11-17', '2021-11-18', '2021-11-19', '2021-11-20', '2021-11-21', '2021-11-22', '2021-11-23', '2021-11-24', '2021-11-25', '2021-11-26']
+                  boundaryGap: false,
+                  data: generateXAxis(statusList.number_of_items_in_cache.length)
                 }
               ]}
               yAxis={[
@@ -76,7 +90,7 @@ export default function Status() {
               ]}
               series={[
                 {
-                  data: [4168, 12441, 3297, 2801, 5465, 5609, 3907, 3487, 2967, 4988, 3620, 3648, 3635, 7262, 2138, 2177, 3431, 3424, 5990, 5262, 3882, 10322, 4370, 2621, 4715, 2951, 8873, 7002, 3711, 2692, 3106, 5574, 3381, 3430, 3492, 4225, 2738, 2048, 4196, 6041, 2918, 2366, 3848, 7078, 3129, 2387, 3252, 2626, 6399],
+                  data: statusList.number_of_items_in_cache,
                   type: 'line'
                 }
               ]}
@@ -86,7 +100,8 @@ export default function Status() {
               xAxis={[
                 {
                   type: 'category',
-                  data: ['2021-10-09', '2021-10-10', '2021-10-11', '2021-10-12', '2021-10-13', '2021-10-14', '2021-10-15', '2021-10-16', '2021-10-17', '2021-10-18', '2021-10-19', '2021-10-20', '2021-10-21', '2021-10-22', '2021-10-23', '2021-10-24', '2021-10-25', '2021-10-26', '2021-10-27', '2021-10-28', '2021-10-29', '2021-10-30', '2021-10-31', '2021-11-01', '2021-11-02', '2021-11-03', '2021-11-04', '2021-11-05', '2021-11-06', '2021-11-07', '2021-11-08', '2021-11-09', '2021-11-10', '2021-11-11', '2021-11-12', '2021-11-13', '2021-11-14', '2021-11-15', '2021-11-16', '2021-11-17', '2021-11-18', '2021-11-19', '2021-11-20', '2021-11-21', '2021-11-22', '2021-11-23', '2021-11-24', '2021-11-25', '2021-11-26']
+                  boundaryGap: false,
+                  data: generateXAxis(statusList.total_size_of_items_in_cache.length)
                 }
               ]}
               yAxis={[
@@ -99,7 +114,7 @@ export default function Status() {
               }
               series={[
                 {
-                  data: [4168, 12441, 3297, 2801, 5465, 5609, 3907, 3487, 2967, 4988, 3620, 3648, 3635, 7262, 2138, 2177, 3431, 3424, 5990, 5262, 3882, 10322, 4370, 2621, 4715, 2951, 8873, 7002, 3711, 2692, 3106, 5574, 3381, 3430, 3492, 4225, 2738, 2048, 4196, 6041, 2918, 2366, 3848, 7078, 3129, 2387, 3252, 2626, 6399],
+                  data: statusList.total_size_of_items_in_cache,
                   type: 'line'
                 }
               ]}
@@ -109,7 +124,8 @@ export default function Status() {
               xAxis={[
                 {
                   type: 'category',
-                  data: ['2021-10-09', '2021-10-10', '2021-10-11', '2021-10-12', '2021-10-13', '2021-10-14', '2021-10-15', '2021-10-16', '2021-10-17', '2021-10-18', '2021-10-19', '2021-10-20', '2021-10-21', '2021-10-22', '2021-10-23', '2021-10-24', '2021-10-25', '2021-10-26', '2021-10-27', '2021-10-28', '2021-10-29', '2021-10-30', '2021-10-31', '2021-11-01', '2021-11-02', '2021-11-03', '2021-11-04', '2021-11-05', '2021-11-06', '2021-11-07', '2021-11-08', '2021-11-09', '2021-11-10', '2021-11-11', '2021-11-12', '2021-11-13', '2021-11-14', '2021-11-15', '2021-11-16', '2021-11-17', '2021-11-18', '2021-11-19', '2021-11-20', '2021-11-21', '2021-11-22', '2021-11-23', '2021-11-24', '2021-11-25', '2021-11-26']
+                  boundaryGap: false,
+                  data: generateXAxis(statusList.number_of_requests_served_per_minute.length)
                 }
               ]}
               yAxis={[
@@ -119,7 +135,7 @@ export default function Status() {
               }
               series={[
                 {
-                  data: [4168, 12441, 3297, 2801, 5465, 5609, 3907, 3487, 2967, 4988, 3620, 3648, 3635, 7262, 2138, 2177, 3431, 3424, 5990, 5262, 3882, 10322, 4370, 2621, 4715, 2951, 8873, 7002, 3711, 2692, 3106, 5574, 3381, 3430, 3492, 4225, 2738, 2048, 4196, 6041, 2918, 2366, 3848, 7078, 3129, 2387, 3252, 2626, 6399],
+                  data: statusList.number_of_requests_served_per_minute,
                   type: 'line'
                 }
               ]}
@@ -127,7 +143,7 @@ export default function Status() {
           </>
         }
       />
-      {/* <SubmissionPrompt
+      <SubmissionPrompt
         failed={{
           title: "Failed to retrieve status",
           text: loaderResponse?.statusText,
@@ -139,7 +155,7 @@ export default function Status() {
         }}
         submittedText="Status retrieved successfully"
         submissionStatus = {loaderResponse}
-      /> */}
+      />
     </>
   );
 }

@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { useActionData } from "react-router-dom";
+import {
+  useActionData,
+  useLoaderData
+} from "react-router-dom";
 import {
   MenuItem,
   Button,
@@ -22,14 +25,24 @@ import SubmissionPrompt from "../components/submission-prompt";
 import { TooltipOnError } from "../components/tooltip";
 
 export async function loader({ params }) {
-  // const response = await getConfig();
-  // if (response.status !== 200) {
-  //   throw new Response(config.data.message, {
-  //     status: response.status,
-  //     statusText: response.statusText,
-  //   });
-  // }
-  // return response.data;
+  const nodeConfig = await getConfig("cache");
+  const poolConfig = await getConfig("poolsize");
+  const poolSize = await getPoolSize();
+  if (![nodeConfig.status === 200, poolConfig.status === 200, poolSize.status === 200].every((e) => e)) {
+    throw new Response("Failed to retrieve configurations.", {
+      status: 500,
+      statusText: "Internal Server Error",
+    });
+  }
+  const response = {
+    node: nodeConfig.data.content,
+    pool: {
+      config: poolConfig.data.content,
+      size: poolSize.data.content,
+    },
+
+  };
+  return response;
 }
 
 export async function action({ request, params }) {
@@ -71,28 +84,21 @@ export async function action({ request, params }) {
 }
 
 export default function Config() {
-  // const loaderResponse = useLoaderData();
+  const loaderResponse = useLoaderData();
   const actionResponse = useActionData();
   const [submitted, setSubmitted] = useState(false);
 
-  const [capacity, setCapacity] = useState(100);
-  // const [capacity, setCapacity] = useState(loaderResponse.config.node.capacity);
+  const [capacity, setCapacity] = useState(loaderResponse.node.capacity);
   const [capacityError, setCapacityError] = useState(false);
-  const [policy, setPolicy] = useState("lru");
-  // const [policy, setPolicy] = useState(loaderResponse.config.node.policy);
+  const [policy, setPolicy] = useState(loaderResponse.node.replacement_policy);
   const [clearCache, setClearCache] = useState(false);
 
-  const [poolSize, setPoolSize] = useState(1);
-  // const [poolSize, setPoolSize] = useState(loaderResponse.config.pool.size);
-  const [resizingMode, setResizingMode] = useState("automatic");
-  // const [resizingMode, setResizingMode] = useState(loaderResponse.config.pool.mode);
-  const [missRateThreshold, setMissRateThreshold] = useState([0, 100]);
-  // const [missRateThreshold, setMissRateThreshold] = useState([loaderResponse.config.pool.min_miss_rate_threshold, loaderResponse.config.pool.max_miss_rate_threshold]);
-  const [expandRatio, setExpandRatio] = useState("1");
-  // const [expandRatio, setExpandRatio] = useState(loaderResponse.config.pool.expand_ratio);
+  const [poolSize, setPoolSize] = useState(loaderResponse.pool.size);
+  const [resizingMode, setResizingMode] = useState(loaderResponse.pool.config.resize_pool_option);
+  const [missRateThreshold, setMissRateThreshold] = useState([loaderResponse.pool.config.resize_pool_parameters.min_miss_rate_threshold, loaderResponse.pool.config.resize_pool_parameters.max_miss_rate_threshold]);
+  const [expandRatio, setExpandRatio] = useState(loaderResponse.pool.config.resize_pool_parameters.ratio_expand_pool);
   const [expandRatioError, setExpandRatioError] = useState(false);
-  const [shrinkRatio, setShrinkRatio] = useState("0");
-  // const [shrinkRatio, setShrinkRatio] = useState(loaderResponse.config.pool.shrink_ratio);
+  const [shrinkRatio, setShrinkRatio] = useState(loaderResponse.pool.config.resize_pool_parameters.ratio_shrink_pool);
   const [shrinkRatioError, setShrinkRatioError] = useState(false);
   const [manualNodeChange, setManualNodeChange] = useState("");
   const [clearData, setClearData] = useState(false);
