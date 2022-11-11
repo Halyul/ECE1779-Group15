@@ -208,7 +208,7 @@ def notify_while_bring_up_node(notify_info, changed_id):
     logging.info("notify_while_bring_up_node - all new nodes are up, sending request to notify A1")
     logging.info("notify_while_bring_up_node - notify_info = {}".format(json.dumps(notify_info)))
     # TODO: enable this line and makes sure format matches with A1
-    # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic')])
+    # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'increase')])
     return
 
 def refresh_node_list():
