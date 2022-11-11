@@ -54,7 +54,9 @@ def set_test_miss_rate():
     check_miss_rate_every_min(manully_triggered = True)
     return redirect(url_for('main'))
 
-initialization()
+# assume start up when auto_mode = False, so don't need to add node in the beginning
+# initialization()
+
 thread = threading.Thread(target = check_miss_rate_every_min, daemon = True)
 # code exicute in the background
 try:

@@ -22,7 +22,7 @@
             current cache pool size = {{data['cache_pool_size']}}
             <br>cache nodes info:
             {% for instance in instances %}
-                <br>id = {{instance['id']}}, address = {{instance['address']}}
+                <br>id = {{instance['id']}}, address = {{instance['address']}}, is_running = {{instance['is_running']}}
             {% endfor %}
             
             <br>

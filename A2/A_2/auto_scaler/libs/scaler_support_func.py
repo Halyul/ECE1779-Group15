@@ -1,4 +1,4 @@
-from flask import json
+from flask import json, request
 import requests
 import threading
 import logging
@@ -11,7 +11,7 @@ import auto_scaler.config as config
 import auto_scaler.statistics as statistics
 from auto_scaler import webapp
 
-from auto_scaler.libs.ec2_support_func import ec2_create, ec2_destroy, ec2_get_instance_ip, ec2_get_cache_ec2_object_list
+from auto_scaler.libs.ec2_support_func import ec2_create, ec2_destroy, ec2_get_instance_ip, ec2_get_instance_ip
 from auto_scaler.libs.ssh_support_func import run_cache
 from auto_scaler.libs.cloudwatch_func import get_num_GET_request_served, get_num_hit
 
@@ -172,6 +172,7 @@ def get_cache_pool_size():
         return config.cache_pool_size
     else: 
         # TODO: get the node list from manager, or manager need to send the list every time list updated
+        refresh_node_list()
         return config.cache_pool_size
 
 def clear_all_cache_stats():
@@ -209,3 +210,39 @@ def notify_while_bring_up_node(notify_info, changed_id):
     # TODO: enable this line and makes sure format matches with A1
     # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip'])])
     return
+
+def refresh_node_list():
+    if config.auto_mode == True:
+        return
+    else:
+        # get the node_list from manager and process the listif in manaul mode
+        node_list = []
+        response = requests.get("http://127.0.0.1:" + str(config.manager_port) + "/api/manager/pool_node_list")
+        node_dict = json.loads(response.content)['pool_node_list']
+        for node_id in node_dict:
+            node_list.append(node_id)
+
+        set_node_list_from_node_list(node_list)
+        return
+
+def set_node_list_from_node_list(node_list):
+    if config.auto_mode == False:
+        config.cache_pool_ids = node_list
+        config.cache_pool_size = len(config.cache_pool_ids)
+        # refresh the statistics.node_running
+        statistics.node_running = {}
+        unrunning_node = []
+        for node_id in node_list:
+            statistics.node_running[node_id] = False
+            addr = ec2_get_instance_ip(node_id)
+            is_running =  check_if_node_is_up(node_id, addr)
+            if is_running == -1:
+                unrunning_node.append(node_id)
+        if len(unrunning_node) == 0:
+            return gen_success_responce("")
+        else:
+            logging.error("Some nodes are not running! {}".format(json.dumps(unrunning_node)))
+            return gen_failed_responce(400, "Some nodes are not running! {}".format(json.dumps(unrunning_node)))
+    else:
+        logging.error("Should not set node_list from outside while auto mode!")
+        return gen_failed_responce(400, "Should not set node_list from outside while auto mode!")
