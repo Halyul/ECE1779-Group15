@@ -14,7 +14,7 @@ URL                      |  Method  | Content Type        | Body                
 /                        | GET      | N/A                 | N/A                                                | for testing only: home page
 /keys                    | GET/POST | application/json    | N/A                                                | for testing only: returns a list of keys in cache
 /api/cache/statistics    | POST     | N/A                 | N/A                                                | for testing only: cache info page
-/api/cache/move_keys     | POST     | N/A                 | `dict{manager, dest, cache_ip}`                    | for key moving while change pool size, and to do node remove
+/api/cache/move_keys     | POST     | N/A                 | `port`, `dest`                                     | for key moving while change pool size, and to do node remove
                              
 
 ## TODO
@@ -22,6 +22,5 @@ URL                      |  Method  | Content Type        | Body                
 - [x] Add 'cache_index' to config so as to separate the data send to CloudWatch Custom Metrics
 - [x] Remove the use of SQL
 - [x] add an API to handle 1) moving key-value pair to other nodes 2) initiate the node delete if this is the node that needs to be deleted
-  - dict['manager'] should be `ip:port` if this node needs to be deleted, or "" if this node is not
-  - dict['dest'] should be a dict in format of `{node_ip : [keys]}`
-  - dict['cache_ip'] should be the ipv4 address of this cache, this will eventually send to the manager and auto_scaler to remove a specific cache node
+  - 'port' should be `port` of manager or scaler depends on auto_mode if this node to be delete, or `-1` if this node is not
+  - 'dest' should be a dict in format of `{node_ip : [keys]}`
