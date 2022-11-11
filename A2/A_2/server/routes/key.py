@@ -111,5 +111,7 @@ def clear(mode):
         database.clear_keys()
         database.unlock()
         BUCKET.object.delete_all()
+        logging.info("Data Cleared.")
     CACHED_KEYS.remove_all()
+    logging.info("Cache Cleared.")
     return True, 200, None

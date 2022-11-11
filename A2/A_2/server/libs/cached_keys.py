@@ -6,8 +6,11 @@ class CachedKeys:
         self.keys = dict()
     
     def add(self, key):
-        self.keys[key] = find_partition(key)
-        logging.info("Key: {}, Partition: {}".format(key, self.keys[key]))
+        partition = find_partition(key)
+        if partition not in self.keys:
+            self.keys[partition] = set()
+        self.keys[partition].add(key)
+        logging.info("Added cached key: {}, Partition: {}".format(key, partition))
     
     def remove_all(self):
         self.keys = dict()

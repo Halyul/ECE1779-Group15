@@ -34,8 +34,9 @@ class Api(Resource):
         if destination == "list_keys":
             return list_keys()
         if destination == "notify":
-            parser.add_argument("node_ip", type=list, required=True)
-            parser.add_argument("mode", type=bool, required=True)
+            parser.add_argument("node_ip", type=list, required=True, location="json")
+            parser.add_argument("mode", type=str, required=True, location="json")
+            parser.add_argument("change", type=str, required=True, location="json")
             args = parser.parse_args()
             return pool_change(args)
         return False, 400, None

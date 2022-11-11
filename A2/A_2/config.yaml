@@ -19,6 +19,7 @@ database:
 cache:
   host: 127.0.0.1
   port: 5001
+  partitions: 16
 
 manager:
   host: 127.0.0.1
