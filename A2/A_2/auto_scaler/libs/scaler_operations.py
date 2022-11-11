@@ -17,6 +17,11 @@ from auto_scaler.libs.scaler_support_func import gen_failed_responce, gen_succes
 from auto_scaler.libs.ec2_support_func import ec2_list, ec2_get_instance_ip
 
 def responce_main():
+    if config.auto_mode == False:
+        # TODO: uncomment it when manager is ready
+        # refresh_node_list()
+        pass
+
     data = {}
     data['miss_rate'] = get_miss_rate()
     data['auto_mode'] = config.auto_mode
@@ -112,13 +117,11 @@ def check_miss_rate_every_min(manully_triggered = False):
                 temtitive_pool_size = get_cache_pool_size()
                 while expected_pool_size != temtitive_pool_size:
                     if expected_pool_size > get_cache_pool_size():
-                        # TODO: need to match the API with A1
                         add_cache_node()
                         temtitive_pool_size += 1
                         notify_info['action'] = 'add'
                         changed_id.append(config.cache_pool_ids[-1])
                     else:
-                        # TODO: need to match the API with A1
                         temtitive_pool_size -= 1
                         notify_info['action'] = 'delete'
                         notify_info['ip'].append(ec2_get_instance_ip(config.cache_pool_ids[-1]))
@@ -129,7 +132,7 @@ def check_miss_rate_every_min(manully_triggered = False):
                     if notify_info['action'] == 'delete':
                         logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
                         logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
-                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip'])])
+                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic')])
                     else:
                         # wait for nodes bring up, notify_while_bring_up_node will also notify A1 these new nodes
                         thread = threading.Thread(target = notify_while_bring_up_node, args=(notify_info, changed_id,), daemon = True)
@@ -150,7 +153,11 @@ def check_miss_rate_every_min(manully_triggered = False):
 
 def responce_do_node_delete():
     if len(config.cache_pool_ids) > 1:
-        cache_ip = request.form.get('cache_ip')
+        try:
+            # for testing only
+            cache_ip = request.form.get('cache_ip')
+        except:
+            cache_ip = request.environ['REMOTE_ADDR']
         cache_id = ''
         for id in config.cache_pool_ids:
             if cache_ip == ec2_get_instance_ip(id):

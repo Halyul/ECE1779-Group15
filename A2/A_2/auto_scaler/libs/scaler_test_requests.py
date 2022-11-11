@@ -34,8 +34,9 @@ def set_node_list(node_list):
     response = requests.post('http://127.0.0.1:' + str(port) + '/api/scaler/cache_list', data=passed_data)
     return response.content
 
-def test():
-    cache_ip = '34.201.54.172'
+def test_delete_node(cache_ip):
     target_ip = '3.86.213.92'
-    dict = json.dumps({'manager': '127.0.0.1:5010', 'dest': {target_ip: ['a', 'c']}, 'cache_ip': cache_ip})
-    response = requests.post('http://' + cache_ip + ':5001' + '/api/cache/move_keys', data=[('dict', dict)])
+    # dict = json.dumps({'port': '5010', 'dest': {target_ip: ['a', 'c']}})
+    port = '5010'
+    dest = json.dumps({})
+    response = requests.post('http://' + cache_ip + ':5001' + '/api/cache/move_keys', data=[('port', port), ('dest', dest)])
