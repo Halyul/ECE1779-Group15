@@ -14,8 +14,6 @@ database:
   name: ece1779_memcache
   table_names:
     key_image: key_image
-    config: config
-    status: status
 
 cache:
   host: 127.0.0.1
@@ -28,6 +26,7 @@ manager:
   
 auto_scaler:
   port: 5010
+
 aws:
   private_key_file: C:/Users/13698/.ssh/ece1779_assignment1_keypair.pem
   credential_file: C:/Users/13698/.aws/credentials
