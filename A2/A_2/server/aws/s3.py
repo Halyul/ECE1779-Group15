@@ -76,3 +76,11 @@ class Bucket:
                 return True, resp
             logging.error("Delete object: {}".format(resp))
             return False, resp
+        
+        def delete_all(self):
+            resp = self.client.delete_objects(Bucket=self.bucket, Delete={"Objects": [{"Key": i} for i in self.list()[1]]})
+            if resp["ResponseMetadata"]["HTTPStatusCode"] == 200:
+                logging.info("Delete objects: {}".format(resp))
+                return True, resp
+            logging.error("Delete objects: {}".format(resp))
+            return False, resp

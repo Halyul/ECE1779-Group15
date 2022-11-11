@@ -1,7 +1,8 @@
 import werkzeug.datastructures
 from flask_restful import Resource, reqparse, request
 from .message import response
-from .routes.key import create_key, get_key, list_keys
+from .routes.key import create_key, get_key, list_keys, clear
+from .routes.pool import pool_change
 
 PARASER = reqparse.RequestParser()
 
@@ -11,15 +12,12 @@ class Api(Resource):
         self.key = None
 
     @response
-    def get(self):
-        pass
-
-    @response
     def post(self, key=None):
         urls = [
             "/api/upload",
             "/api/list_keys",
             "/api/key/{}".format(key),
+            "/api/notify",
         ]
         path = request.path
         if path not in urls:
@@ -35,4 +33,23 @@ class Api(Resource):
             return get_key(key)
         if destination == "list_keys":
             return list_keys()
+        if destination == "notify":
+            parser.add_argument("node_ip", type=list, required=True)
+            parser.add_argument("mode", type=bool, required=True)
+            args = parser.parse_args()
+            return pool_change(args)
+        return False, 400, None
+
+    @response
+    def delete(self, mode=None):
+        urls = [
+            "/api/clear/{}".format(mode),
+        ]
+        path = request.path
+        if path not in urls:
+            return False, 400, None
+        parser = reqparse.RequestParser()
+        destination = path.split("/")[2]
+        if destination == "clear":
+            return clear(mode)
         return False, 400, None

@@ -48,8 +48,7 @@ APIAPP.add_resource(Api,
     '/api/upload',
     '/api/list_keys',
     '/api/key/<key>',
-    '/api/config',
-    '/api/status',
+    '/api/clear/<mode>',
 )
 
 if __name__ == '__main__':

@@ -3,11 +3,13 @@ from server.config import Config
 from server.libs.database import Database
 from server.libs.thread_task import ThreadTask
 from server.aws.s3 import Bucket
+from server.libs.cached_keys import CachedKeys
 import requests, logging
 
 CONFIG = Config().fetch()
 CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
 KEY_IMAGE_TABLE_NAME = CONFIG["database"]["table_names"]["key_image"]
+CACHED_KEYS = CachedKeys()
 
 def create_key(args):
     """
@@ -71,6 +73,7 @@ def get_key(key):
             database.unlock()
             return False, 404, "No such key."
         content = None
+        CACHED_KEYS.add(key)
         key = key_image_pair[0]
         flag, content = Bucket(CONFIG["server"]["bucket"]["name"]).object.get(key)
         if not flag:
@@ -99,3 +102,13 @@ def list_keys():
     return True, 200, dict(
         keys=[e[0] for e in keys_entries]
     )
+
+def clear(mode):
+    if mode == "data":
+        database = Database()
+        database.lock(table=KEY_IMAGE_TABLE_NAME)
+        database.clear_keys()
+        database.unlock()
+        Bucket(CONFIG["server"]["bucket"]["name"]).object.delete_all()
+    CACHED_KEYS.remove_all()
+    return True, 200, None
