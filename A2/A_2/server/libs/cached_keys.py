@@ -12,3 +12,6 @@ class CachedKeys:
     def remove_all(self):
         self.keys = dict()
         logging.info("Cached keys cleared")
+    
+    def list(self):
+        return self.keys

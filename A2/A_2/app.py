@@ -1,4 +1,4 @@
-import os
+import os, logging
 from flask import Flask, jsonify, send_from_directory, make_response
 from flask_restful import Api as RestfulApi
 from flask_cors import CORS
@@ -11,6 +11,8 @@ CONFIG = Config().fetch()
 APP = Flask(__name__, static_folder=CONFIG["server"]["static_folder"])
 CORS(APP)
 APIAPP = RestfulApi(APP)
+
+logging.basicConfig(level=logging.INFO)
 
 @APP.errorhandler(400)
 def bad_request(error):
@@ -47,6 +49,7 @@ def serve(path):
 APIAPP.add_resource(Api, 
     '/api/upload',
     '/api/list_keys',
+    "/api/notify",
     '/api/key/<key>',
     '/api/clear/<mode>',
 )

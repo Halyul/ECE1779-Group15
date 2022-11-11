@@ -10,6 +10,7 @@ CONFIG = Config().fetch()
 CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
 KEY_IMAGE_TABLE_NAME = CONFIG["database"]["table_names"]["key_image"]
 CACHED_KEYS = CachedKeys()
+BUCKET = Bucket(CONFIG["server"]["bucket"]["name"])
 
 def create_key(args):
     """
@@ -28,6 +29,7 @@ def create_key(args):
     if not file_entry:
         filename = "{}.{}".format(str(int(time.time() * 1000)), "s3")
         logging.info("Created key-image pair: {}-{}".format(args["key"], filename))
+        database.create_key_image_pair(args["key"], filename)
     else:
         filename = file_entry[0]
         logging.info("Updating key-image pair: {}-{}".format(args["key"], filename))
@@ -40,11 +42,10 @@ def create_key(args):
             )
         ).start()
     file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
-    flag, resp = Bucket(CONFIG["server"]["bucket"]["name"]).object.upload(file_base64, filename)
+    flag, resp = BUCKET.object.upload(file_base64, filename)
     if not flag:
         database.unlock()
         return False, 500, "Failed to upload the image."
-    database.create_key_image_pair(args["key"], filename)
     database.unlock()
     return True, 200, None
 
@@ -75,7 +76,7 @@ def get_key(key):
         content = None
         CACHED_KEYS.add(key)
         key = key_image_pair[0]
-        flag, content = Bucket(CONFIG["server"]["bucket"]["name"]).object.get(key)
+        flag, content = BUCKET.object.get(key)
         if not flag:
             database.unlock()
             return False, 500, "Failed to retrieve the image."
@@ -109,6 +110,6 @@ def clear(mode):
         database.lock(table=KEY_IMAGE_TABLE_NAME)
         database.clear_keys()
         database.unlock()
-        Bucket(CONFIG["server"]["bucket"]["name"]).object.delete_all()
+        BUCKET.object.delete_all()
     CACHED_KEYS.remove_all()
     return True, 200, None
