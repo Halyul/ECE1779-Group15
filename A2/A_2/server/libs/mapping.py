@@ -3,7 +3,6 @@ import requests
 import logging
 from server.config import Config
 
-
 CONFIG = Config().fetch()
 MANAGER_URL = "http://{host}:{port}".format(**CONFIG["manager"])
 logging.basicConfig(level=logging.INFO)
@@ -17,9 +16,6 @@ def find_partition(key):
     md5 = get_str_md5(key)
     partition = int.from_bytes(md5.digest(), byteorder="big") >> (4 * 31)
     return partition
-
-def find_cached_node(cur_node_num, partition):
-    return partition % cur_node_num
 
 class Mapping:
     def __init__(self, CACHED_KEYS):
@@ -103,3 +99,7 @@ class Mapping:
                 output.append(result)
         logging.info("Balance result: {}".format(output))
         return output
+    
+    def find_cached_node(self, partition):
+        index = partition % len(self.nodes)
+        return self.nodes[index]
