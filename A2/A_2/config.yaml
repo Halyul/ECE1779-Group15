@@ -7,7 +7,7 @@ server:
     name: "ece1779assignment2group15"
 
 database:
-  host: 127.0.0.1
+  host: ece1779assignment2group15.co0mwaevj3y4.us-east-1.rds.amazonaws.com
   port: 3306
   user: root
   password: ece1779pass

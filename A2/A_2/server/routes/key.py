@@ -3,7 +3,7 @@ from server.config import Config
 from server.libs.database import Database
 from server.libs.thread_task import ThreadTask
 from server.aws.s3 import Bucket
-import requests
+import requests, logging
 
 CONFIG = Config().fetch()
 CACHE_URL = "http://{host}:{port}".format(**CONFIG["cache"])
@@ -22,11 +22,13 @@ def create_key(args):
     database = Database()
     database.lock(table=KEY_IMAGE_TABLE_NAME)
     file_entry = database.get_key_image_pair(args["key"])
+    logging.info("File entry: {}".format(file_entry))
     if not file_entry:
         filename = "{}.{}".format(str(int(time.time() * 1000)), "s3")
-        database.create_key_image_pair(args["key"], filename)
+        logging.info("Created key-image pair: {}-{}".format(args["key"], filename))
     else:
         filename = file_entry[0]
+        logging.info("Updating key-image pair: {}-{}".format(args["key"], filename))
         # invalidate the key in the memcache
         ThreadTask(
             requests.delete, 
@@ -36,7 +38,11 @@ def create_key(args):
             )
         ).start()
     file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
-    Bucket(CONFIG["server"]["bucket"]["name"]).object.upload(file_base64, filename)
+    flag, resp = Bucket(CONFIG["server"]["bucket"]["name"]).object.upload(file_base64, filename)
+    if not flag:
+        database.unlock()
+        return False, 500, "Failed to upload the image."
+    database.create_key_image_pair(args["key"], filename)
     database.unlock()
     return True, 200, None
 
@@ -60,6 +66,7 @@ def get_key(key):
         database = Database()
         database.lock(table=KEY_IMAGE_TABLE_NAME)
         key_image_pair = database.get_key_image_pair(key)
+        logging.info("Key image pair: {}".format(key_image_pair))
         if key_image_pair is None:
             database.unlock()
             return False, 404, "No such key."

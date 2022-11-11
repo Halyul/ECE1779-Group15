@@ -13,7 +13,7 @@ URL               | Method  | Content Type        | Body
 - [x] Remove functionality to configure memcache settings.
 - [x] Remove functionality that displays memcache statistics.
 - [x] All image files should be stored in S3.
-- [ ] The mapping between keys and image files should be stored in AWS RDS. Do not store the images themselves in the RDS database.
+- [x] The mapping between keys and image files should be stored in AWS RDS. Do not store the images themselves in the RDS database.
 - [ ] Route requests to the memcache pool using a consistent hashing approach based on MD5 hashes. For simplicity, assume that the key space is partitioned into 16 equal-size regions which are then allocated to the pool of memcache nodes. Figures 1-3 illustrate how this assignment changes as the pool size changes from one node to two nodes to three nodes More information changes as the pool size changes from one node to two nodes, to three nodes. More information is provided in the Consistent Hashing section below.
   - [x] find_location(cur_node_num, find_partition(key))
   - [ ] Moving keys and values before cache access if pool size changed, "The assignment of key values to nodes changes each time a new node is added or removed, so ensure that you are updating nodes each time". (added by Teng Shu)
