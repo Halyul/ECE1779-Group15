@@ -1,11 +1,12 @@
 import requests
 import logging
-from server.routes.key import CACHED_KEYS
+from server.libs.cached_keys import CachedKeys
 from server.libs.mapping import Mapping
 from server.libs.thread_task import ThreadTask
 from server.config import Config
 
 CONFIG = Config().fetch()
+CACHED_KEYS = CachedKeys()
 MAPPING = Mapping(CACHED_KEYS)
 
 def pool_change(args):

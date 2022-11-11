@@ -16,7 +16,7 @@ URL               | Method  | Content Type        | Body
 INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'A', 5: 'B', 6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'C', 11: 'D', 12: 'A', 13: 'B', 14: 'C', 15: 'D'}
 INFO:root:New mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'A', 4: 'B', 5: 'C', 6: 'A', 7: 'B', 8: 'C', 9: 'A', 10: 'B', 11: 'C', 12: 'A', 13: 'B', 14: 'C', 15: 'A'}
 INFO:root:Old-new mapping: {'D': [(3, 'A'), (7, 'B'), (11, 'C'), (15, 'A')], 'A': [(4, 'B'), (8, 'C')], 'B': [(5, 'C'), (9, 'A')], 'C': [(6, 'A'), (10, 'B')]}
-INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
 INFO:root:Balance result: [{'send_to': 'D', 'payload': {'port': 5004, 'dest': {'C': ['k1']}}}, {'send_to': 'C', 'payload': {'port': -1, 'dest': {'A': ['k2']}}}]
 INFO:root:Send to: D:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'C': ['k1']}}
 INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'A': ['k2']}}
@@ -26,7 +26,7 @@ INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {
 INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'A', 4: 'B', 5: 'C', 6: 'A', 7: 'B', 8: 'C', 9: 'A', 10: 'B', 11: 'C', 12: 'A', 13: 'B', 14: 'C', 15: 'A'}
 INFO:root:New mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'A', 5: 'B', 6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'C', 11: 'D', 12: 'A', 13: 'B', 14: 'C', 15: 'D'}
 INFO:root:Old-new mapping: {'A': [(3, 'D'), (6, 'C'), (9, 'B'), (15, 'D')], 'B': [(4, 'A'), (7, 'D'), (10, 'C')], 'C': [(5, 'B'), (8, 'A'), (11, 'D')]}
-INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
 INFO:root:Balance result: [{'send_to': 'A', 'payload': {'port': -1, 'dest': {'C': ['k2']}}}, {'send_to': 'C', 'payload': {'port': -1, 'dest': {'D': ['k1']}}}]
 INFO:root:Send to: A:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'C': ['k2']}}
 INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'D': ['k1']}}
@@ -36,7 +36,26 @@ INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {
 INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'A', 5: 'B', 6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'C', 11: 'D', 12: 'A', 13: 'B', 14: 'C', 15: 'D'}
 INFO:root:New mapping: {0: 'A', 1: 'B', 2: 'A', 3: 'B', 4: 'A', 5: 'B', 6: 'A', 7: 'B', 8: 'A', 9: 'B', 10: 'A', 11: 'B', 12: 'A', 13: 'B', 14: 'A', 15: 'B'}
 INFO:root:Old-new mapping: {'C': [(2, 'A'), (6, 'A'), (10, 'A'), (14, 'A')], 'D': [(3, 'B'), (7, 'B'), (11, 'B'), (15, 'B')]}
-INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Balance result: [{'send_to': 'C', 'payload': {'port': 5004, 'dest': {'A': ['k2']}}}, {'send_to': 'D', 'payload': {'port': 5004, 'dest': {'B': ['k1']}}}]
+INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'A': ['k2']}}
+INFO:root:Send to: D:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'B': ['k1']}}
+```
+[A, B] -> [A, B, D]
+```
+INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'A', 3: 'B', 4: 'A', 5: 'B', 6: 'A', 7: 'B', 8: 'A', 9: 'B', 10: 'A', 11: 'B', 12: 'A', 13: 'B', 14: 'A', 15: 'B'}
+INFO:root:New mapping: {0: 'A', 1: 'B', 2: 'D', 3: 'A', 4: 'B', 5: 'D', 6: 'A', 7: 'B', 8: 'D', 9: 'A', 10: 'B', 11: 'D', 12: 'A', 13: 'B', 14: 'D', 15: 'A'}
+INFO:root:Old-new mapping: {'A': [(2, 'D'), (4, 'B'), (8, 'D'), (10, 'B'), (14, 'D')], 'B': [(3, 'A'), (5, 'D'), (9, 'A'), (11, 'D'), (15, 'A')]}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Balance result: [{'send_to': 'B', 'payload': {'port': -1, 'dest': {'D': ['k1']}}}]
+INFO:root:Send to: B:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'D': ['k1']}}
+```
+[A, B, C, D] -> [A, B]
+```
+INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'A', 5: 'B', 6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'C', 11: 'D', 12: 'A', 13: 'B', 14: 'C', 15: 'D'}
+INFO:root:New mapping: {0: 'A', 1: 'B', 2: 'A', 3: 'B', 4: 'A', 5: 'B', 6: 'A', 7: 'B', 8: 'A', 9: 'B', 10: 'A', 11: 'B', 12: 'A', 13: 'B', 14: 'A', 15: 'B'}
+INFO:root:Old-new mapping: {'C': [(2, 'A'), (6, 'A'), (10, 'A'), (14, 'A')], 'D': [(3, 'B'), (7, 'B'), (11, 'B'), (15, 'B')]}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
 INFO:root:Balance result: [{'send_to': 'C', 'payload': {'port': 5004, 'dest': {'A': ['k2']}}}, {'send_to': 'D', 'payload': {'port': 5004, 'dest': {'B': ['k1']}}}]
 INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'A': ['k2']}}
 INFO:root:Send to: D:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'B': ['k1']}}
@@ -44,21 +63,21 @@ INFO:root:Send to: D:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest':
 [A, B] -> [A, B, C, D]
 ```
 INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'A', 3: 'B', 4: 'A', 5: 'B', 6: 'A', 7: 'B', 8: 'A', 9: 'B', 10: 'A', 11: 'B', 12: 'A', 13: 'B', 14: 'A', 15: 'B'}
-INFO:root:New mapping: {0: 'A', 1: 'B', 2: 'D', 3: 'C', 4: 'A', 5: 'B', 6: 'D', 7: 'C', 8: 'A', 9: 'B', 10: 'D', 11: 'C', 12: 'A', 13: 'B', 14: 'D', 15: 'C'}
-INFO:root:Old-new mapping: {'A': [(2, 'D'), (6, 'D'), (10, 'D'), (14, 'D')], 'B': [(3, 'C'), (7, 'C'), (11, 'C'), (15, 'C')]}
-INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
-INFO:root:Balance result: [{'send_to': 'A', 'payload': {'port': -1, 'dest': {'D': ['k2']}}}, {'send_to': 'B', 'payload': {'port': -1, 'dest': {'C': ['k1']}}}]
-INFO:root:Send to: A:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'D': ['k2']}}
-INFO:root:Send to: B:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'C': ['k1']}}
+INFO:root:New mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'A', 5: 'B', 6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'C', 11: 'D', 12: 'A', 13: 'B', 14: 'C', 15: 'D'}
+INFO:root:Old-new mapping: {'A': [(2, 'C'), (6, 'C'), (10, 'C'), (14, 'C')], 'B': [(3, 'D'), (7, 'D'), (11, 'D'), (15, 'D')]}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Balance result: [{'send_to': 'A', 'payload': {'port': -1, 'dest': {'C': ['k2']}}}, {'send_to': 'B', 'payload': {'port': -1, 'dest': {'D': ['k1']}}}]
+INFO:root:Send to: A:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'C': ['k2']}}
+INFO:root:Send to: B:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'D': ['k1']}}
 ```
 [A, B, C, D] -> [C, D]
 ```
 INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'A', 5: 'B', 6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'C', 11: 'D', 12: 'A', 13: 'B', 14: 'C', 15: 'D'}
 INFO:root:New mapping: {0: 'C', 1: 'D', 2: 'C', 3: 'D', 4: 'C', 5: 'D', 6: 'C', 7: 'D', 8: 'C', 9: 'D', 10: 'C', 11: 'D', 12: 'C', 13: 'D', 14: 'C', 15: 'D'}
 INFO:root:Old-new mapping: {'A': [(0, 'C'), (4, 'C'), (8, 'C'), (12, 'C')], 'B': [(1, 'D'), (5, 'D'), (9, 'D'), (13, 'D')]}
-INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
-INFO:root:Balance result: [{'send_to': 'A', 'payload': {'port': 5004, 'dest': {'C': ['test', 'testabc', 'test123']}}}, {'send_to': 'B', 'payload': {'port': 5004, 'dest': {}}}]
-INFO:root:Send to: A:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'C': ['test', 'testabc', 'test123']}}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Balance result: [{'send_to': 'A', 'payload': {'port': 5004, 'dest': {'C': ['test', 'test123', 'testabc']}}}, {'send_to': 'B', 'payload': {'port': 5004, 'dest': {}}}]
+INFO:root:Send to: A:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'C': ['test', 'test123', 'testabc']}}
 INFO:root:Send to: B:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {}}
 ```
 [C, D] -> [A, B, C, D]
@@ -66,29 +85,30 @@ INFO:root:Send to: B:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest':
 INFO:root:Old mapping: {0: 'C', 1: 'D', 2: 'C', 3: 'D', 4: 'C', 5: 'D', 6: 'C', 7: 'D', 8: 'C', 9: 'D', 10: 'C', 11: 'D', 12: 'C', 13: 'D', 14: 'C', 15: 'D'}
 INFO:root:New mapping: {0: 'C', 1: 'D', 2: 'A', 3: 'B', 4: 'C', 5: 'D', 6: 'A', 7: 'B', 8: 'C', 9: 'D', 10: 'A', 11: 'B', 12: 'C', 13: 'D', 14: 'A', 15: 'B'}
 INFO:root:Old-new mapping: {'C': [(2, 'A'), (6, 'A'), (10, 'A'), (14, 'A')], 'D': [(3, 'B'), (7, 'B'), (11, 'B'), (15, 'B')]}
-INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
 INFO:root:Balance result: [{'send_to': 'C', 'payload': {'port': -1, 'dest': {'A': ['k2']}}}, {'send_to': 'D', 'payload': {'port': -1, 'dest': {'B': ['k1']}}}]
 INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'A': ['k2']}}
 INFO:root:Send to: D:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'B': ['k1']}}
 ```
 [A, B, C, D] -> [B, C, D]
 ```
-INFO:root:Old mapping: {0: 'C', 1: 'D', 2: 'A', 3: 'B', 4: 'C', 5: 'D', 6: 'A', 7: 'B', 8: 'C', 9: 'D', 10: 'A', 11: 'B', 12: 'C', 13: 'D', 14: 'A', 15: 'B'}
-INFO:root:New mapping: {0: 'C', 1: 'D', 2: 'B', 3: 'C', 4: 'D', 5: 'B', 6: 'C', 7: 'D', 8: 'B', 9: 'C', 10: 'D', 11: 'B', 12: 'C', 13: 'D', 14: 'B', 15: 'C'}
-INFO:root:Old-new mapping: {'A': [(2, 'B'), (6, 'C'), (10, 'D'), (14, 'B')], 'B': [(3, 'C'), (7, 'D'), (15, 'C')], 'C': [(4, 'D'), (8, 'B')], 'D': [(5, 'B'), (9, 'C')]}
-INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
-INFO:root:Balance result: [{'send_to': 'A', 'payload': {'port': 5004, 'dest': {'C': ['k2']}}}]
-INFO:root:Send to: A:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'C': ['k2']}}
+INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'A', 5: 'B', 6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'C', 11: 'D', 12: 'A', 13: 'B', 14: 'C', 15: 'D'}
+INFO:root:New mapping: {0: 'B', 1: 'C', 2: 'D', 3: 'B', 4: 'C', 5: 'D', 6: 'B', 7: 'C', 8: 'D', 9: 'B', 10: 'C', 11: 'D', 12: 'B', 13: 'C', 14: 'D', 15: 'B'}
+INFO:root:Old-new mapping: {'A': [(0, 'B'), (4, 'C'), (8, 'D'), (12, 'B')], 'B': [(1, 'C'), (5, 'D'), (13, 'C')], 'C': [(2, 'D'), (6, 'B'), (14, 'D')], 'D': [(3, 'B'), (7, 'C'), (15, 'B')]}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Balance result: [{'send_to': 'A', 'payload': {'port': 5004, 'dest': {'B': ['test', 'test123', 'testabc']}}}, {'send_to': 'C', 'payload': {'port': -1, 'dest': {'B': ['k2']}}}]
+INFO:root:Send to: A:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'B': ['test', 'test123', 'testabc']}}
+INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'B': ['k2']}}
 ```
 [B, C, D] -> [A, B, C, D]
 ```
-INFO:root:Old mapping: {0: 'C', 1: 'D', 2: 'B', 3: 'C', 4: 'D', 5: 'B', 6: 'C', 7: 'D', 8: 'B', 9: 'C', 10: 'D', 11: 'B', 12: 'C', 13: 'D', 14: 'B', 15: 'C'}
-INFO:root:New mapping: {0: 'C', 1: 'D', 2: 'B', 3: 'A', 4: 'C', 5: 'D', 6: 'B', 7: 'A', 8: 'C', 9: 'D', 10: 'B', 11: 'A', 12: 'C', 13: 'D', 14: 'B', 15: 'A'}
-INFO:root:Old-new mapping: {'C': [(3, 'A'), (6, 'B'), (9, 'D'), (15, 'A')], 'D': [(4, 'C'), (7, 'A'), (10, 'B')], 'B': [(5, 'D'), (8, 'C'), (11, 'A')]}
-INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
-INFO:root:Balance result: [{'send_to': 'C', 'payload': {'port': -1, 'dest': {'B': ['k2']}}}, {'send_to': 'B', 'payload': {'port': -1, 'dest': {'A': ['k1']}}}]
-INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'B': ['k2']}}
-INFO:root:Send to: B:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'A': ['k1']}}
+INFO:root:Old mapping: {0: 'B', 1: 'C', 2: 'D', 3: 'B', 4: 'C', 5: 'D', 6: 'B', 7: 'C', 8: 'D', 9: 'B', 10: 'C', 11: 'D', 12: 'B', 13: 'C', 14: 'D', 15: 'B'}
+INFO:root:New mapping: {0: 'B', 1: 'C', 2: 'D', 3: 'A', 4: 'B', 5: 'C', 6: 'D', 7: 'A', 8: 'B', 9: 'C', 10: 'D', 11: 'A', 12: 'B', 13: 'C', 14: 'D', 15: 'A'}
+INFO:root:Old-new mapping: {'B': [(3, 'A'), (6, 'D'), (9, 'C'), (15, 'A')], 'C': [(4, 'B'), (7, 'A'), (10, 'D')], 'D': [(5, 'C'), (8, 'B'), (11, 'A')]}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'test123', 'testabc'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Balance result: [{'send_to': 'B', 'payload': {'port': -1, 'dest': {'D': ['k2']}}}, {'send_to': 'D', 'payload': {'port': -1, 'dest': {'A': ['k1']}}}]
+INFO:root:Send to: B:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'D': ['k2']}}
+INFO:root:Send to: D:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'A': ['k1']}}
 ```
 ## TODO
 - [x] Remove functionality to configure memcache settings.
