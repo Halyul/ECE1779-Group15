@@ -13,7 +13,7 @@ URL                      |  Method  | Content Type        | Body                
 /api/scaler/set_test_miss_rate | POST | N/A               | `test_miss_rate`                                   | for testing only: send a test_miss_rate and then force a pool size adjustment
 /api/scaler/cache_list   | GET      | N/A                 | N/A                                                | to get the current list of nodes' ids
 /api/scaler/cache_list   | POST     | application/json    | `cache_pool_ids`                                   | to change the current list of nodes' ids
-/api/poolsize/change     | POST     | application/json    | `cache_ip`                                         | to actually do the node deletion
+/api/poolsize/change     | POST     | application/json    |                                                    | to actually do the node deletion
                              
 
 ## TODO
@@ -29,6 +29,8 @@ URL                      |  Method  | Content Type        | Body                
 - [x] cache nodes need to be destroyed by code
 - [x] a new API to get cache id list from elsewhere
 - [x] a new API to send cache id list
-- [ ] tell A1 there are nodes to be removed
+- [x] tell A1 there are nodes to be removed
+  - [ ] to be enabled
 - [x] a new API to actually remove the node
-- [ ] get pool size from manager if auto_mode is disabled
+- [x] get pool size from manager if auto_mode is disabled
+  - [ ] to be enabled
