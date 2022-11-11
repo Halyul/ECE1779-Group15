@@ -27,14 +27,13 @@ class Mapping:
         logging.info("Mapping: {}".format(self.mapping))
 
     def get_current_nodes(self):
-        # response = requests.get(MANAGER_URL + "/api/manager/pool_node_list")
-        # if response.status_code != 200:
-        #     logging.error("Error when getting current nodes: {}".format(response.text))
-        #     raise
-        # resp = response.json()["pool_node_list"]
-        # logging.info("Current nodes: {}".format(resp)
-        # return resp
-        return ["A", "B", "C", "D"]
+        response = requests.get(MANAGER_URL + "/api/manager/pool_node_list")
+        if response.status_code != 200:
+            logging.error("Error when getting current nodes: {}".format(response.text))
+            raise
+        resp = response.json()["pool_node_list"]
+        logging.info("Current nodes: {}".format(resp))
+        return resp
     
     def generate_mapping(self):
         output = dict()
