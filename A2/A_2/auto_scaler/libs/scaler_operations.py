@@ -132,7 +132,7 @@ def check_miss_rate_every_min(manully_triggered = False):
                     if notify_info['action'] == 'delete':
                         logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
                         logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
-                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic')])
+                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'decrease')])
                     else:
                         # wait for nodes bring up, notify_while_bring_up_node will also notify A1 these new nodes
                         thread = threading.Thread(target = notify_while_bring_up_node, args=(notify_info, changed_id,), daemon = True)
