@@ -53,8 +53,6 @@ def set_num_hit():
 # functions for testting
 @webapp.route('/')
 def main():
-    source_ip = request.environ['REMOTE_ADDR']
-    logging.info("main page - source ip is {}".format(source_ip))
     return render_template("main.html")
 
 @webapp.route('/keys', methods=['GET','POST'])
