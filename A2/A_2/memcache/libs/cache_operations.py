@@ -170,10 +170,8 @@ def show_info_service():
                             hit_rate_10min = hit_rate_10min)
 
 def move_keys_to_other_nodes_service():
-    dict = request.form.get('dict')
-    dict = json.loads(dict)
-    port = json.loads(dict['port'])
-    dest = dict['dest']
+    port = int(request.form.get('port'))
+    dest = json.loads(request.form.get('dest'))
     response_out = ''
     for node_ip in dest:
         for key in dest[node_ip]:
