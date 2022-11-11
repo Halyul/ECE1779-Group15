@@ -51,6 +51,8 @@ def add_cache_node():
     
     config.cache_pool_size += 1
     config.cache_pool_ids.append(instance.id)
+    # TODO: enable it while manager is ready
+    # send_list_to_manager()
 
 def run_cache_update_status(id):
     time.sleep(1) # add small delay so the 'ec2.instances.filter' can find the newly created instance
@@ -119,6 +121,8 @@ def remove_cache_node(id):
     del statistics.node_running[id]
     config.cache_pool_size -= 1
     config.cache_pool_ids.remove(id)
+    # TODO: enable it while manager is ready
+    # send_list_to_manager()
 
 def clear_cache_node():
     for instance_id in config.cache_pool_ids:
@@ -246,3 +250,11 @@ def set_node_list_from_node_list(node_list):
     else:
         logging.error("Should not set node_list from outside while auto mode!")
         return gen_failed_responce(400, "Should not set node_list from outside while auto mode!")
+
+def send_list_to_manager():
+    list_json = json.dumps(config.cache_pool_ids)
+    response = requests.get("http://127.0.0.1:" + str(config.manager_port) + "/api/manager/pool_node_list/update", data=[('list', list_json)])
+    if response.status_code == 200:
+        return 0
+    else:
+        return -1
