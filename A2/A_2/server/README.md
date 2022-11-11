@@ -31,6 +31,26 @@ INFO:root:Balance result: [{'send_to': 'A', 'payload': {'port': -1, 'dest': {'C'
 INFO:root:Send to: A:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'C': ['k2']}}
 INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'D': ['k1']}}
 ```
+[A, B, C, D] -> [A, B]
+```
+INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'A', 5: 'B', 6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'C', 11: 'D', 12: 'A', 13: 'B', 14: 'C', 15: 'D'}
+INFO:root:New mapping: {0: 'A', 1: 'B', 2: 'A', 3: 'B', 4: 'A', 5: 'B', 6: 'A', 7: 'B', 8: 'A', 9: 'B', 10: 'A', 11: 'B', 12: 'A', 13: 'B', 14: 'A', 15: 'B'}
+INFO:root:Old-new mapping: {'C': [(2, 'A'), (6, 'A'), (10, 'A'), (14, 'A')], 'D': [(3, 'B'), (7, 'B'), (11, 'B'), (15, 'B')]}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Balance result: [{'send_to': 'C', 'payload': {'port': 5004, 'dest': {'A': ['k2']}}}, {'send_to': 'D', 'payload': {'port': 5004, 'dest': {'B': ['k1']}}}]
+INFO:root:Send to: C:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'A': ['k2']}}
+INFO:root:Send to: D:5001/api/cache/move_keys with Paylod {'port': 5004, 'dest': {'B': ['k1']}}
+```
+[A, B] -> [A, B, C, D]
+```
+INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'A', 3: 'B', 4: 'A', 5: 'B', 6: 'A', 7: 'B', 8: 'A', 9: 'B', 10: 'A', 11: 'B', 12: 'A', 13: 'B', 14: 'A', 15: 'B'}
+INFO:root:New mapping: {0: 'A', 1: 'B', 2: 'D', 3: 'C', 4: 'A', 5: 'B', 6: 'D', 7: 'C', 8: 'A', 9: 'B', 10: 'D', 11: 'C', 12: 'A', 13: 'B', 14: 'D', 15: 'C'}
+INFO:root:Old-new mapping: {'A': [(2, 'D'), (6, 'D'), (10, 'D'), (14, 'D')], 'B': [(3, 'C'), (7, 'C'), (11, 'C'), (15, 'C')]}
+INFO:root:Current cached keys: {0: {'test'}, 12: {'testabc', 'test123'}, 11: {'k1'}, 6: {'k2'}}
+INFO:root:Balance result: [{'send_to': 'A', 'payload': {'port': -1, 'dest': {'D': ['k2']}}}, {'send_to': 'B', 'payload': {'port': -1, 'dest': {'C': ['k1']}}}]
+INFO:root:Send to: A:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'D': ['k2']}}
+INFO:root:Send to: B:5001/api/cache/move_keys with Paylod {'port': -1, 'dest': {'C': ['k1']}}
+```
 [A, B, C, D] -> [C, D]
 ```
 INFO:root:Old mapping: {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'A', 5: 'B', 6: 'C', 7: 'D', 8: 'A', 9: 'B', 10: 'C', 11: 'D', 12: 'A', 13: 'B', 14: 'C', 15: 'D'}
