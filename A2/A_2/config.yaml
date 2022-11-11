@@ -7,7 +7,8 @@ server:
     name: "ece1779assignment2group15"
 
 database:
-  host: ece1779assignment2group15.co0mwaevj3y4.us-east-1.rds.amazonaws.com
+  # host: ece1779assignment2group15.co0mwaevj3y4.us-east-1.rds.amazonaws.com
+  host: 127.0.0.1
   port: 3306
   user: root
   password: ece1779pass
@@ -18,6 +19,7 @@ database:
 cache:
   host: 127.0.0.1
   port: 5001
+  partitions: 16
 
 manager:
   host: 127.0.0.1

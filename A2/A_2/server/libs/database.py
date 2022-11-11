@@ -42,6 +42,9 @@ class Database:
 
     def get_keys(self):
         return self.__fetch("SELECT `key` FROM {table_name}".format(table_name=KEY_IMAGE_TABLE_NAME))
+
+    def clear_keys(self):
+        self.__execute("DELETE FROM {table_name}".format(table_name=KEY_IMAGE_TABLE_NAME))
     
     def lock(self, table, mode=Mode.WRITE):
         self.__execute("LOCK TABLES `{table_name}` {mode}".format(table_name=table, mode="WRITE" if mode == Mode.WRITE else "READ"))
