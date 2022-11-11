@@ -13,10 +13,15 @@ import auto_scaler.statistics as statistics
 
 from auto_scaler.libs.scaler_support_func import gen_failed_responce, gen_success_responce, get_miss_rate, \
     get_cache_pool_size, remove_cache_node, add_cache_node, clear_cache_node, clear_all_cache_stats, \
-    notify_while_bring_up_node, check_if_node_is_up
+    notify_while_bring_up_node, check_if_node_is_up, refresh_node_list, set_node_list_from_node_list
 from auto_scaler.libs.ec2_support_func import ec2_list, ec2_get_instance_ip
 
 def responce_main():
+    if config.auto_mode == False:
+        # TODO: uncomment it when manager is ready
+        # refresh_node_list()
+        pass
+
     data = {}
     data['miss_rate'] = get_miss_rate()
     data['auto_mode'] = config.auto_mode
@@ -33,6 +38,7 @@ def responce_main():
         instance = {}
         instance['id'] = instance_id
         instance['address'] = ec2_get_instance_ip(instance_id)
+        instance['is_running'] = statistics.node_running[instance_id]
         instances.append(instance)
     return render_template("info.html", data = data, instances = instances)
 
@@ -100,7 +106,7 @@ def check_miss_rate_every_min(manully_triggered = False):
             if config.auto_mode == True and miss_rate != 'n/a':
                 expected_pool_size = get_cache_pool_size()
                 if miss_rate < config.min_miss_rate_threshold:
-                    expected_pool_size = get_cache_pool_size() / config.shrink_ratio
+                    expected_pool_size = get_cache_pool_size() * config.shrink_ratio
                 elif miss_rate > config.max_miss_rate_threshold:
                     expected_pool_size = get_cache_pool_size() * config.expand_ratio
                 
@@ -111,13 +117,11 @@ def check_miss_rate_every_min(manully_triggered = False):
                 temtitive_pool_size = get_cache_pool_size()
                 while expected_pool_size != temtitive_pool_size:
                     if expected_pool_size > get_cache_pool_size():
-                        # TODO: need to match the API with A1
                         add_cache_node()
                         temtitive_pool_size += 1
                         notify_info['action'] = 'add'
                         changed_id.append(config.cache_pool_ids[-1])
                     else:
-                        # TODO: need to match the API with A1
                         temtitive_pool_size -= 1
                         notify_info['action'] = 'delete'
                         notify_info['ip'].append(ec2_get_instance_ip(config.cache_pool_ids[-1]))
@@ -128,7 +132,7 @@ def check_miss_rate_every_min(manully_triggered = False):
                     if notify_info['action'] == 'delete':
                         logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
                         logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
-                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip'])])
+                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic')])
                     else:
                         # wait for nodes bring up, notify_while_bring_up_node will also notify A1 these new nodes
                         thread = threading.Thread(target = notify_while_bring_up_node, args=(notify_info, changed_id,), daemon = True)
@@ -136,6 +140,7 @@ def check_miss_rate_every_min(manully_triggered = False):
                         
             elif config.auto_mode == False:
                 # TODO: need to get the node_id list from manager
+                # refresh_node_list()
                 pass
 
             # if this update of num cache nodes is manully triggered, will return after one round of pool size update
@@ -148,7 +153,11 @@ def check_miss_rate_every_min(manully_triggered = False):
 
 def responce_do_node_delete():
     if len(config.cache_pool_ids) > 1:
-        cache_ip = request.form.get('cache_ip')
+        try:
+            # for testing only
+            cache_ip = request.form.get('cache_ip')
+        except:
+            cache_ip = request.environ['REMOTE_ADDR']
         cache_id = ''
         for id in config.cache_pool_ids:
             if cache_ip == ec2_get_instance_ip(id):
@@ -172,29 +181,9 @@ def responce_get_node_list():
     return json.dumps(config.cache_pool_ids)
 
 def responce_set_node_list(node_list = []):
-    if config.auto_mode == False:
-        # if function called without set node_list, this function used to serve http response
-        if node_list == []:
-            node_list = json.loads(request.form.get('cache_pool_ids'))
-        config.cache_pool_ids = node_list
-        config.cache_pool_size = len(config.cache_pool_ids)
-        # refresh the statistics.node_running
-        statistics.node_running = {}
-        unrunning_node = []
-        for node_id in node_list:
-            statistics.node_running[node_id] = False
-            addr = ec2_get_instance_ip(node_id)
-            is_running =  check_if_node_is_up(node_id, addr)
-            if is_running == -1:
-                unrunning_node.append(node_id)
-        if len(unrunning_node) == 0:
-            return gen_success_responce("")
-        else:
-            logging.error("Some nodes are not running! {}".format(json.dumps(unrunning_node)))
-            return gen_failed_responce(400, "Some nodes are not running! {}".format(json.dumps(unrunning_node)))
-    else:
-        logging.error("Should not set node_list from outside while auto mode!")
-        return gen_failed_responce(400, "Should not set node_list from outside while auto mode!")
+    node_list = json.loads(request.form.get('cache_pool_ids'))
+    response = set_node_list_from_node_list(node_list)
+    return response
 
 # for testing
 def responce_terminate_all():

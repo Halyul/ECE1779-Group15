@@ -127,22 +127,35 @@ def ec2_destroy(id):
 
 # get the ipv4 address from the ec2 instance id
 def ec2_get_instance_ip(id):
-    try:
-        # create connection to ec2
-        ec2 = boto3.resource('ec2')
-        instances = ec2.instances.filter(
-                Filters=[
-                    {
-                        'Name': 'instance-id',
-                        'Values': [id]
-                    }
-                ])
-        for item in instances:
-            instance = item
-            break
+    # create connection to ec2
+    ec2 = boto3.resource('ec2')
+    instances = ec2.instances.filter(
+            Filters=[
+                {
+                    'Name': 'instance-id',
+                    'Values': [id]
+                }
+            ])
+    for item in instances:
+        instance = item
         return instance.public_ip_address
-    except Exception as error:
-        return "{}".format(error)
+    return "ec2 with id {} not found!".format(id)
+
+# get id from ipv4 address
+def ec2_get_instance_id(ip):
+    # create connection to ec2
+    ec2 = boto3.resource('ec2')
+    instances = ec2.instances.filter(
+            Filters=[
+                {
+                    'Name': 'ip-address',
+                    'Values': [ip]
+                }
+            ])
+    for item in instances:
+        instance = item
+        return instance.id
+    return "ec2 with ip {} not found!".format(ip)
 
 def ec2_get_cache_ec2_object_list():
     ec2 = boto3.resource('ec2')

@@ -8,12 +8,12 @@ logging.basicConfig(level=logging.INFO)
 max_miss_rate_threshold = 0.6
 min_miss_rate_threshold = 0.4
 expand_ratio = 1.5
-shrink_ratio = 1.5
+shrink_ratio = 0.5
 
 cache_pool_size = 0 # size can be from 1 to 8
 cache_pool_ids = [] # keeps a list of ids, can be used to look up the ip address, or find out the cache node index
 
-auto_mode = True
+auto_mode = False
 
 stop_threads = False
 
@@ -27,6 +27,7 @@ config_info = setup_config.fetch()
 cache_port = config_info['cache']['port']
 server_port = config_info['server']['port']
 auto_scaler_port = config_info['auto_scaler']['port']
+manager_port = config_info['manager']['port']
 
 # aws configs
 ami_id = config_info['aws']['ami_id']

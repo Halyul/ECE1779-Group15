@@ -170,11 +170,8 @@ def show_info_service():
                             hit_rate_10min = hit_rate_10min)
 
 def move_keys_to_other_nodes_service():
-    dict = request.form.get('dict')
-    dict = json.loads(dict)
-    manager = dict['manager']
-    dest = dict['dest']
-    curr_ip = dict['cache_ip']
+    port = int(request.form.get('port'))
+    dest = json.loads(request.form.get('dest'))
     response_out = ''
     for node_ip in dest:
         for key in dest[node_ip]:
@@ -186,9 +183,9 @@ def move_keys_to_other_nodes_service():
             else:
                 logging.error("move_keys_to_other_nodes_service - key {} does not exist".format(key))
                 response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - key {} does not exist".format(key))
-    if manager != "":
-        passed_data=[('cache_ip', curr_ip)]
-        response = requests.post('http://' + manager + '/api/poolsize/change', data=passed_data)
+    if port != -1:
+        source_ip = request.environ['REMOTE_ADDR']
+        response = requests.post('http://' + source_ip + ':' + str(port) + '/api/poolsize/change')
         if response.status_code != 200:
             logging.error("move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
             response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
