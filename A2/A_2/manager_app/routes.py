@@ -17,12 +17,18 @@ def serve(path):
 
     if path != "" and os.path.exists(webapp.static_folder + "/" + path):
         return send_from_directory(
-            webapp.static_folder, 
+            webapp.static_folder,
             path,
             mimetype=set_mimetype(path)
         )
     else:
         return send_from_directory(webapp.static_folder, "index.html")
+
+
+@webapp.route('/api/manager/pool_node_list/update', methods=['POST'])
+def update_node_list():
+    return services.update_node_list()
+
 
 @webapp.route('/api/manager/pool_node_list', methods=['GET'])
 def get_pool_size():
