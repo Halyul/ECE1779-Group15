@@ -102,3 +102,6 @@ class Mapping:
     def find_cached_node(self, partition):
         index = partition % len(self.nodes)
         return self.nodes[index]
+
+    def get_nodes(self):
+        return self.nodes

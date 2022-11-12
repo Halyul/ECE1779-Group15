@@ -117,5 +117,14 @@ def clear(mode):
         BUCKET.object.delete_all()
         logging.info("Data Cleared.")
     CACHED_KEYS.remove_all()
+    for node in MAPPING.get_nodes():
+        url = node + ":" + str(CONFIG["cache"]["port"]) + "/api/cache"
+        logging.info("Clear cache request send to: {}".format(url))
+        ThreadTask(
+            requests.delete,
+            kwargs=dict(
+                url=url
+            )
+        ).start()
     logging.info("Cache Cleared.")
     return True, 200, None
