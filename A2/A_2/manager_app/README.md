@@ -24,10 +24,7 @@ URL                    		       | Method | Content Type     | Body              
 - [x] Set auto-scalar parameters
 - [x] Set memcache configuration
 - [x] Clear all cache
-- [ ] Clear all data
-  - [x] EC2
-  - [x] S3
-  - [ ] RDS
+- [x] Clear all data
 - [ ] Get 30 mins aggregate statistics and chart
 - [x] Call function applying to multiple EC2 instances
 - [x] Notify instance 1 before destroying EC2 instance

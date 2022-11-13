@@ -12,12 +12,18 @@ from manager_app.helper_functions.responses import success_response, failed_resp
 def update_node_list():
     node_list = request.form.get('list')
     variables.pool_node_id_list = node_list
-    return success_response(jsonify(node_list=node_list))
+    params = {
+        "node_list": node_list
+    }
+    return success_response(params)
 
 
 def get_pool_size():
-    size = variables.pool_node_id_list.size()
-    return success_response(jsonify(size=size))
+    size = len(variables.pool_node_id_list)
+    params = {
+        "size": size
+    }
+    return success_response(params)
 
 
 # Rewrite
@@ -25,16 +31,19 @@ def get_pool_node_list():
     node_ip_list = []
     for instance_id in variables.pool_node_id_list:
         node_ip_list.append(ec2_get_instance_ip(instance_id))
-    return success_response(jsonify(node_id_list=variables.pool_node_id_list,
-                                    node_ip_list=node_ip_list))
+    params = {
+        "node_id_list": variables.pool_node_id_list,
+        "node_ip_list": node_ip_list
+    }
+    return success_response(params)
 
 
 def get_resize_pool_config():
-    content = jsonify(
-        resize_pool_option=variables.resize_pool_option,
-        resize_pool_parameters=variables.resize_pool_parameters
-    )
-    return success_response(content)
+    params = {
+        "resize_pool_option": variables.resize_pool_option,
+        "resize_pool_parameters": variables.resize_pool_parameters
+    }
+    return success_response(params)
 
 
 # def get_30_min_data():
@@ -116,11 +125,11 @@ def set_auto_scaler_parameters():
 
 
 def get_cache_configurations():
-    content = jsonify(
-        capacity=variables.memcache_capacity,
-        replacement_policy=variables.memcache_replacement_policy
-    )
-    return success_response(content)
+    params = {
+        "capacity": variables.memcache_capacity,
+        "replacement_policy": variables.memcache_replacement_policy
+    }
+    return success_response(params)
 
 
 def set_cache_configurations():

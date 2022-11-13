@@ -1,7 +1,6 @@
 import os
 from flask import send_from_directory
-import services
-from manager_app import webapp
+from manager_app import webapp, services
 
 
 @webapp.route("/", defaults={"path": ""})
@@ -46,7 +45,7 @@ def get_aggregate_stats():
 
 
 @webapp.route('/api/manager/poolsize', methods=['GET'])
-def get_pool_size():
+def get_memcache_pool_size():
     return services.get_pool_size()
 
 
@@ -71,7 +70,7 @@ def change_pool_size_auto():
 
 
 @webapp.route('/api/manager/cache/config', methods=['POST'])
-def set_cache_configurations():
+def set_memcache_configurations():
     return services.set_cache_configurations()
 
 
