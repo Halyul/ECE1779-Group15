@@ -13,13 +13,13 @@ import auto_scaler.statistics as statistics
 
 from auto_scaler.libs.scaler_support_func import gen_failed_responce, gen_success_responce, get_miss_rate, \
     get_cache_pool_size, remove_cache_node, add_cache_node, clear_cache_node, clear_all_cache_stats, \
-    notify_while_bring_up_node, check_if_node_is_up, refresh_node_list, set_node_list_from_node_list
+    notify_while_resize_pool, check_if_node_is_up, refresh_node_list, set_node_list_from_node_list
 from auto_scaler.libs.ec2_support_func import ec2_list, ec2_get_instance_ip
 
 def responce_main():
     if config.auto_mode == False:
         # TODO: uncomment it when manager is ready
-        # refresh_node_list()
+        # refresh_node_list() # will take some time
         pass
 
     data = {}
@@ -59,7 +59,13 @@ def responce_refresh_config():
         if float(request.form.get('shrink_ratio')) >= 1 or float(request.form.get('shrink_ratio')) <= 0:
             return gen_failed_responce(400, "shrink_ratio = {} which is not valid".format(float(request.form.get('shrink_ratio'))))
         config.shrink_ratio = float(request.form.get('shrink_ratio'))
-        config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
+        
+        if config.auto_mode == False and (request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'):
+            # if auto_mode changed from False to True, force a poolsize update
+            config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
+            check_miss_rate_every_min(manully_triggered = True)
+        else:
+            config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
 
         return gen_success_responce("")
     except Exception as error:
@@ -96,6 +102,13 @@ def responce_refresh_cache_config():
 def check_miss_rate_every_min(manully_triggered = False):
     try:
         while True:
+            # refresh nodes running status
+            for node_id in statistics.node_running:
+                if statistics.node_running[node_id] == False:
+                    node_addr = ec2_get_instance_ip(node_id)
+                    thread = threading.Thread(target = check_if_node_is_up, args=(node_id, node_addr,), daemon = True)
+                    thread.start()
+
             notify_info = {'action' : '', 'ip' : []}
             changed_id = []
             miss_rate = get_miss_rate(manully_triggered = manully_triggered)
@@ -124,23 +137,18 @@ def check_miss_rate_every_min(manully_triggered = False):
                     else:
                         temtitive_pool_size -= 1
                         notify_info['action'] = 'delete'
-                        notify_info['ip'].append(ec2_get_instance_ip(config.cache_pool_ids[-1]))
+                        # notify_info['ip'].append(ec2_get_instance_ip(config.cache_pool_ids[-1 - len(notify_info['ip'])]))
+                        changed_id.append(config.cache_pool_ids[-1 - len(changed_id)])
                 if expected_pool_size != original_pool_size:
                     # clear cache num_GET_request_served and num_hit if pool size needs adjustment
                     clear_all_cache_stats()
-                    # TODO: need to match the API with A1
-                    if notify_info['action'] == 'delete':
-                        logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
-                        logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
-                        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'decrease')])
-                    else:
-                        # wait for nodes bring up, notify_while_bring_up_node will also notify A1 these new nodes
-                        thread = threading.Thread(target = notify_while_bring_up_node, args=(notify_info, changed_id,), daemon = True)
-                        thread.start()
+                    # wait for nodes bring up, notify_while_resize_pool will notify A1 these changed nodes
+                    thread = threading.Thread(target = notify_while_resize_pool, args=(notify_info, changed_id,), daemon = True)
+                    thread.start()
                         
             elif config.auto_mode == False:
                 # TODO: need to get the node_id list from manager
-                # refresh_node_list()
+                # refresh_node_list() # will take some time
                 pass
 
             # if this update of num cache nodes is manully triggered, will return after one round of pool size update

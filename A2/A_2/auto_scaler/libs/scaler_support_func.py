@@ -191,13 +191,13 @@ def clear_all_cache_stats():
         #     thread.start()
     return 
 
-def notify_while_bring_up_node(notify_info, changed_id):
+def notify_while_resize_pool(notify_info, changed_id):
     start_time = datetime.now()
     all_running = False
     while all_running == False:
         time.sleep(1)
         if datetime.now() > (start_time + timedelta(minutes=2)):
-            logging.error("notify_while_bring_up_node - node {} not responding!".format(id))
+            logging.error("notify_while_resize_pool - node {} not responding!".format(id))
             return
         # wait until all nodes are running or a timeout after 2mins
         all_running = True
@@ -205,24 +205,33 @@ def notify_while_bring_up_node(notify_info, changed_id):
             if statistics.node_running[id] == False:
                 all_running = False
                 break
-            else:
-                ip = ec2_get_instance_ip(id)
-                if ip not in notify_info['ip']:
-                    notify_info['ip'].append(ip)
-    logging.info("notify_while_bring_up_node - all new nodes are up, sending request to notify A1")
-    logging.info("notify_while_bring_up_node - notify_info = {}".format(json.dumps(notify_info)))
-    # TODO: enable this line and makes sure format matches with A1
-    # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'increase')])
+    # all nodes are up here
+    # build the ip list in order
+    for id in changed_id:
+        ip = ec2_get_instance_ip(id)
+        notify_info['ip'].append(ip) # note that changed_id will be in order if add, in inverse order if delete
+        
+    if notify_info['action'] == 'add':
+        logging.info("notify_while_resize_pool - all new nodes are up, sending request to notify A1")
+        logging.info("notify_while_resize_pool - notify_info = {}".format(json.dumps(notify_info)))
+        # TODO: enable this line and makes sure format matches with A1
+        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'increase')])
+    else:
+        time.sleep(4) # arbitry delay
+        logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
+        logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
+        # TODO: enable this line and makes sure format matches with A1
+        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'decrease')])
     return
 
 def refresh_node_list():
     if config.auto_mode == True:
         return
     else:
-        # get the node_list from manager and process the listif in manaul mode
+        # get the node_list from manager and process the list if in manaul mode
         node_list = []
         response = requests.get("http://127.0.0.1:" + str(config.manager_port) + "/api/manager/pool_node_list")
-        node_dict = json.loads(response.content)['pool_node_list']
+        node_dict = json.loads(response.content)['node_id_list']
         for node_id in node_dict:
             node_list.append(node_id)
 
