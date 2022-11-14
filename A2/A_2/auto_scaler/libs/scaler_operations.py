@@ -59,7 +59,13 @@ def responce_refresh_config():
         if float(request.form.get('shrink_ratio')) >= 1 or float(request.form.get('shrink_ratio')) <= 0:
             return gen_failed_responce(400, "shrink_ratio = {} which is not valid".format(float(request.form.get('shrink_ratio'))))
         config.shrink_ratio = float(request.form.get('shrink_ratio'))
-        config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
+        
+        if config.auto_mode == False and (request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'):
+            # if auto_mode changed from False to True, force a poolsize update
+            config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
+            check_miss_rate_every_min(manully_triggered = True)
+        else:
+            config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
 
         return gen_success_responce("")
     except Exception as error:

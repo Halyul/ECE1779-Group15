@@ -222,7 +222,7 @@ def refresh_node_list():
         # get the node_list from manager and process the listif in manaul mode
         node_list = []
         response = requests.get("http://127.0.0.1:" + str(config.manager_port) + "/api/manager/pool_node_list")
-        node_dict = json.loads(response.content)['pool_node_list']
+        node_dict = json.loads(response.content)['node_id_list']
         for node_id in node_dict:
             node_list.append(node_id)
 
