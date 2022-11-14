@@ -24,7 +24,7 @@ cache:
 manager:
   host: 127.0.0.1
   port: 5004
-  static_folder: ./react/manager/dist
+  static_folder: ../react/manager/dist
   
 auto_scaler:
   port: 5010

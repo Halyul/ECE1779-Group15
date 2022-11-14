@@ -60,7 +60,9 @@ def notify_pool_size_change():
     4. If increasing, increase pool size, notify instance 1
     5. If decreasing, notify instance 1
     """
-    change = request.form.get('change')
+    request_data = request.get_json()
+    change = request_data['change']
+    # change = request.form.get('change')
     variables.manual_operation = change
     manager_app.resize_pool_option = 'manual'
     manager_app.resize_pool_parameters = {}
@@ -77,7 +79,7 @@ def notify_pool_size_change():
     else:
         return failed_response(400, "Parameter change can only be increase or decrease")
 
-    changed_node_ip = variables.pool_node_id_list[-1].public_ip_address
+    changed_node_ip = ec2_get_instance_ip(variables.pool_node_id_list[-1])
     response = requests.post(config.SERVER_URL + "/api/notify", data={"node_ip": [changed_node_ip],
                                                                       "mode": variables.resize_pool_option,
                                                                       "change": change})
@@ -104,10 +106,16 @@ def set_auto_scaler_parameters():
     1. Update local resize_pool_option to automatic, and store parameters
     2. Pass parameters to auto_scalar
     """
-    max_miss_rate_threshold = request.form.get('max_miss_rate_threshold')
-    min_miss_rate_threshold = request.form.get('min_miss_rate_threshold')
-    ratio_expand_pool = request.form.get('ratio_expand_pool')
-    ratio_shrink_pool = request.form.get('ratio_shrink_pool')
+    request_data = request.get_json()
+    max_miss_rate_threshold = request_data['max_miss_rate_threshold']
+    min_miss_rate_threshold = request_data['min_miss_rate_threshold']
+    ratio_expand_pool = request_data['expand_ratio']
+    ratio_shrink_pool = request_data['shrink_ratio']
+
+    # max_miss_rate_threshold = request.form.get('max_miss_rate_threshold')
+    # min_miss_rate_threshold = request.form.get('min_miss_rate_threshold')
+    # ratio_expand_pool = request.form.get('expand_ratio')
+    # ratio_shrink_pool = request.form.get('shrink_ratio')
 
     parameters = {'max_miss_rate_threshold': max_miss_rate_threshold,
                   'min_miss_rate_threshold': min_miss_rate_threshold,
@@ -127,7 +135,7 @@ def set_auto_scaler_parameters():
 def get_cache_configurations():
     params = {
         "capacity": variables.memcache_capacity,
-        "replacement_policy": variables.memcache_replacement_policy
+        "policy": variables.memcache_replacement_policy
     }
     return success_response(params)
 
@@ -138,8 +146,13 @@ def set_cache_configurations():
     2. Store cache configs to local
     3. For each ip, call instance 2 set cache config
     """
-    capacity = request.form.get('capacity')
-    replacement_policy = request.form.get('replacement_policy')
+    request_data = request.get_json()
+    capacity = request_data['capacity']
+    replacement_policy = request_data['policy']
+
+    # capacity = request.form.get('capacity')
+    # replacement_policy = request.form.get('replacement_policy')
+
     variables.memcache_capacity = capacity
     variables.memcache_replacement_policy = replacement_policy
 
