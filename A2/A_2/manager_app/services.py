@@ -3,39 +3,53 @@ from flask import request, jsonify
 
 import manager_app
 from manager_app import variables, config
+from manager_app.helper_functions.ec2_helper import ec2_get_instance_ip
 from manager_app.helper_functions.manager_helper import generate_node_ip_list, increase_pool_size_manual, \
     decrease_pool_size_manual
 from manager_app.helper_functions.responses import success_response, failed_response
-from manager_app.helper_functions.s3_helper import s3_list, s3_clear
+
+
+def update_node_list():
+    node_list = request.form.get('list')
+    variables.pool_node_id_list = node_list
+    params = {
+        "node_list": node_list
+    }
+    return success_response(params)
 
 
 def get_pool_size():
-    # Rewrite: get size from ec2 filtered by subnet
-    # Node list only got updated when switching from auto -> manual
-    size = variables.memcache_pool_node_list.size()
-    return jsonify(size=size)
+    size = len(variables.pool_node_id_list)
+    params = {
+        "size": size
+    }
+    return success_response(params)
 
 
+# Rewrite
 def get_pool_node_list():
-    return jsonify(pool_node_list=variables.memcache_pool_node_list)
+    node_ip_list = []
+    for instance_id in variables.pool_node_id_list:
+        node_ip_list.append(ec2_get_instance_ip(instance_id))
+    params = {
+        "node_id_list": variables.pool_node_id_list,
+        "node_ip_list": node_ip_list
+    }
+    return success_response(params)
 
 
 def get_resize_pool_config():
-    content = jsonify(
-        resize_pool_option=variables.resize_pool_option,
-        resize_pool_parameters=variables.resize_pool_parameters
-    )
-    return content
+    params = {
+        "resize_pool_option": variables.resize_pool_option,
+        "resize_pool_parameters": variables.resize_pool_parameters
+    }
+    return success_response(params)
 
 
-def get_30_min_data():
-    if manager_app.data_30_min.size >= 30:
-        manager_app.data_30_min.pop(0)
-    manager_app.data_30_min.append(get_stats_from_db())
-
-
-def task_queue():
-    return
+# def get_30_min_data():
+#     if manager_app.data_30_min.size >= 30:
+#         manager_app.data_30_min.pop(0)
+#     manager_app.data_30_min.append(get_stats_from_db())
 
 
 def notify_pool_size_change():
@@ -62,9 +76,11 @@ def notify_pool_size_change():
             return failed_response(400, "The size of memcache pool has been reached to minimum")
     else:
         return failed_response(400, "Parameter change can only be increase or decrease")
-    # Rewrite, confirm URL, confirm data body: one instance/instance_list, ip or instance
-    changed_node_ip = variables.memcache_pool_node_list[-1].public_ip_address
-    response = requests.post(config.SERVER_URL + "/api/pool_size_change", data={"node_ip": changed_node_ip})
+
+    changed_node_ip = variables.pool_node_id_list[-1].public_ip_address
+    response = requests.post(config.SERVER_URL + "/api/notify", data={"node_ip": [changed_node_ip],
+                                                                      "mode": variables.resize_pool_option,
+                                                                      "change": change})
     content = response["content"]
     return success_response(content)
 
@@ -109,11 +125,11 @@ def set_auto_scaler_parameters():
 
 
 def get_cache_configurations():
-    content = jsonify(
-        capacity=variables.memcache_capacity,
-        replacement_policy=variables.memcache_replacement_policy
-    )
-    return content
+    params = {
+        "capacity": variables.memcache_capacity,
+        "replacement_policy": variables.memcache_replacement_policy
+    }
+    return success_response(params)
 
 
 def set_cache_configurations():
@@ -140,27 +156,17 @@ def set_cache_configurations():
 
 def clear_all_cache():
     """
-    1. Get running node ip
-    2. For each ip, call instance 2 clear all cache
+    1. Call instance 1 to clear cache
     """
-    content = []
-    ip_list = generate_node_ip_list()
-    for ip in ip_list:
-        node_url = ip + ":" + config.cache_port
-        response = requests.delete(node_url + "/api/cache")
-        content.append(response["content"])
+    response = requests.delete(config.SERVER_URL + "/api/clear/cache")
+    content = response["content"]
     return success_response(content)
 
 
 def clear_all_data():
     """
-    1. Clear all cache
-    2. Clear s3 buckets
-    3. Clear RDS
+    1. Call instance 1 to clear data
     """
-    clear_all_cache()
-
-    buckets = s3_list()
-    s3_clear(buckets[0])
-
-    # RDS
+    response = requests.delete(config.SERVER_URL + "/api/clear/data")
+    content = response["content"]
+    return success_response(content)

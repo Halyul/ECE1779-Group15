@@ -1,7 +1,6 @@
 import os
 from flask import send_from_directory
-import services
-from manager_app import webapp
+from manager_app import webapp, services
 
 
 @webapp.route("/", defaults={"path": ""})
@@ -17,12 +16,18 @@ def serve(path):
 
     if path != "" and os.path.exists(webapp.static_folder + "/" + path):
         return send_from_directory(
-            webapp.static_folder, 
+            webapp.static_folder,
             path,
             mimetype=set_mimetype(path)
         )
     else:
         return send_from_directory(webapp.static_folder, "index.html")
+
+
+@webapp.route('/api/manager/pool_node_list/update', methods=['POST'])
+def update_node_list():
+    return services.update_node_list()
+
 
 @webapp.route('/api/manager/pool_node_list', methods=['GET'])
 def get_pool_size():
@@ -40,7 +45,7 @@ def get_aggregate_stats():
 
 
 @webapp.route('/api/manager/poolsize', methods=['GET'])
-def get_pool_size():
+def get_memcache_pool_size():
     return services.get_pool_size()
 
 
@@ -65,7 +70,7 @@ def change_pool_size_auto():
 
 
 @webapp.route('/api/manager/cache/config', methods=['POST'])
-def set_cache_configurations():
+def set_memcache_configurations():
     return services.set_cache_configurations()
 
 

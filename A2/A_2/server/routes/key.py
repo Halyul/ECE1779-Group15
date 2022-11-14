@@ -36,13 +36,13 @@ def create_key(args):
         # invalidate the key in the memcache
         url = MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/key"
         logging.info("Invalidate cache request send to: {}".format(url))
-        # ThreadTask(
-        #     requests.delete, 
-        #     kwargs=dict(
-        #         url=url, 
-        #         data=[("key", key)]
-        #     )
-        # ).start()
+        ThreadTask(
+            requests.delete, 
+            kwargs=dict(
+                url=url, 
+                data=[("key", key)]
+            )
+        ).start()
     file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
     flag, resp = BUCKET.object.upload(file_base64, filename)
     if not flag:
@@ -117,5 +117,14 @@ def clear(mode):
         BUCKET.object.delete_all()
         logging.info("Data Cleared.")
     CACHED_KEYS.remove_all()
+    for node in MAPPING.get_nodes():
+        url = node + ":" + str(CONFIG["cache"]["port"]) + "/api/cache"
+        logging.info("Clear cache request send to: {}".format(url))
+        ThreadTask(
+            requests.delete,
+            kwargs=dict(
+                url=url
+            )
+        ).start()
     logging.info("Cache Cleared.")
     return True, 200, None

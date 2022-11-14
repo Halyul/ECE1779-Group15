@@ -12,6 +12,8 @@ mysql-connector-python = "*"
 requests = "*"
 boto3 = "*"
 moto = {extras = ["s3"], version = "*"}
+paramiko = "*"
+numpy = "*"
 
 [dev-packages]
 moto = {extras = ["s3"], version = "*"}

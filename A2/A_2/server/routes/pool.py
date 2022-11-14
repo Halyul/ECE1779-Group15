@@ -31,11 +31,11 @@ def pool_change(args):
     for entry in result:
         url = entry["send_to"] + ":" + str(CONFIG["cache"]["port"])  + "/api/cache/move_keys"
         logging.info("Send to: {} with Paylod {}".format(url, entry["payload"]))
-        # ThreadTask(
-        #     requests.post, 
-        #     kwargs=dict(
-        #         url=entry["send_to"] + ":" + CONFIG["cache"]["port"]  + "/api/cache/move_keys", 
-        #         data=entry["payload"]
-        #     )
-        # ).start()
+        ThreadTask(
+            requests.post, 
+            kwargs=dict(
+                url=entry["send_to"] + ":" + CONFIG["cache"]["port"]  + "/api/cache/move_keys", 
+                data=entry["payload"]
+            )
+        ).start()
     return True, 200, None
