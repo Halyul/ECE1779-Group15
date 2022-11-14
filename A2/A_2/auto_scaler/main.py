@@ -7,7 +7,7 @@ import auto_scaler.statistics as statistics
 from auto_scaler.libs.scaler_operations import responce_main, responce_refresh_config, \
     responce_terminate_all, responce_list_cache, check_miss_rate_every_min, responce_get_node_list, \
     responce_set_node_list, responce_do_node_delete, responce_refresh_cache_config
-from auto_scaler.libs.scaler_support_func import initialization
+from auto_scaler.libs.scaler_support_func import initialization, get_miss_rate
 
 @webapp.route('/',methods=['GET'])
 def home():
@@ -53,6 +53,16 @@ def set_test_miss_rate():
     statistics.test_miss_rate = float(request.form.get('test_miss_rate'))
     check_miss_rate_every_min(manully_triggered = True)
     return redirect(url_for('main'))
+
+# for testing
+@webapp.route('/api/scaler/miss_rate',methods=['POST', 'GET'])
+def miss_rate():
+    return get_miss_rate()
+
+# for testing, should be accessed only in auto mode
+@webapp.route('/api/scaler/pool_size',methods=['POST', 'GET'])
+def get_pool_size():
+    return config.cache_pool_size
 
 # assume start up when auto_mode = False, so don't need to add node in the beginning
 # initialization()

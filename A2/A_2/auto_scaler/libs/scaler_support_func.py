@@ -219,7 +219,7 @@ def refresh_node_list():
     if config.auto_mode == True:
         return
     else:
-        # get the node_list from manager and process the listif in manaul mode
+        # get the node_list from manager and process the list if in manaul mode
         node_list = []
         response = requests.get("http://127.0.0.1:" + str(config.manager_port) + "/api/manager/pool_node_list")
         node_dict = json.loads(response.content)['node_id_list']
