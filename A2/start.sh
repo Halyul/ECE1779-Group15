@@ -1,10 +1,8 @@
 #!/bin/bash
 cd A_2
 # Install deps
-pip install -r requirements.txt
-# create database
-python3 create_database.py
+pip3 install -r requirements.txt
 # Run the app
-python3 app.py & python3 cache_app.py && kill $!
+python3 manager_app.py & python3 auto_scaler_app.py & python3 app.py && jobs -p | xargs kill -9
 
 cd ..
