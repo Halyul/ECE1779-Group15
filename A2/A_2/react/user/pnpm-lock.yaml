@@ -9,6 +9,7 @@ specifiers:
   '@types/react': ^18.0.22
   '@types/react-dom': ^18.0.7
   '@vitejs/plugin-react': ^2.2.0
+  dompurify: ^2.4.1
   react: ^18.2.0
   react-dom: ^18.2.0
   react-router-dom: ^6.4.3
@@ -21,6 +22,7 @@ dependencies:
   '@mui/icons-material': 5.10.9_5n7l3nqogz2ltkpvtlyqobxizm
   '@mui/material': 5.10.12_gs4twfomdgooimayvnfrqgiwam
   '@mui/x-data-grid': 5.17.9_ogbgppkmgjwo37r7ushwshulca
+  dompurify: 2.4.1
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-router-dom: 6.4.3_biqbaboplfbrettd7655fr4n2y
@@ -806,6 +808,10 @@ packages:
     dependencies:
       '@babel/runtime': 7.20.1
       csstype: 3.1.1
+    dev: false
+
+  /dompurify/2.4.1:
+    resolution: {integrity: sha512-ewwFzHzrrneRjxzmK6oVz/rZn9VWspGFRDb4/rRtIsM1n36t9AKma/ye8syCpcw+XJ25kOK/hOG7t1j2I2yBqA==}
     dev: false
 
   /electron-to-chromium/1.4.284:

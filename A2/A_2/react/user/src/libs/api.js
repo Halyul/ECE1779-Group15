@@ -40,7 +40,7 @@ function responseAdapter(response) {
 }
 
 async function request(
-  url = "",
+  url,
   options = {},
 ) {
   return fetch(url, options)
@@ -58,6 +58,7 @@ async function request(
     })
     .catch((error) => {
       console.error("Error:", error);
+      // CASE: Network error
       if (error.message) {
         return {
           data: {
@@ -68,21 +69,21 @@ async function request(
           statusText: error.message,
         }
       }
-      if (typeof error === "object") {
-        return {
-          data: {
-            success: false,
-            message: error.statusText,
-          },
-          status: error.status,
-          statusText: error.statusText,
-        }
-      }
-      return error.json().then((data) => {
+      // CASE: HTTP error
+      return error.headers.get('content-type')?.includes('application/json') ? error.json().then((data) => {
         return {
           data: {
             success: error.ok,
             message: data.error.message,
+          },
+          status: error.status,
+          statusText: error.statusText,
+        }
+      }) : error.text().then((data) => {
+        return {
+          data: {
+            success: error.ok,
+            message: data,
           },
           status: error.status,
           statusText: error.statusText,
