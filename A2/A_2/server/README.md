@@ -10,6 +10,41 @@ URL               | Method  | Content Type        | Body
 /api/notify       | POST    | application/json    | `node_ip`, `mode`, `change`
 /api/clear/{data, cache} | DELETE | N/A | N/A
 
+## AWS Setup
+### Preamble
+- The Main EC2 Instance refers to the EC2 instance which hosts Instace 1, Manager, and Auto-Scaler.
+- Make sure the Main EC2 Instance has the correct `config` and `credentials` under `.aws`. The Main EC2 Instance, S3, and RDS must be under the same AWS account.
+
+### S3
+1. Create a bucket [here](https://s3.console.aws.amazon.com/s3/bucket/create)
+2. Make sure the `region` matches the region of the Main EC2 Instance
+3. Bucket name is set under `config.yaml -> server -> bucket -> name` (currently set to `ece1779assignment2group15`)
+4. Leave everything else as default settings.
+
+### RDS
+0. Start the Main EC2 Instance
+1. Create a database [here](https://us-east-1.console.aws.amazon.com/rds/home?region=us-east-1#launch-dbinstance:gdb=false;isHermesCreate=true;s3-import=false)
+2. Select `Standard create` under `Choose a database creation method`
+3. Select `MySQL` under `Engine options`
+4. Select `Free tier` under `Templates`
+5. Under `Settings`:
+  1. `Master username` is set under `config.yaml -> database -> user` (currently set to `root`)
+  2. `Master password` is set under `config.yaml -> database -> password` (currently set to `ece1779pass`)
+6. Select `db.t2.micro` under `Instance configuration`
+7. Under `Storage`:
+  1. Set `Allocated storage` to `20`
+  2. Set `Maximum storage threshold` to `22`
+8. Under `Connectivity`
+  1. Select `Connect to an EC2 compute resource` under `Compute resource`
+  2. Select the Main EC2 Instance under `EC2 Instance`
+9. Leave everything else as default settings.
+10. Create the database
+11. When creation finished, go to the detail page of the database, copy the `Endpoint` URL under `Connectivity & security`
+12. `ssh` into the Main EC2 Instance
+  1. Paste the URL to `config.yaml -> database -> host`
+  2. Test the database connection by running `mysql -h <Endpoint URL> -P 3306 -u <database username> -p`, enter the database password. If MySQL spawns a shell, means the database is created successfully and can be connected normally.
+  2. Run `python3 create_database.py`
+
 ## Balance Result
 [A, B, C, D] -> [A, B, C]
 ```

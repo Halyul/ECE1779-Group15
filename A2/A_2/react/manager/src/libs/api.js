@@ -96,7 +96,7 @@ async function request(
           statusText: error.message,
         }
       }
-      if (typeof error === "object") {
+      if (typeof error !== "object") {
         return {
           data: {
             success: false,
