@@ -56,7 +56,7 @@ class Bucket:
                 return False, resp
             except ClientError as e:
                 if e.response['Error']['Code'] == 'NoSuchKey':
-                    logging.error("Get S3 object: {}".format(resp))
+                    logging.error("Get S3 object: {}".format(e))
                     return False, {"error": "No such key"}
                 else:
                     raise
