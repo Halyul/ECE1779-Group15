@@ -29,12 +29,12 @@ def pool_change(args):
     change = args["change"]
     result = MAPPING.notify_change(ips, mode, change)
     for entry in result:
-        url = entry["send_to"] + ":" + str(CONFIG["cache"]["port"])  + "/api/cache/move_keys"
+        url = "http://" + entry["send_to"] + ":" + str(CONFIG["cache"]["port"])  + "/api/cache/move_keys"
         logging.info("Send to: {} with Paylod {}".format(url, entry["payload"]))
         ThreadTask(
             requests.post, 
             kwargs=dict(
-                url="http://" + entry["send_to"] + ":" + str(CONFIG["cache"]["port"])  + "/api/cache/move_keys", 
+                url=url, 
                 json=entry["payload"]
             )
         ).start()
