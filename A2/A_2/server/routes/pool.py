@@ -34,8 +34,8 @@ def pool_change(args):
         ThreadTask(
             requests.post, 
             kwargs=dict(
-                url=entry["send_to"] + ":" + CONFIG["cache"]["port"]  + "/api/cache/move_keys", 
-                data=entry["payload"]
+                url="http://" + entry["send_to"] + ":" + str(CONFIG["cache"]["port"])  + "/api/cache/move_keys", 
+                json=entry["payload"]
             )
         ).start()
     return True, 200, None

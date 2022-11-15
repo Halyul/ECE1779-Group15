@@ -170,7 +170,7 @@ def show_info_service():
                             hit_rate_10min = hit_rate_10min)
 
 def move_keys_to_other_nodes_service():
-    data = json.loads(request.get_json())
+    data = request.get_json()
     port = data['port']
     dest = data['dest']
     response_out = ''
