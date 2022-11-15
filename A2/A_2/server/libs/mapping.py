@@ -31,7 +31,9 @@ class Mapping:
         if response.status_code != 200:
             logging.error("Error when getting current nodes: {}".format(response.text))
             raise
+
         resp = response.json()["content"]["node_ip_list"]
+
         logging.info("Current nodes: {}".format(resp))
         return resp
     
