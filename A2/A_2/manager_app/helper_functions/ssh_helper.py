@@ -12,6 +12,7 @@ def run_cache_update_status(node_id):
     """
     1. Run instance2 on new node
     2. Set cache config for new node
+    3. Notifying instance 1
     """
 
     error_count = 0
@@ -47,5 +48,20 @@ def run_cache_update_status(node_id):
                 return
             continue
 
-    time.sleep(10)
+    error_count = 0
+    if len(variables.pool_node_id_list) > 1:
+        while True:
+            try:
+                address = ec2_get_instance_ip(node_id)
+                requests.post(config.SERVER_URL + "/api/notify", json={"node_ip": [address],
+                                                                       "mode": variables.resize_pool_option,
+                                                                       "change": variables.manual_operation})
+                logging.info("Notifying instance 1")
+                break
+            except Exception as error:
+                error_count += 1
+                if error_count > 5:
+                    logging.error("Notifying instance 1 changing {} failed due to {}".format(address, error))
+                    return
+                continue
     return

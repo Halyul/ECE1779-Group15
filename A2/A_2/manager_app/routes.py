@@ -24,7 +24,6 @@ def serve(path):
         return send_from_directory(webapp.static_folder, "index.html")
 
 
-# TODO confirm URL
 @webapp.route('/api/manager/pool_node_list/update', methods=['POST'])
 def update_node_list():
     return services.update_node_list()
