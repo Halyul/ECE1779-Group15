@@ -11,6 +11,7 @@ import {
   DialogActions,
   Snackbar,
 } from "@mui/material";
+import DOMPurify from 'dompurify';
 
 export default function SubmissionPrompt(props) {
   const [submitionSuccess, setSubmitionSuccess] = useState(false);
@@ -44,9 +45,10 @@ export default function SubmissionPrompt(props) {
       >
         <DialogTitle id="alert-dialog-title">{props.failed.title}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {props.failed.text}
-          </DialogContentText>
+          <DialogContentText
+            id="alert-dialog-description"
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(props.failed.text) }}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>Close</Button>

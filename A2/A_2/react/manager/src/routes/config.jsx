@@ -38,7 +38,7 @@ export async function loader({ params }) {
     node: nodeConfig.data.content,
     pool: {
       config: poolConfig.data.content,
-      size: poolSize.data.content,
+      size: poolSize.data.content.size,
     },
 
   };
@@ -79,7 +79,7 @@ export async function action({ request, params }) {
   }
   return {
     status: response.status,
-    statusText: response.statusText,
+    statusText: response.data?.message || response.statusText,
   };
 }
 
@@ -90,15 +90,15 @@ export default function Config() {
 
   const [capacity, setCapacity] = useState(loaderResponse.node.capacity);
   const [capacityError, setCapacityError] = useState(false);
-  const [policy, setPolicy] = useState(loaderResponse.node.replacement_policy);
+  const [policy, setPolicy] = useState(loaderResponse.node.policy);
   const [clearCache, setClearCache] = useState(false);
 
   const [poolSize, setPoolSize] = useState(loaderResponse.pool.size);
   const [resizingMode, setResizingMode] = useState(loaderResponse.pool.config.resize_pool_option);
-  const [missRateThreshold, setMissRateThreshold] = useState([loaderResponse.pool.config.resize_pool_parameters.min_miss_rate_threshold, loaderResponse.pool.config.resize_pool_parameters.max_miss_rate_threshold]);
-  const [expandRatio, setExpandRatio] = useState(loaderResponse.pool.config.resize_pool_parameters.ratio_expand_pool);
+  const [missRateThreshold, setMissRateThreshold] = useState([loaderResponse.pool.config.resize_pool_parameters.min_miss_rate_threshold || 30, loaderResponse.pool.config.resize_pool_parameters.max_miss_rate_threshold || 80]);
+  const [expandRatio, setExpandRatio] = useState(loaderResponse.pool.config.resize_pool_parameters.ratio_expand_pool || 1);
   const [expandRatioError, setExpandRatioError] = useState(false);
-  const [shrinkRatio, setShrinkRatio] = useState(loaderResponse.pool.config.resize_pool_parameters.ratio_shrink_pool);
+  const [shrinkRatio, setShrinkRatio] = useState(loaderResponse.pool.config.resize_pool_parameters.ratio_shrink_pool || 0.5);
   const [shrinkRatioError, setShrinkRatioError] = useState(false);
   const [manualNodeChange, setManualNodeChange] = useState("");
   const [clearData, setClearData] = useState(false);
@@ -338,7 +338,7 @@ export default function Config() {
                       />
                       <Slider
                         getAriaLabel={() => 'Miss Rate Threshold'}
-                        value={missRateThreshold}
+                        defaultValue={missRateThreshold}
                         onChange={(_, newValue, __) => setMissRateThreshold(newValue)}
                         valueLabelDisplay="auto"
                         getAriaValueText={(value) => `${value}%`}
