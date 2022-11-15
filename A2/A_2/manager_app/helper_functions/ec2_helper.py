@@ -6,7 +6,8 @@ from manager_app import config
 def ec2_create():
     ec2 = boto3.resource('ec2')
     instance = ec2.create_instances(ImageId=config.ami_id, MinCount=1, MaxCount=1,
-                                    InstanceType='t2.micro', SubnetId=config.subnet_id)
+                                    InstanceType='t2.micro', SubnetId=config.subnet_id,
+                                    SecurityGroupIds=[config.security_group_id], KeyName=config.ssh_key_name)
     return instance[0]
 
 
@@ -24,5 +25,6 @@ def ec2_get_instance_ip(instance_id):
                 'Values': [instance_id]
             }
         ])
-    instance = list(instances.all())[0]
+    instance_list = list(instances.all())
+    instance = instance_list[0]
     return instance.public_ip_address
