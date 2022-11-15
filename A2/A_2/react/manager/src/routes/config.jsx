@@ -79,7 +79,7 @@ export async function action({ request, params }) {
   }
   return {
     status: response.status,
-    statusText: response.statusText,
+    statusText: response.data?.message || response.statusText,
   };
 }
 
