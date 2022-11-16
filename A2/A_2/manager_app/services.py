@@ -1,5 +1,5 @@
 import requests
-from flask import request, jsonify
+from flask import request
 
 import manager_app
 from manager_app import variables, config
@@ -62,7 +62,6 @@ def notify_pool_size_change():
     """
     request_data = request.get_json()
     change = request_data['change']
-    # change = request.form.get('change')
     variables.manual_operation = change
     manager_app.resize_pool_option = 'manual'
     manager_app.resize_pool_parameters = {}
@@ -76,13 +75,15 @@ def notify_pool_size_change():
     elif change == 'decrease':
         if pool_size == 1:
             return failed_response(400, "The size of memcache pool has been reached to minimum")
+        else:
+            changed_node_ip = ec2_get_instance_ip(variables.pool_node_id_list[-1])
+            requests.post(config.SERVER_URL + "/api/notify", json={"node_ip": [changed_node_ip],
+                                                                   "mode": variables.resize_pool_option,
+                                                                   "change": change})
+
     else:
         return failed_response(400, "Parameter change can only be increase or decrease")
 
-    changed_node_ip = ec2_get_instance_ip(variables.pool_node_id_list[-1])
-    requests.post(config.SERVER_URL + "/api/notify", data={"node_ip": [changed_node_ip],
-                                                                      "mode": variables.resize_pool_option,
-                                                                      "change": change})
     return success_response("Notifying instance 1 pool size change")
 
 
@@ -112,11 +113,6 @@ def set_auto_scaler_parameters():
     min_miss_rate_threshold = request_data['min_miss_rate_threshold']
     ratio_expand_pool = request_data['expand_ratio']
     ratio_shrink_pool = request_data['shrink_ratio']
-
-    # max_miss_rate_threshold = request.form.get('max_miss_rate_threshold')
-    # min_miss_rate_threshold = request.form.get('min_miss_rate_threshold')
-    # ratio_expand_pool = request.form.get('expand_ratio')
-    # ratio_shrink_pool = request.form.get('shrink_ratio')
 
     parameters = {'max_miss_rate_threshold': max_miss_rate_threshold,
                   'min_miss_rate_threshold': min_miss_rate_threshold,
@@ -150,9 +146,6 @@ def set_cache_configurations():
     request_data = request.get_json()
     capacity = request_data['capacity']
     replacement_policy = request_data['policy']
-
-    # capacity = request.form.get('capacity')
-    # replacement_policy = request.form.get('replacement_policy')
 
     variables.memcache_capacity = capacity
     variables.memcache_replacement_policy = replacement_policy

@@ -43,9 +43,9 @@ def decrease_pool_size_manual():
     3. Send updated node_list to auto_scalar
     """
 
-    instance = variables.pool_node_id_list[-1]
-    ec2_destroy(instance.id)
-    variables.pool_node_id_list.append(instance.id)
+    instance_id = variables.pool_node_id_list[-1]
+    ec2_destroy(instance_id)
+    variables.pool_node_id_list.remove(instance_id)
     # requests.post(config.AUTO_SCALAR_URL + "/api/scaler/cache_list", data={"node_list": variables.pool_node_id_list})
     return
 

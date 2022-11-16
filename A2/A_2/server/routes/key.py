@@ -34,7 +34,7 @@ def create_key(args):
         filename = file_entry[0]
         logging.info("Updating key-image pair: {}-{}".format(key, filename))
         # invalidate the key in the memcache
-        url = MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/key"
+        url = "http://" + MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/key"
         logging.info("Invalidate cache request send to: {}".format(url))
         ThreadTask(
             requests.delete, 
@@ -62,7 +62,7 @@ def get_key(key):
     if " " in key or "" == key or len(key) > 48:
         return False, 400, "Key does not meet the requirement."
     try:
-        url = MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/key"
+        url = "http://" + MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/key"
         response = requests.post(url, data=[("key", key)]).json()
         content = response["content"]
         return True, 200, dict(
@@ -81,7 +81,7 @@ def get_key(key):
         if not flag:
             database.unlock()
             return False, 500, "Failed to retrieve the image."
-        url = MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/content"
+        url = "http://" + MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/content"
         logging.info("Add cache request send to: {}".format(url))
         ThreadTask(
             requests.post,
@@ -118,7 +118,7 @@ def clear(mode):
         logging.info("Data Cleared.")
     CACHED_KEYS.remove_all()
     for node in MAPPING.get_nodes():
-        url = node + ":" + str(CONFIG["cache"]["port"]) + "/api/cache"
+        url = "http://" + node + ":" + str(CONFIG["cache"]["port"]) + "/api/cache"
         logging.info("Clear cache request send to: {}".format(url))
         ThreadTask(
             requests.delete,
