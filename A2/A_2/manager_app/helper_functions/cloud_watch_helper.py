@@ -24,7 +24,6 @@ def my_get_metric_data(cache_index: int, metric_name: str):
                     },
                     'Period': 60,
                     'Stat': 'Sum',
-                    'Unit': 'None'
                 },
             },
         ],

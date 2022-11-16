@@ -1,5 +1,7 @@
 import server.config
 
+add_one_min_data_thread_stop = False
+
 # Config from config.yaml
 config_info = server.config.Config().fetch()
 cache_port = config_info['cache']['port']
