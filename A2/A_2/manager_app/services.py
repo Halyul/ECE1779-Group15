@@ -1,8 +1,13 @@
+import logging
+import threading
+import time
+
 import requests
 from flask import request
 
 import manager_app
 from manager_app import variables, config
+from manager_app.helper_functions.cloud_watch_helper import get_one_min_data
 from manager_app.helper_functions.ec2_helper import ec2_get_instance_ip
 from manager_app.helper_functions.manager_helper import generate_node_ip_list, increase_pool_size_manual, \
     decrease_pool_size_manual
@@ -46,10 +51,17 @@ def get_resize_pool_config():
     return success_response(params)
 
 
-# def get_30_min_data():
-#     if manager_app.data_30_min.size >= 30:
-#         manager_app.data_30_min.pop(0)
-#     manager_app.data_30_min.append(get_stats_from_db())
+def add_one_min_data():
+    logging.info("Adding one min data")
+    if len(variables.miss_rate) >= 30:
+        variables.miss_rate.pop(0)
+        variables.hit_rate.pop(0)
+        variables.cache_item_num.pop(0)
+        variables.cache_total_size.pop(0)
+        variables.request_served_num.pop(0)
+    get_one_min_data()
+    time.sleep(60)
+    return
 
 
 def notify_pool_size_change():
