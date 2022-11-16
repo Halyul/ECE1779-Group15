@@ -186,11 +186,13 @@ def move_keys_to_other_nodes_service():
                 response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - key {} does not exist".format(key))
     if port != -1:
         source_ip = request.environ['REMOTE_ADDR']
-        response = requests.post('http://' + source_ip + ':' + str(port) + '/api/poolsize/change')
-        if response.status_code != 200:
-            logging.error("move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
-            response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
-    
+        try:
+            response = requests.post('http://' + source_ip + ':' + str(port) + '/api/poolsize/change')
+            if response.status_code != 200:
+                logging.error("move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
+                response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - failed to remove itself, {}".format(response._content))
+        except Exception as error:
+            response_out = gen_failed_responce(400, "move_keys_to_other_nodes_service - {}".format(error))
     if response_out == '':
         return gen_success_responce("")
     else:
