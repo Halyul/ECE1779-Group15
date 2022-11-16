@@ -116,8 +116,8 @@ export default function Config() {
         if (response.status === 200) {
           setPoolSize(response.data.content.size);
         }
+        timer = setTimeout(loop, 1000)
       });
-      timer = setTimeout(loop, 1000)
     }
     loop()
     return () => clearTimeout(timer)
