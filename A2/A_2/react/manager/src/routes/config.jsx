@@ -1,4 +1,7 @@
-import { useState } from "react";
+import {
+  useState,
+  useEffect,
+} from "react";
 import {
   useActionData,
   useLoaderData
@@ -102,6 +105,23 @@ export default function Config() {
   const [shrinkRatioError, setShrinkRatioError] = useState(false);
   const [manualNodeChange, setManualNodeChange] = useState("");
   const [clearData, setClearData] = useState(false);
+
+  useEffect(() => {
+    let timer
+    const loop = () => {
+      const fetchData = async () => {
+        return await getPoolSize();
+      }
+      fetchData().then((response) => {
+        if (response.status === 200) {
+          setPoolSize(response.data.content.size);
+        }
+      });
+      timer = setTimeout(loop, 1000)
+    }
+    loop()
+    return () => clearTimeout(timer)
+ }, [])
 
   return (
     <>
