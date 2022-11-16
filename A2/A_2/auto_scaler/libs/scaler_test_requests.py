@@ -1,8 +1,14 @@
 import requests
 import json
 
-# TODO: need to read it from the yaml
-port = 5010
+import sys
+sys.path.append(".") 
+import server.config
+
+setup_config = server.config.Config()
+config_info = setup_config.fetch()
+
+port = config_info['auto_scaler']['port']
 
 def set_scaler_config(max_miss_rate_threshold, min_miss_rate_threshold, expand_ratio, shrink_ratio, auto_mode):
     passed_data=[('max_miss_rate_threshold', max_miss_rate_threshold), ('min_miss_rate_threshold', min_miss_rate_threshold), \

@@ -51,8 +51,8 @@ def add_cache_node():
     
     config.cache_pool_size += 1
     config.cache_pool_ids.append(instance.id)
-    # TODO: enable it while manager is ready
-    # send_list_to_manager()
+    # send node_list to manager
+    send_list_to_manager()
 
 def run_cache_update_status(id):
     time.sleep(1) # add small delay so the 'ec2.instances.filter' can find the newly created instance
@@ -121,8 +121,8 @@ def remove_cache_node(id):
     del statistics.node_running[id]
     config.cache_pool_size -= 1
     config.cache_pool_ids.remove(id)
-    # TODO: enable it while manager is ready
-    # send_list_to_manager()
+    # send node_list to manager
+    send_list_to_manager()
 
 def clear_cache_node():
     for instance_id in config.cache_pool_ids:
@@ -175,7 +175,7 @@ def get_cache_pool_size():
     if config.auto_mode == True:
         return config.cache_pool_size
     else: 
-        # TODO: get the node list from manager, or manager need to send the list every time list updated
+        # get node_list from manager
         refresh_node_list()
         return config.cache_pool_size
 
@@ -214,14 +214,14 @@ def notify_while_resize_pool(notify_info, changed_id):
     if notify_info['action'] == 'add':
         logging.info("notify_while_resize_pool - all new nodes are up, sending request to notify A1")
         logging.info("notify_while_resize_pool - notify_info = {}".format(json.dumps(notify_info)))
-        # TODO: enable this line and makes sure format matches with A1
-        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'increase')])
+        # notify A1 nodes change
+        response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'increase')])
     else:
         time.sleep(4) # arbitry delay
         logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
         logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
-        # TODO: enable this line and makes sure format matches with A1
-        # response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'decrease')])
+        # notify A1 nodes change
+        response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', data=[('ip', notify_info['ip']), ('mode', 'automatic'), ('change', 'decrease')])
     return
 
 def refresh_node_list():
