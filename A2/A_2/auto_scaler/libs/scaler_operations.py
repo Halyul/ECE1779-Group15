@@ -18,8 +18,8 @@ from auto_scaler.libs.ec2_support_func import ec2_list, ec2_get_instance_ip
 
 def responce_main():
     if config.auto_mode == False:
-        # TODO: uncomment it when manager is ready
-        # refresh_node_list() # will take some time
+        # get node_list from manager
+        refresh_node_list() # will take some time
         pass
 
     data = {}
@@ -147,8 +147,8 @@ def check_miss_rate_every_min(manully_triggered = False):
                     thread.start()
                         
             elif config.auto_mode == False:
-                # TODO: need to get the node_id list from manager
-                # refresh_node_list() # will take some time
+                # get node_list from manager
+                refresh_node_list() # will take some time
                 pass
 
             # if this update of num cache nodes is manully triggered, will return after one round of pool size update
