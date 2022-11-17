@@ -148,7 +148,7 @@ def check_miss_rate_every_min(manully_triggered = False):
                         
             elif config.auto_mode == False:
                 # get node_list from manager
-                refresh_node_list() # will take some time
+                # refresh_node_list() # will take some time
                 pass
 
             # if this update of num cache nodes is manully triggered, will return after one round of pool size update
@@ -189,8 +189,8 @@ def responce_get_node_list():
     return json.dumps(config.cache_pool_ids)
 
 def responce_set_node_list(node_list = []):
-    logging.info("cache_pool_ids = {}".format(request.form.get('cache_pool_ids')))
-    node_list = json.loads(request.form.get('cache_pool_ids'))
+    logging.info("cache_pool_ids = {}".format(request.get_json('cache_pool_ids')))
+    node_list = request.get_json()['cache_pool_ids']
     response = set_node_list_from_node_list(node_list)
     return response
 
