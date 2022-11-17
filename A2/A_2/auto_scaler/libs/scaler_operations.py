@@ -101,8 +101,9 @@ def responce_refresh_cache_config():
         logging.error('responce_refresh_cache_config - ' + error)
         return gen_failed_responce(400, error)
 
+prev_miss_rate = -1
 def check_miss_rate_every_min(manully_triggered = False):
-    prev_miss_rate = -1
+    global prev_miss_rate
     try:
         while True:
             # # refresh nodes running status
