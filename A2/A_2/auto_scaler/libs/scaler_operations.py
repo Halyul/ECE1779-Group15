@@ -189,8 +189,8 @@ def responce_get_node_list():
     return json.dumps(config.cache_pool_ids)
 
 def responce_set_node_list(node_list = []):
-    logging.info("cache_pool_ids = {}".format(request.form.get('cache_pool_ids')))
-    node_list = json.loads(request.form.get('cache_pool_ids'))
+    logging.info("cache_pool_ids = {}".format(request.get_json('cache_pool_ids')))
+    node_list = json.loads(request.get_json('cache_pool_ids'))
     response = set_node_list_from_node_list(node_list)
     return response
 
