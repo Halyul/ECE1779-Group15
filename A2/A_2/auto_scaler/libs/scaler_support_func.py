@@ -52,7 +52,10 @@ def add_cache_node():
     config.cache_pool_size += 1
     config.cache_pool_ids.append(instance.id)
     # send node_list to manager
-    send_list_to_manager()
+    try:
+        send_list_to_manager()
+    except Exception as error:
+        logging.error("add_cache_node - {}".format(error))
 
 def run_cache_update_status(id):
     time.sleep(1) # add small delay so the 'ec2.instances.filter' can find the newly created instance
@@ -107,6 +110,7 @@ def check_if_node_is_up(id, address):
             # cache is not responding
             error_count += 1
             if error_count < 20:
+                time.sleep(1)
                 continue
             else:
                 logging.error("check_if_node_is_up - node with ip {} access timeout! {}".format(address, error))
@@ -123,7 +127,10 @@ def remove_cache_node(id):
     config.cache_pool_size -= 1
     config.cache_pool_ids.remove(id)
     # send node_list to manager
-    send_list_to_manager()
+    try:
+        send_list_to_manager()
+    except Exception as error:
+        logging.error("remove_cache_node - {}".format(error))
 
 def clear_cache_node():
     for instance_id in config.cache_pool_ids:
@@ -149,28 +156,27 @@ def get_memcache_statistics(address):
     else:
         return -1
 
-def get_miss_rate(manully_triggered = False):
-    if manully_triggered == False:
-        total_get_request = 0
-        total_hit = 0
-        # read total_get_request and total_hit from CloudWatch
-        for i in range(len(config.cache_pool_ids)):
-            if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
-                # logging.info("reading statistics from cloudwatch, i = {}".format(i))
-                cloudwatch_num_hit = get_num_hit(i)
-                if cloudwatch_num_hit != []:
-                    total_hit += cloudwatch_num_hit[0]
-                cloudwatch_num_GET_request_served = get_num_GET_request_served(i)
-                if cloudwatch_num_GET_request_served != []:
-                    total_get_request += cloudwatch_num_GET_request_served[0]
-                # logging.info("statistics: total_hit = {}, total_get_request = {}".format(total_hit, total_get_request))
-        # start calculating the miss rate
-        if total_get_request == 0:
-            return 'n/a'
-        logging.info("get_miss_rate - total_get_request = {}, total_hit = {}".format(total_get_request, total_hit))
-        return (total_get_request - total_hit) / total_get_request
-    else: # for testing only
-        return statistics.test_miss_rate
+def get_miss_rate():
+    total_get_request = 0
+    total_hit = 0
+    # read total_get_request and total_hit from CloudWatch
+    for i in range(len(config.cache_pool_ids)):
+        if config.cache_pool_ids[i] in statistics.node_running and statistics.node_running[config.cache_pool_ids[i]] == True:
+            # logging.info("reading statistics from cloudwatch, i = {}".format(i))
+            cloudwatch_num_hit = get_num_hit(i)
+            if cloudwatch_num_hit != []:
+                total_hit += cloudwatch_num_hit[0]
+            cloudwatch_num_GET_request_served = get_num_GET_request_served(i)
+            if cloudwatch_num_GET_request_served != []:
+                total_get_request += cloudwatch_num_GET_request_served[0]
+                if cloudwatch_num_GET_request_served[0] < 0:
+                    logging.error("get_miss_rate - cache index {}, num_GET_request_served = {}".format(i, cloudwatch_num_GET_request_served[0]))
+            # logging.info("statistics: total_hit = {}, total_get_request = {}".format(total_hit, total_get_request))
+    # start calculating the miss rate
+    if total_get_request == 0:
+        return 'n/a'
+    logging.info("get_miss_rate - total_get_request = {}, total_hit = {}".format(total_get_request, total_hit))
+    return (total_get_request - total_hit) / total_get_request
 
 def get_cache_pool_size():
     if config.auto_mode == True:
@@ -197,7 +203,7 @@ def notify_while_resize_pool(notify_info, changed_id):
     all_running = False
     while all_running == False:
         time.sleep(1)
-        if datetime.now() > (start_time + timedelta(minutes=2)):
+        if datetime.now() > (start_time + timedelta(minutes=5)):
             logging.error("notify_while_resize_pool - node {} not responding!".format(id))
             return
         # wait until all nodes are running or a timeout after 2mins
@@ -211,19 +217,23 @@ def notify_while_resize_pool(notify_info, changed_id):
     for id in changed_id:
         ip = ec2_get_instance_ip(id)
         notify_info['ip'].append(ip) # note that changed_id will be in order if add, in inverse order if delete
-        
-    if notify_info['action'] == 'add':
-        logging.info("notify_while_resize_pool - all new nodes are up, sending request to notify A1")
-        logging.info("notify_while_resize_pool - notify_info = {}".format(json.dumps(notify_info)))
-        # notify A1 nodes change
-        response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', json={'ip': notify_info['ip'], 'mode': 'automatic', 'change': 'increase'})
-    else:
-        time.sleep(4) # arbitry delay
-        logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
-        logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
-        # notify A1 nodes change
-        response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', json={'ip': notify_info['ip'], 'mode': 'automatic', 'change': 'decrease'})
-    return
+    
+    try:
+        if notify_info['action'] == 'add':
+            logging.info("notify_while_resize_pool - all new nodes are up, sending request to notify A1")
+            logging.info("notify_while_resize_pool - notify_info = {}".format(json.dumps(notify_info)))
+            # notify A1 nodes change
+            response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', json={'node_ip': notify_info['ip'], 'mode': 'automatic', 'change': 'increase'})
+        else:
+            time.sleep(4) # arbitry delay
+            logging.info("notify_while_resize_pool - deleting nodes, sending request to notify A1")
+            logging.info("notify_while_resize_pool - notify_info = {}".format(json.dumps(notify_info)))
+            # notify A1 nodes change
+            response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', json={'node_ip': notify_info['ip'], 'mode': 'automatic', 'change': 'decrease'})
+        return
+    except Exception as error:
+        logging.error("notify_while_resize_pool - {}".format(error))
+        return
 
 def refresh_node_list():
     if config.auto_mode == True:
@@ -231,13 +241,17 @@ def refresh_node_list():
     else:
         # get the node_list from manager and process the list if in manaul mode
         node_list = []
-        response = requests.get("http://127.0.0.1:" + str(config.manager_port) + "/api/manager/pool_node_list")
-        node_dict = json.loads(response.content)['content']['node_id_list']
-        for node_id in node_dict:
-            node_list.append(node_id)
+        try:
+            response = requests.get("http://127.0.0.1:" + str(config.manager_port) + "/api/manager/pool_node_list")
+            node_dict = json.loads(response.content)['content']['node_id_list']
+            for node_id in node_dict:
+                node_list.append(node_id)
 
-        set_node_list_from_node_list(node_list)
-        return
+            set_node_list_from_node_list(node_list)
+            return
+        except Exception as error:
+            logging.error("refresh_node_list - {}".format(error))
+            return
 
 def set_node_list_from_node_list(node_list):
     if config.auto_mode == False:

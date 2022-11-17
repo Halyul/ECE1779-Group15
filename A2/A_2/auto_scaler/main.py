@@ -50,19 +50,19 @@ def list_cache():
 # for testing
 @webapp.route('/api/scaler/set_test_miss_rate',methods=['POST'])
 def set_test_miss_rate():
-    statistics.test_miss_rate = float(request.form.get('test_miss_rate'))
+    # statistics.test_miss_rate = float(request.form.get('test_miss_rate'))
     check_miss_rate_every_min(manully_triggered = True)
     return redirect(url_for('main'))
 
 # for testing
 @webapp.route('/api/scaler/miss_rate',methods=['POST', 'GET'])
 def miss_rate():
-    return get_miss_rate()
+    return str(get_miss_rate())
 
 # for testing, should be accessed only in auto mode
 @webapp.route('/api/scaler/pool_size',methods=['POST', 'GET'])
 def get_pool_size():
-    return config.cache_pool_size
+    return str(config.cache_pool_size)
 
 # assume start up when auto_mode = False, so don't need to add node in the beginning
 # initialization()

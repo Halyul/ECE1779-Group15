@@ -49,6 +49,8 @@ def responce_refresh_config():
             return gen_failed_responce(400, "max_miss_rate_threshold = {} which is not valid".format(float(request.form.get('max_miss_rate_threshold'))))
         if float(request.form.get('min_miss_rate_threshold')) < 0 or float(request.form.get('min_miss_rate_threshold')) > 1:
             return gen_failed_responce(400, "min_miss_rate_threshold = {} which is not valid".format(float(request.form.get('min_miss_rate_threshold'))))
+        if float(request.form.get('min_miss_rate_threshold')) >= float(request.form.get('max_miss_rate_threshold')) :
+            return gen_failed_responce(400, "min_miss_rate_threshold should be smaller then max_miss_rate_threshold!")
         config.max_miss_rate_threshold = float(request.form.get('max_miss_rate_threshold'))
         config.min_miss_rate_threshold = float(request.form.get('min_miss_rate_threshold'))
         # expand_ratio should be in range (1, inf)
@@ -99,24 +101,42 @@ def responce_refresh_cache_config():
         logging.error('responce_refresh_cache_config - ' + error)
         return gen_failed_responce(400, error)
 
+prev_miss_rate = -1
 def check_miss_rate_every_min(manully_triggered = False):
+    global prev_miss_rate
     try:
         while True:
-            # refresh nodes running status
-            for node_id in statistics.node_running:
-                if statistics.node_running[node_id] == False:
-                    node_addr = ec2_get_instance_ip(node_id)
-                    thread = threading.Thread(target = check_if_node_is_up, args=(node_id, node_addr,), daemon = True)
-                    thread.start()
+            # # refresh nodes running status
+            # for node_id in statistics.node_running:
+            #     if statistics.node_running[node_id] == False:
+            #         node_addr = ec2_get_instance_ip(node_id)
+            #         thread = threading.Thread(target = check_if_node_is_up, args=(node_id, node_addr,), daemon = True)
+            #         thread.start()
 
             notify_info = {'action' : '', 'ip' : []}
             changed_id = []
-            miss_rate = get_miss_rate(manully_triggered = manully_triggered)
+            if manully_triggered == True:
+                try:
+                    # manually triggered from a http request with formdata
+                    miss_rate = float(request.form.get('test_miss_rate'))
+                except:
+                    # manually triggered from a function call
+                    miss_rate = get_miss_rate()
+            else:
+                miss_rate = get_miss_rate()
             # if miss_rate is 'n/a', means no one is using any of the cache, so to decrease the pool size
             if miss_rate == 'n/a':
                 miss_rate = 0
             
             if config.auto_mode == True and miss_rate != 'n/a':
+                # to gate two increases/decreases due to cloudwatch delay
+                if miss_rate != prev_miss_rate:
+                    prev_miss_rate = miss_rate
+                else:
+                    prev_miss_rate = -1
+                    logging.info("check_miss_rate_every_min - miss_rate unchanged, bypassed pool size adjust!")
+                    time.sleep(60)
+                    continue
                 expected_pool_size = get_cache_pool_size()
                 if miss_rate < config.min_miss_rate_threshold:
                     expected_pool_size = get_cache_pool_size() * config.shrink_ratio
@@ -161,11 +181,11 @@ def check_miss_rate_every_min(manully_triggered = False):
 
 def responce_do_node_delete():
     if len(config.cache_pool_ids) > 1:
-        try:
+        if request.form.get('cache_ip') == None:
+            cache_ip = request.environ['REMOTE_ADDR']
+        else:
             # for testing only
             cache_ip = request.form.get('cache_ip')
-        except:
-            cache_ip = request.environ['REMOTE_ADDR']
         cache_id = ''
         for id in config.cache_pool_ids:
             if cache_ip == ec2_get_instance_ip(id):
@@ -189,7 +209,6 @@ def responce_get_node_list():
     return json.dumps(config.cache_pool_ids)
 
 def responce_set_node_list(node_list = []):
-    logging.info("cache_pool_ids = {}".format(request.get_json('cache_pool_ids')))
     node_list = request.get_json()['cache_pool_ids']
     response = set_node_list_from_node_list(node_list)
     return response
