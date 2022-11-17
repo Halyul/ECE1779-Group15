@@ -18,7 +18,7 @@ auto_mode = False
 stop_threads = False
 
 # cache config
-capacity = 1 # in MB
+capacity = 100 # in MB
 replacement_policy = 'rr'
 
 # read the setup config from the yaml file

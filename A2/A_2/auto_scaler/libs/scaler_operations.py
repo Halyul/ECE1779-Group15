@@ -100,6 +100,7 @@ def responce_refresh_cache_config():
         return gen_failed_responce(400, error)
 
 def check_miss_rate_every_min(manully_triggered = False):
+    prev_miss_rate = -1
     try:
         while True:
             # refresh nodes running status
@@ -117,6 +118,12 @@ def check_miss_rate_every_min(manully_triggered = False):
                 miss_rate = 0
             
             if config.auto_mode == True and miss_rate != 'n/a':
+                if miss_rate != prev_miss_rate:
+                    prev_miss_rate = miss_rate
+                else:
+                    prev_miss_rate = -1
+                    time.sleep(60)
+                    continue
                 expected_pool_size = get_cache_pool_size()
                 if miss_rate < config.min_miss_rate_threshold:
                     expected_pool_size = get_cache_pool_size() * config.shrink_ratio
