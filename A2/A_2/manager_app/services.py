@@ -121,8 +121,8 @@ def set_auto_scaler_parameters():
     2. Update local resize_pool_option to automatic, and store parameters
     3. Pass parameters to auto_scalar
     """
-    requests.post(config.AUTO_SCALAR_URL + "/api/scaler/cache_list", data={"cache_pool_id": variables.pool_node_id_list})
-
+    requests.post(config.AUTO_SCALAR_URL + "/api/scaler/cache_list", json={"cache_pool_ids": variables.pool_node_id_list})
+    logging.info(variables.pool_node_id_list)
     request_data = request.get_json()
     max_miss_rate_threshold = request_data['max_miss_rate_threshold']
     min_miss_rate_threshold = request_data['min_miss_rate_threshold']
