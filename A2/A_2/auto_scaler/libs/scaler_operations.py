@@ -103,12 +103,12 @@ def check_miss_rate_every_min(manully_triggered = False):
     prev_miss_rate = -1
     try:
         while True:
-            # refresh nodes running status
-            for node_id in statistics.node_running:
-                if statistics.node_running[node_id] == False:
-                    node_addr = ec2_get_instance_ip(node_id)
-                    thread = threading.Thread(target = check_if_node_is_up, args=(node_id, node_addr,), daemon = True)
-                    thread.start()
+            # # refresh nodes running status
+            # for node_id in statistics.node_running:
+            #     if statistics.node_running[node_id] == False:
+            #         node_addr = ec2_get_instance_ip(node_id)
+            #         thread = threading.Thread(target = check_if_node_is_up, args=(node_id, node_addr,), daemon = True)
+            #         thread.start()
 
             notify_info = {'action' : '', 'ip' : []}
             changed_id = []
@@ -118,6 +118,7 @@ def check_miss_rate_every_min(manully_triggered = False):
                 miss_rate = 0
             
             if config.auto_mode == True and miss_rate != 'n/a':
+                # to gate two increases/decreases due to cloudwatch delay
                 if miss_rate != prev_miss_rate:
                     prev_miss_rate = miss_rate
                 else:
