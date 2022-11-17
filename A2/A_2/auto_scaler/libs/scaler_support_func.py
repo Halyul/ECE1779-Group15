@@ -107,6 +107,7 @@ def check_if_node_is_up(id, address):
             # cache is not responding
             error_count += 1
             if error_count < 20:
+                time.sleep(1)
                 continue
             else:
                 logging.error("check_if_node_is_up - node with ip {} access timeout! {}".format(address, error))
