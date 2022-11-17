@@ -24,7 +24,7 @@ def run_cache_update_status(node_id):
             break
         except Exception as error:
             error_count += 1
-            if error_count > 5:
+            if error_count > 10:
                 logging.error("run_cache_update_status - node with ip {} brought up failed! {}".format(address, error))
                 return
             continue
@@ -43,7 +43,7 @@ def run_cache_update_status(node_id):
             break
         except Exception as error:
             error_count += 1
-            if error_count > 5:
+            if error_count > 10:
                 logging.error("Set cache config on {} failed due to {}".format(address, error))
                 return
             continue
@@ -60,7 +60,7 @@ def run_cache_update_status(node_id):
                 break
             except Exception as error:
                 error_count += 1
-                if error_count > 5:
+                if error_count > 10:
                     logging.error("Notifying instance 1 changing {} failed due to {}".format(address, error))
                     return
                 continue
