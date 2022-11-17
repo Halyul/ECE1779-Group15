@@ -5,7 +5,7 @@ import time
 import requests
 
 from manager_app import variables, config
-from manager_app.helper_functions.cloud_watch_helper import get_one_min_data
+from manager_app.helper_functions.cloud_watch_helper import my_get_metric_data
 from manager_app.helper_functions.ec2_helper import ec2_create, ec2_destroy, ec2_get_instance_ip
 from manager_app.helper_functions.ssh_helper import run_cache_update_status
 
@@ -57,11 +57,11 @@ def get_one_min_aggregate_data():
     cache_total_size = 0
     request_served_num = 0
     for i in range(8):
-        miss_rate += get_one_min_data(i, 'miss rate')
-        hit_rate += get_one_min_data(i, 'hit rate')
-        cache_item_num += get_one_min_data(i, 'number of keys added')
-        cache_total_size += get_one_min_data(i, 'capacity used')
-        request_served_num += get_one_min_data(i, 'request served')
+        miss_rate += my_get_metric_data(i, 'miss rate')
+        hit_rate += my_get_metric_data(i, 'hit rate')
+        cache_item_num += my_get_metric_data(i, 'number of keys added')
+        cache_total_size += my_get_metric_data(i, 'capacity used')
+        request_served_num += my_get_metric_data(i, 'request served')
     variables.miss_rate.append(miss_rate)
     variables.hit_rate.append(hit_rate)
     variables.cache_item_num.append(cache_item_num)

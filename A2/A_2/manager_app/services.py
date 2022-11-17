@@ -1,8 +1,14 @@
+import json
+import logging
+import threading
+import time
+
 import requests
 from flask import request
 
 import manager_app
 from manager_app import variables, config
+from manager_app.helper_functions.cloud_watch_helper import get_one_min_data
 from manager_app.helper_functions.ec2_helper import ec2_get_instance_ip
 from manager_app.helper_functions.manager_helper import generate_node_ip_list, increase_pool_size_manual, \
     decrease_pool_size_manual
@@ -46,10 +52,18 @@ def get_resize_pool_config():
     return success_response(params)
 
 
-# def get_30_min_data():
-#     if manager_app.data_30_min.size >= 30:
-#         manager_app.data_30_min.pop(0)
-#     manager_app.data_30_min.append(get_stats_from_db())
+def add_one_min_data():
+    while not config.add_one_min_data_thread_stop:
+        logging.info("Adding one min data")
+        if len(variables.miss_rate) >= 30:
+            variables.miss_rate.pop(0)
+            variables.hit_rate.pop(0)
+            variables.cache_item_num.pop(0)
+            variables.cache_total_size.pop(0)
+            variables.request_served_num.pop(0)
+        get_one_min_data()
+        time.sleep(60)
+    return
 
 
 def notify_pool_size_change():
@@ -103,8 +117,9 @@ def change_pool_size_manual():
 
 def set_auto_scaler_parameters():
     """
-    1. Update local resize_pool_option to automatic, and store parameters
-    2. Pass parameters to auto_scalar
+    1. Update auto-scalar node list
+    2. Update local resize_pool_option to automatic, and store parameters
+    3. Pass parameters to auto_scalar
     """
     requests.post(config.AUTO_SCALAR_URL + "/api/scaler/cache_list", data={"node_list": variables.pool_node_id_list})
 
@@ -123,10 +138,9 @@ def set_auto_scaler_parameters():
     manager_app.resize_pool_option = 'automatic'
     manager_app.resize_pool_parameters = parameters
 
-    response = requests.post(config.AUTO_SCALAR_URL + "/api/scaler/config",
+    requests.post(config.AUTO_SCALAR_URL + "/api/scaler/config",
                              data=parameters)
-    content = response.json()["content"]
-    return success_response(content)
+    return success_response("Auto-scalar parameters sent")
 
 
 def get_cache_configurations():

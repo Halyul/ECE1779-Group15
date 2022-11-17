@@ -1,4 +1,7 @@
-import { useState } from "react";
+import {
+  useState,
+  useEffect,
+} from "react";
 import {
   useActionData,
   useLoaderData
@@ -102,6 +105,23 @@ export default function Config() {
   const [shrinkRatioError, setShrinkRatioError] = useState(false);
   const [manualNodeChange, setManualNodeChange] = useState("");
   const [clearData, setClearData] = useState(false);
+
+  useEffect(() => {
+    let timer
+    const loop = () => {
+      const fetchData = async () => {
+        return await getPoolSize();
+      }
+      fetchData().then((response) => {
+        if (response.status === 200) {
+          setPoolSize(response.data.content.size);
+        }
+        timer = setTimeout(loop, 1000)
+      });
+    }
+    loop()
+    return () => clearTimeout(timer)
+ }, [])
 
   return (
     <>
@@ -389,12 +409,12 @@ export default function Config() {
               onClick={(e) => {
                 const expandRatioValue = parseFloat(expandRatio).toFixed(2);
                 const shrinkRatioValue = parseFloat(shrinkRatio).toFixed(2);
-                if (isNaN(expandRatioValue) || expandRatioValue < 1 || expandRatio === "") {
+                if (isNaN(expandRatioValue) || expandRatioValue <= 1 || expandRatio === "") {
                   setExpandRatioError(true)
                   e.preventDefault()
                   return
                 }
-                if (isNaN(shrinkRatioValue) || shrinkRatioValue > 1 || shrinkRatioValue < 0 || shrinkRatio === "") {
+                if (isNaN(shrinkRatioValue) || shrinkRatioValue >= 1 || shrinkRatioValue <= 0 || shrinkRatio === "") {
                   setShrinkRatioError(true)
                   e.preventDefault()
                   return
