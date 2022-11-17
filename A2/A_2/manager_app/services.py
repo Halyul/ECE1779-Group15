@@ -121,7 +121,7 @@ def set_auto_scaler_parameters():
     2. Update local resize_pool_option to automatic, and store parameters
     3. Pass parameters to auto_scalar
     """
-    requests.post(config.AUTO_SCALAR_URL + "/api/scaler/cache_list", data={"node_list": variables.pool_node_id_list})
+    requests.post(config.AUTO_SCALAR_URL + "/api/scaler/cache_list", data={"cache_pool_id": variables.pool_node_id_list})
 
     request_data = request.get_json()
     max_miss_rate_threshold = request_data['max_miss_rate_threshold']
@@ -164,6 +164,9 @@ def set_cache_configurations():
     variables.memcache_capacity = capacity
     variables.memcache_replacement_policy = replacement_policy
 
+    requests.post(config.AUTO_SCALAR_URL + "/api/scaler/cache_config",
+                  data={'capacity': capacity,
+                        'replacement_policy': replacement_policy})
     content = []
     ip_list = generate_node_ip_list()
     for ip in ip_list:
@@ -172,6 +175,7 @@ def set_cache_configurations():
                                  data={'capacity': capacity,
                                        'replacement_policy': replacement_policy})
         content.append(response.json()["success"])
+
     return success_response(content)
 
 
