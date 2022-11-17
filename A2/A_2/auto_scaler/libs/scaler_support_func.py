@@ -197,7 +197,7 @@ def notify_while_resize_pool(notify_info, changed_id):
     all_running = False
     while all_running == False:
         time.sleep(1)
-        if datetime.now() > (start_time + timedelta(minutes=2)):
+        if datetime.now() > (start_time + timedelta(minutes=5)):
             logging.error("notify_while_resize_pool - node {} not responding!".format(id))
             return
         # wait until all nodes are running or a timeout after 2mins
