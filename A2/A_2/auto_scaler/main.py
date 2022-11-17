@@ -50,7 +50,7 @@ def list_cache():
 # for testing
 @webapp.route('/api/scaler/set_test_miss_rate',methods=['POST'])
 def set_test_miss_rate():
-    statistics.test_miss_rate = float(request.form.get('test_miss_rate'))
+    # statistics.test_miss_rate = float(request.form.get('test_miss_rate'))
     check_miss_rate_every_min(manully_triggered = True)
     return redirect(url_for('main'))
 

@@ -112,7 +112,15 @@ def check_miss_rate_every_min(manully_triggered = False):
 
             notify_info = {'action' : '', 'ip' : []}
             changed_id = []
-            miss_rate = get_miss_rate(manully_triggered = manully_triggered)
+            if manully_triggered == True:
+                try:
+                    # manually triggered from a http request with formdata
+                    miss_rate = float(request.form.get('test_miss_rate'))
+                except:
+                    # manually triggered from a function call
+                    miss_rate = get_miss_rate()
+            else:
+                miss_rate = get_miss_rate()
             # if miss_rate is 'n/a', means no one is using any of the cache, so to decrease the pool size
             if miss_rate == 'n/a':
                 miss_rate = 0
@@ -123,6 +131,7 @@ def check_miss_rate_every_min(manully_triggered = False):
                     prev_miss_rate = miss_rate
                 else:
                     prev_miss_rate = -1
+                    logging.info("check_miss_rate_every_min - miss_rate unchanged, bypassed pool size adjust!")
                     time.sleep(60)
                     continue
                 expected_pool_size = get_cache_pool_size()
@@ -169,7 +178,11 @@ def check_miss_rate_every_min(manully_triggered = False):
 
 def responce_do_node_delete():
     if len(config.cache_pool_ids) > 1:
-        cache_ip = request.environ['REMOTE_ADDR']
+        if request.form.get('cache_ip') == None:
+            cache_ip = request.environ['REMOTE_ADDR']
+        else:
+            # for testing only
+            cache_ip = request.form.get('cache_ip')
         cache_id = ''
         for id in config.cache_pool_ids:
             if cache_ip == ec2_get_instance_ip(id):
@@ -193,7 +206,6 @@ def responce_get_node_list():
     return json.dumps(config.cache_pool_ids)
 
 def responce_set_node_list(node_list = []):
-    logging.info("cache_pool_ids = {}".format(request.get_json('cache_pool_ids')))
     node_list = request.get_json()['cache_pool_ids']
     response = set_node_list_from_node_list(node_list)
     return response
