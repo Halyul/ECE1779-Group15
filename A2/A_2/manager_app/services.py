@@ -54,7 +54,6 @@ def get_resize_pool_config():
 
 def add_one_min_data():
     while not config.add_one_min_data_thread_stop:
-        logging.info("Adding one min data")
         if len(variables.miss_rate) >= 30:
             variables.miss_rate.pop(0)
             variables.hit_rate.pop(0)
