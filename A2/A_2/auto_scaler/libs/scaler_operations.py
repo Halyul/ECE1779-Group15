@@ -169,11 +169,7 @@ def check_miss_rate_every_min(manully_triggered = False):
 
 def responce_do_node_delete():
     if len(config.cache_pool_ids) > 1:
-        try:
-            # for testing only
-            cache_ip = request.form.get('cache_ip')
-        except:
-            cache_ip = request.environ['REMOTE_ADDR']
+        cache_ip = request.environ['REMOTE_ADDR']
         cache_id = ''
         for id in config.cache_pool_ids:
             if cache_ip == ec2_get_instance_ip(id):
