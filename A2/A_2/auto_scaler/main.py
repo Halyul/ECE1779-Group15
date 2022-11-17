@@ -57,12 +57,12 @@ def set_test_miss_rate():
 # for testing
 @webapp.route('/api/scaler/miss_rate',methods=['POST', 'GET'])
 def miss_rate():
-    return get_miss_rate()
+    return str(get_miss_rate())
 
 # for testing, should be accessed only in auto mode
 @webapp.route('/api/scaler/pool_size',methods=['POST', 'GET'])
 def get_pool_size():
-    return config.cache_pool_size
+    return str(config.cache_pool_size)
 
 # assume start up when auto_mode = False, so don't need to add node in the beginning
 # initialization()

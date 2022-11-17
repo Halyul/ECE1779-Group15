@@ -49,6 +49,8 @@ def responce_refresh_config():
             return gen_failed_responce(400, "max_miss_rate_threshold = {} which is not valid".format(float(request.form.get('max_miss_rate_threshold'))))
         if float(request.form.get('min_miss_rate_threshold')) < 0 or float(request.form.get('min_miss_rate_threshold')) > 1:
             return gen_failed_responce(400, "min_miss_rate_threshold = {} which is not valid".format(float(request.form.get('min_miss_rate_threshold'))))
+        if float(request.form.get('min_miss_rate_threshold')) >= float(request.form.get('max_miss_rate_threshold')) :
+            return gen_failed_responce(400, "min_miss_rate_threshold should be smaller then max_miss_rate_threshold!")
         config.max_miss_rate_threshold = float(request.form.get('max_miss_rate_threshold'))
         config.min_miss_rate_threshold = float(request.form.get('min_miss_rate_threshold'))
         # expand_ratio should be in range (1, inf)
