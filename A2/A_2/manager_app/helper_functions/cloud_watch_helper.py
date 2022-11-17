@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import boto3
+from pytz import timezone
 
 from manager_app import variables
 
@@ -27,8 +28,8 @@ def my_get_metric_data(cache_index: int, metric_name: str):
                 },
             },
         ],
-        StartTime=datetime.now() - timedelta(minutes=1),
-        EndTime=datetime.now(),
+        StartTime=datetime.now(timezone('EST')) - timedelta(minutes=1),
+        EndTime=datetime.now(timezone('EST')),
         ScanBy='TimestampDescending',
     )
     value = 0
