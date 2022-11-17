@@ -409,12 +409,12 @@ export default function Config() {
               onClick={(e) => {
                 const expandRatioValue = parseFloat(expandRatio).toFixed(2);
                 const shrinkRatioValue = parseFloat(shrinkRatio).toFixed(2);
-                if (isNaN(expandRatioValue) || expandRatioValue < 1 || expandRatio === "") {
+                if (isNaN(expandRatioValue) || expandRatioValue <= 1 || expandRatio === "") {
                   setExpandRatioError(true)
                   e.preventDefault()
                   return
                 }
-                if (isNaN(shrinkRatioValue) || shrinkRatioValue > 1 || shrinkRatioValue < 0 || shrinkRatio === "") {
+                if (isNaN(shrinkRatioValue) || shrinkRatioValue >= 1 || shrinkRatioValue <= 0 || shrinkRatio === "") {
                   setShrinkRatioError(true)
                   e.preventDefault()
                   return

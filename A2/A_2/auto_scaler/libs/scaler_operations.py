@@ -52,13 +52,13 @@ def responce_refresh_config():
         config.max_miss_rate_threshold = float(request.form.get('max_miss_rate_threshold'))
         config.min_miss_rate_threshold = float(request.form.get('min_miss_rate_threshold'))
         # expand_ratio should be in range (1, inf)
-        if float(request.form.get('expand_ratio')) <= 1:
-            return gen_failed_responce(400, "expand_ratio = {} which is not valid".format(float(request.form.get('expand_ratio'))))
-        config.expand_ratio = float(request.form.get('expand_ratio'))
-        # shrink_ratio should be in range (0, 1)
-        if float(request.form.get('shrink_ratio')) >= 1 or float(request.form.get('shrink_ratio')) <= 0:
-            return gen_failed_responce(400, "shrink_ratio = {} which is not valid".format(float(request.form.get('shrink_ratio'))))
-        config.shrink_ratio = float(request.form.get('shrink_ratio'))
+        if float(request.form.get('ratio_expand_pool')) <= 1:
+            return gen_failed_responce(400, "ratio_expand_pool = {} which is not valid".format(float(request.form.get('ratio_expand_pool'))))
+        config.expand_ratio = float(request.form.get('ratio_expand_pool'))
+        # shrink_ratio should be in range (0, 1) ratio_shrink_pool
+        if float(request.form.get('ratio_shrink_pool')) >= 1 or float(request.form.get('ratio_shrink_pool')) <= 0:
+            return gen_failed_responce(400, "ratio_shrink_pool = {} which is not valid".format(float(request.form.get('ratio_shrink_pool'))))
+        config.shrink_ratio = float(request.form.get('ratio_shrink_pool'))
         
         if config.auto_mode == False and (request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'):
             # if auto_mode changed from False to True, force a poolsize update
@@ -69,7 +69,7 @@ def responce_refresh_config():
 
         return gen_success_responce("")
     except Exception as error:
-        logging.error('responce_refresh_config - ' + error)
+        logging.error('responce_refresh_config - {}'.format(error))
         return gen_failed_responce(400, error)
     
 def responce_refresh_cache_config():
