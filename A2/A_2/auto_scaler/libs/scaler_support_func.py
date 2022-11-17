@@ -217,13 +217,13 @@ def notify_while_resize_pool(notify_info, changed_id):
         logging.info("notify_while_resize_pool - all new nodes are up, sending request to notify A1")
         logging.info("notify_while_resize_pool - notify_info = {}".format(json.dumps(notify_info)))
         # notify A1 nodes change
-        response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', json={'ip': notify_info['ip'], 'mode': 'automatic', 'change': 'increase'})
+        response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', json={'node_ip': notify_info['ip'], 'mode': 'automatic', 'change': 'increase'})
     else:
         time.sleep(4) # arbitry delay
         logging.info("check_miss_rate_every_min - deleting nodes, sending request to notify A1")
         logging.info("check_miss_rate_every_min - notify_info = {}".format(json.dumps(notify_info)))
         # notify A1 nodes change
-        response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', json={'ip': notify_info['ip'], 'mode': 'automatic', 'change': 'decrease'})
+        response = requests.post('http://127.0.0.1:' + str(config.server_port) + '/api/notify', json={'node_ip': notify_info['ip'], 'mode': 'automatic', 'change': 'decrease'})
     return
 
 def refresh_node_list():
