@@ -99,6 +99,7 @@ def check_if_node_is_up(id, address):
                 if statistics.node_running[id] == False:
                     statistics.node_running[id] = True
                 # once the cache node is up, refresh config and assign the node index
+                # TODO: should not run if in manual mode
                 response = requests.post("http://" + address + ":" + str(config.cache_port) + "/api/cache/config", \
                     data=[('capacity', config.capacity), ('replacement_policy', config.replacement_policy), ('cache_index', get_cache_index_from_id(id))])
             break

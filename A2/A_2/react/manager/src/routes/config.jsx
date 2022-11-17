@@ -115,8 +115,8 @@ export default function Config() {
       fetchData().then((response) => {
         if (response.status === 200) {
           setPoolSize(response.data.content.size);
+          timer = setTimeout(loop, 1000)
         }
-        timer = setTimeout(loop, 1000)
       });
     }
     loop()
