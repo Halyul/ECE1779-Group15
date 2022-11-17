@@ -55,7 +55,7 @@ def responce_refresh_config():
         if float(request.form.get('ratio_expand_pool')) <= 1:
             return gen_failed_responce(400, "ratio_expand_pool = {} which is not valid".format(float(request.form.get('ratio_expand_pool'))))
         config.expand_ratio = float(request.form.get('ratio_expand_pool'))
-        # shrink_ratio should be in range (0, 1) ratio_shrink_pool
+        # shrink_ratio should be in range (0, 1)
         if float(request.form.get('ratio_shrink_pool')) >= 1 or float(request.form.get('ratio_shrink_pool')) <= 0:
             return gen_failed_responce(400, "ratio_shrink_pool = {} which is not valid".format(float(request.form.get('ratio_shrink_pool'))))
         config.shrink_ratio = float(request.form.get('ratio_shrink_pool'))
@@ -189,6 +189,7 @@ def responce_get_node_list():
     return json.dumps(config.cache_pool_ids)
 
 def responce_set_node_list(node_list = []):
+    logging.info("cache_pool_ids = {}".format(request.form.get('cache_pool_ids')))
     node_list = json.loads(request.form.get('cache_pool_ids'))
     response = set_node_list_from_node_list(node_list)
     return response
