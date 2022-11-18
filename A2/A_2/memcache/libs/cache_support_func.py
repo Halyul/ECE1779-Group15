@@ -133,11 +133,24 @@ def update_database_every_5s():
             #                          statistics.statistics_10min['num_request_served'], statistics.statistics_10min['num_GET_request_served'], \
             #                              statistics.statistics_10min['num_miss'], statistics.statistics_10min['num_hit'], \
             #                                  statistics.statistics_10min['utilization'])
-            my_put_metric_data(config.cache_index, 'number of keys added', statistics.statistics_10min['num_item_in_cache'])
-            my_put_metric_data(config.cache_index, 'capacity used', statistics.statistics_10min['used_size'])
-            my_put_metric_data(config.cache_index, 'request served', statistics.statistics_10min['num_request_served'])
-            my_put_metric_data(config.cache_index, 'GET request served', statistics.statistics_10min['num_GET_request_served'])
-            my_put_metric_data(config.cache_index, 'number of hit', statistics.statistics_10min['num_hit'])
+
+            if statistics.num_GET_request_served == 0:
+                hit_rate = -1
+                miss_rate = -1
+            else:
+                hit_rate = (statistics.num_hit / statistics.num_GET_request_served) * 100
+                miss_rate = 100 - hit_rate
+            # my_put_metric_data(config.cache_index, 'number of keys added', statistics.statistics_10min['num_item_in_cache'])
+            # my_put_metric_data(config.cache_index, 'capacity used', statistics.statistics_10min['used_size'])
+            # my_put_metric_data(config.cache_index, 'request served', statistics.statistics_10min['num_request_served'])
+            # my_put_metric_data(config.cache_index, 'GET request served', statistics.statistics_10min['num_GET_request_served'])
+            # my_put_metric_data(config.cache_index, 'number of hit', statistics.statistics_10min['num_hit'])
+            # my_put_metric_data(config.cache_index, 'cache utilization', utilization)
+            my_put_metric_data(config.cache_index, 'number of keys added', statistics.num_item_in_cache)
+            my_put_metric_data(config.cache_index, 'capacity used', statistics.used_size)
+            my_put_metric_data(config.cache_index, 'request served', statistics.num_request_served)
+            my_put_metric_data(config.cache_index, 'GET request served', statistics.num_GET_request_served)
+            my_put_metric_data(config.cache_index, 'number of hit', statistics.num_hit)
             my_put_metric_data(config.cache_index, 'cache utilization', utilization)
             if hit_rate != -1:
                 my_put_metric_data(config.cache_index, 'hit rate', hit_rate)
