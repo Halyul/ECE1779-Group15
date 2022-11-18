@@ -12,7 +12,7 @@ from manager_app.helper_functions.responses import success_response, failed_resp
 
 
 def update_node_list():
-    node_list = request.form.get('list')
+    node_list = request.get_json()['list']
     variables.pool_node_id_list = node_list
     params = {
         "node_list": node_list
@@ -75,6 +75,15 @@ def notify_pool_size_change():
     variables.resize_pool_option = 'manual'
     variables.resize_pool_parameters = {}
     pool_size = len(variables.pool_node_id_list)
+
+    parameters = {'max_miss_rate_threshold': 0,
+                  'min_miss_rate_threshold': 0,
+                  'ratio_expand_pool': 0,
+                  'ratio_shrink_pool': 0,
+                  'auto_mode': 'False'}
+
+    requests.post(config.AUTO_SCALAR_URL + "/api/scaler/config",
+                  data=parameters)
 
     if change == 'increase':
         if pool_size == 8:
