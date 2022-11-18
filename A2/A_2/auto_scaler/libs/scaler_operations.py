@@ -44,30 +44,41 @@ def responce_main():
 
 def responce_refresh_config():
     try:
-        # max_miss_rate_threshold and min_miss_rate_threshold should between in range [0,1]
-        if float(request.form.get('max_miss_rate_threshold')) < 0 or float(request.form.get('max_miss_rate_threshold')) > 1:
-            return gen_failed_responce(400, "max_miss_rate_threshold = {} which is not valid".format(float(request.form.get('max_miss_rate_threshold'))))
-        if float(request.form.get('min_miss_rate_threshold')) < 0 or float(request.form.get('min_miss_rate_threshold')) > 1:
-            return gen_failed_responce(400, "min_miss_rate_threshold = {} which is not valid".format(float(request.form.get('min_miss_rate_threshold'))))
-        if float(request.form.get('min_miss_rate_threshold')) >= float(request.form.get('max_miss_rate_threshold')) :
-            return gen_failed_responce(400, "min_miss_rate_threshold should be smaller then max_miss_rate_threshold!")
-        config.max_miss_rate_threshold = float(request.form.get('max_miss_rate_threshold'))
-        config.min_miss_rate_threshold = float(request.form.get('min_miss_rate_threshold'))
-        # expand_ratio should be in range (1, inf)
-        if float(request.form.get('ratio_expand_pool')) <= 1:
-            return gen_failed_responce(400, "ratio_expand_pool = {} which is not valid".format(float(request.form.get('ratio_expand_pool'))))
-        config.expand_ratio = float(request.form.get('ratio_expand_pool'))
-        # shrink_ratio should be in range (0, 1)
-        if float(request.form.get('ratio_shrink_pool')) >= 1 or float(request.form.get('ratio_shrink_pool')) <= 0:
-            return gen_failed_responce(400, "ratio_shrink_pool = {} which is not valid".format(float(request.form.get('ratio_shrink_pool'))))
-        config.shrink_ratio = float(request.form.get('ratio_shrink_pool'))
-        
-        if config.auto_mode == False and (request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'):
-            # if auto_mode changed from False to True, force a poolsize update
-            config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
-            check_miss_rate_every_min(manully_triggered = True)
+        if request.form.get('max_miss_rate_threshold') is not None and request.form.get('min_miss_rate_threshold') is not None:
+            if float(request.form.get('min_miss_rate_threshold')) >= float(request.form.get('max_miss_rate_threshold')) :
+                return gen_failed_responce(400, "min_miss_rate_threshold should be smaller then max_miss_rate_threshold!")
+            config.max_miss_rate_threshold = float(request.form.get('max_miss_rate_threshold'))
+            config.min_miss_rate_threshold = float(request.form.get('min_miss_rate_threshold'))
         else:
-            config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
+            if request.form.get('max_miss_rate_threshold') is not None:
+                # max_miss_rate_threshold and min_miss_rate_threshold should between in range [0,1]
+                if float(request.form.get('max_miss_rate_threshold')) < 0 or float(request.form.get('max_miss_rate_threshold')) > 1:
+                    return gen_failed_responce(400, "max_miss_rate_threshold = {} which is not valid".format(float(request.form.get('max_miss_rate_threshold'))))
+                config.max_miss_rate_threshold = float(request.form.get('max_miss_rate_threshold'))
+            if request.form.get('min_miss_rate_threshold') is not None:
+                if float(request.form.get('min_miss_rate_threshold')) < 0 or float(request.form.get('min_miss_rate_threshold')) > 1:
+                    return gen_failed_responce(400, "min_miss_rate_threshold = {} which is not valid".format(float(request.form.get('min_miss_rate_threshold'))))
+                config.min_miss_rate_threshold = float(request.form.get('min_miss_rate_threshold'))
+
+        if request.form.get('ratio_expand_pool') is not None:
+            # expand_ratio should be in range (1, inf)
+            if float(request.form.get('ratio_expand_pool')) <= 1:
+                return gen_failed_responce(400, "ratio_expand_pool = {} which is not valid".format(float(request.form.get('ratio_expand_pool'))))
+            config.expand_ratio = float(request.form.get('ratio_expand_pool'))
+        
+        if request.form.get('ratio_shrink_pool') is not None:
+            # shrink_ratio should be in range (0, 1)
+            if float(request.form.get('ratio_shrink_pool')) >= 1 or float(request.form.get('ratio_shrink_pool')) <= 0:
+                return gen_failed_responce(400, "ratio_shrink_pool = {} which is not valid".format(float(request.form.get('ratio_shrink_pool'))))
+            config.shrink_ratio = float(request.form.get('ratio_shrink_pool'))
+        
+        if request.form.get('auto_mode') is not None:
+            if config.auto_mode == False and (request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'):
+                # if auto_mode changed from False to True, force a poolsize update
+                config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
+                check_miss_rate_every_min(manully_triggered = True)
+            else:
+                config.auto_mode = request.form.get('auto_mode') == 'True' or request.form.get('auto_mode') == 'true'
 
         return gen_success_responce("")
     except Exception as error:
