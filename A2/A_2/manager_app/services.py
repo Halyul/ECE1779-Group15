@@ -76,6 +76,15 @@ def notify_pool_size_change():
     variables.resize_pool_parameters = {}
     pool_size = len(variables.pool_node_id_list)
 
+    parameters = {'max_miss_rate_threshold': 0,
+                  'min_miss_rate_threshold': 0,
+                  'ratio_expand_pool': 0,
+                  'ratio_shrink_pool': 0,
+                  'auto_mode': 'False'}
+
+    requests.post(config.AUTO_SCALAR_URL + "/api/scaler/config",
+                  data=parameters)
+
     if change == 'increase':
         if pool_size == 8:
             return failed_response(400, "The size of memcache pool has been reached to maximum")
