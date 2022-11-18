@@ -276,8 +276,8 @@ def set_node_list_from_node_list(node_list):
         return gen_failed_responce(400, "Should not set node_list from outside while auto mode!")
 
 def send_list_to_manager():
-    list_json = json.dumps(config.cache_pool_ids)
-    response = requests.get("http://127.0.0.1:" + str(config.manager_port) + "/api/manager/pool_node_list/update", data=[('list', list_json)])
+    list_json = config.cache_pool_ids
+    response = requests.post("http://127.0.0.1:" + str(config.manager_port) + "/api/manager/pool_node_list/update", json={'list': list_json})
     if response.status_code == 200:
         return 0
     else:
