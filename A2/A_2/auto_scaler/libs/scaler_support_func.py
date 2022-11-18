@@ -109,7 +109,7 @@ def check_if_node_is_up(id, address):
         except Exception as error:
             # cache is not responding
             error_count += 1
-            if error_count < 20:
+            if error_count < 60:
                 time.sleep(1)
                 continue
             else:
