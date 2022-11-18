@@ -98,7 +98,7 @@ export default function Config() {
 
   const [poolSize, setPoolSize] = useState(loaderResponse.pool.size);
   const [resizingMode, setResizingMode] = useState(loaderResponse.pool.config.resize_pool_option);
-  const [missRateThreshold, setMissRateThreshold] = useState([loaderResponse.pool.config.resize_pool_parameters.min_miss_rate_threshold || 30, loaderResponse.pool.config.resize_pool_parameters.max_miss_rate_threshold || 80]);
+  const [missRateThreshold, setMissRateThreshold] = useState([loaderResponse.pool.config.resize_pool_parameters.min_miss_rate_threshold * 100 || 30, loaderResponse.pool.config.resize_pool_parameters.max_miss_rate_threshold * 100 || 80]);
   const [expandRatio, setExpandRatio] = useState(loaderResponse.pool.config.resize_pool_parameters.ratio_expand_pool || 1);
   const [expandRatioError, setExpandRatioError] = useState(false);
   const [shrinkRatio, setShrinkRatio] = useState(loaderResponse.pool.config.resize_pool_parameters.ratio_shrink_pool || 0.5);
