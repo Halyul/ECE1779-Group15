@@ -1,12 +1,8 @@
-import json
-import logging
-import threading
 import time
 
 import requests
 from flask import request
 
-import manager_app
 from manager_app import variables, config
 from manager_app.helper_functions.cloud_watch_helper import get_one_min_data
 from manager_app.helper_functions.ec2_helper import ec2_get_instance_ip
@@ -76,8 +72,8 @@ def notify_pool_size_change():
     request_data = request.get_json()
     change = request_data['change']
     variables.manual_operation = change
-    manager_app.resize_pool_option = 'manual'
-    manager_app.resize_pool_parameters = {}
+    variables.resize_pool_option = 'manual'
+    variables.resize_pool_parameters = {}
     pool_size = len(variables.pool_node_id_list)
 
     if change == 'increase':
@@ -133,8 +129,8 @@ def set_auto_scaler_parameters():
                   'ratio_shrink_pool': ratio_shrink_pool,
                   'auto_mode': 'True'}
 
-    manager_app.resize_pool_option = 'automatic'
-    manager_app.resize_pool_parameters = parameters
+    variables.resize_pool_option = 'automatic'
+    variables.resize_pool_parameters = parameters
 
     requests.post(config.AUTO_SCALAR_URL + "/api/scaler/config",
                              data=parameters)
