@@ -12,7 +12,7 @@ from manager_app.helper_functions.responses import success_response, failed_resp
 
 
 def update_node_list():
-    node_list = request.form.get('list')
+    node_list = request.get_json()['list']
     variables.pool_node_id_list = node_list
     params = {
         "node_list": node_list
