@@ -64,22 +64,20 @@ def get_key(key):
     try:
         url = "http://" + MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/key"
         response = requests.post(url, data=[("key", key)]).json()
+        print(response)
         content = response["content"]
         return True, 200, dict(
             content=content
         )
     except Exception as e:
         database = Database()
-        database.lock(table=KEY_IMAGE_TABLE_NAME)
         key_image_pair = database.get_key_image_pair(key)
         logging.info("Key image pair: {}".format(key_image_pair))
         if key_image_pair is None:
-            database.unlock()
             return False, 404, "No such key."
         image_key = key_image_pair[0]
         flag, content = BUCKET.object.get(image_key)
         if not flag:
-            database.unlock()
             return False, 500, "Failed to retrieve the image."
         url = "http://" + MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/content"
         logging.info("Add cache request send to: {}".format(url))
@@ -91,7 +89,6 @@ def get_key(key):
             )
         ).start()
         CACHED_KEYS.add(key)
-        database.unlock()
         return True, 200, dict(
             content=content
         )
