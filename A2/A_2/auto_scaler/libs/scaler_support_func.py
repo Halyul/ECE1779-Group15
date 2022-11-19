@@ -246,8 +246,9 @@ def refresh_node_list():
             node_dict = json.loads(response.content)['content']['node_id_list']
             for node_id in node_dict:
                 node_list.append(node_id)
-
-            set_node_list_from_node_list(node_list)
+                
+            thread = threading.Thread(target = set_node_list_from_node_list, args=(node_list,), daemon = True)
+            thread.start()
             return
         except Exception as error:
             logging.error("refresh_node_list - {}".format(error))
