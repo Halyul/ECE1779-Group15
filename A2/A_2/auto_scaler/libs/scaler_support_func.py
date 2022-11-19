@@ -69,7 +69,7 @@ def run_cache_update_status(id):
             break
         except Exception as error:
             error_count += 1
-            if error_count > 5:
+            if error_count > 10:
                 logging.error("run_cache_update_status - node with ip {} brought up failed! {}".format(address, error))
                 return
             continue
@@ -109,7 +109,7 @@ def check_if_node_is_up(id, address):
         except Exception as error:
             # cache is not responding
             error_count += 1
-            if error_count < 60:
+            if error_count < 180:
                 time.sleep(1)
                 continue
             else:
