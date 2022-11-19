@@ -4,22 +4,24 @@ import requests
 import json
 
 CONFIG = yaml.safe_load(open(pathlib.Path(__file__).parent.absolute().joinpath("..", "config.yaml"), "r"))
-BASE_URL = "http://localhost:" + str(CONFIG["server"]["port"])
+BASE_URL = "http://3.83.101.246:" + str(CONFIG["server"]["port"])
 
 
 def upload():
     # files = {
     #     "file": ("test.svg", open(pathlib.Path(__file__).parent.absolute().joinpath("src", "test.svg"), "rb"), "image/svg+xml")
     # }
-    files = {
-        "file": open(pathlib.Path(__file__).parent.absolute().joinpath("src", "test.svg"), "rb")
-    }
-    data = {
-        "key": "123"
-    }
+    for i in range(5):
+        files = {
+            "file": open(pathlib.Path(__file__).parent.absolute().joinpath("src", "test.svg"), "rb")
+        }
+        data = {
+            "key": "123"
+        }
     # print(requests.Request('POST', BASE_URL + "/api/upload", files=files, data=data).prepare().body.decode('utf8'))
-    r = requests.post(BASE_URL + "/api/upload", files=files, data=data)
-    return r.json()
+        r = requests.post(BASE_URL + "/api/upload", files=files, data=data)
+        print(r.json())
+    return
 
 def list_keys():
     r = requests.post(BASE_URL + "/api/list_keys")

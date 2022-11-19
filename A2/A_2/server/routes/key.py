@@ -64,7 +64,6 @@ def get_key(key):
     try:
         url = "http://" + MAPPING.find_cached_node(find_partition(key)) + ":" + str(CONFIG["cache"]["port"]) + "/api/cache/key"
         response = requests.post(url, data=[("key", key)]).json()
-        print(response)
         content = response["content"]
         return True, 200, dict(
             content=content
