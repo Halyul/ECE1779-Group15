@@ -7,27 +7,34 @@ import {
   Route
 } from "react-router-dom";
 import { StyledEngineProvider } from '@mui/material/styles';
-import Root from "./routes/root";
-import ErrorPage from "./routes/error-page";
+import Root from "@/routes/root";
+import ErrorPage from "@/routes/error-page";
+import Login, {
+  LoginRoute,
+} from "@/routes/login";
+import Register, {
+  RegisterRoute,
+} from "@/routes/register";
 import Index, {
   IndexRoute
-} from "./routes/index";
+} from "@/routes/index";
 import Upload, {
   UploadRoute,
   action as uploadAction,
-} from "./routes/upload";
+} from "@/routes/user/upload";
 import Image, {
   ImageRoute,
   loader as imageLoader,
   action as imageAction,
-} from "./routes/image";
-import Keys, {
-  KeysRoute,
-  loader as keysLoader,
-  action as keysAction,
-} from "./routes/keys";
+} from "@/routes/user/image";
+import Album, {
+  AlbumRoute,
+  loader as albumLoader,
+  action as albumAction,
+} from "@/routes/user/album";
 import 'reset-css';
-import './App.css';
+import '@/App.css';
+import Config from "../config";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,11 +42,11 @@ const router = createBrowserRouter(
       path="/"
       element={
         <Root
-          title="User UI"
+          title={Config.appName}
           destinations={[
             IndexRoute,
             UploadRoute,
-            KeysRoute,
+            AlbumRoute,
           ]}
         />
       }
@@ -47,6 +54,14 @@ const router = createBrowserRouter(
     >
       <Route errorElement={<ErrorPage />}>
         <Route index element={<Index />} />
+        <Route
+          path={LoginRoute.path}
+          element={<Login />}
+        />
+        <Route
+          path={RegisterRoute.path}
+          element={<Register />}
+        />
         <Route
           path={UploadRoute.path}
           element={<Upload />}
@@ -59,10 +74,10 @@ const router = createBrowserRouter(
           action={imageAction}
         />
         <Route
-          path={KeysRoute.path}
-          element={<Keys />}
-          loader={keysLoader}
-          action={keysAction}
+          path={AlbumRoute.path}
+          element={<Album />}
+          loader={albumLoader}
+          action={albumAction}
         />
       </Route>
     </Route>

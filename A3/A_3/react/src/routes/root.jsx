@@ -1,4 +1,9 @@
-import { Outlet, NavLink, useNavigation } from "react-router-dom";
+import {
+  Outlet,
+  NavLink,
+  useNavigation,
+  Navigate
+} from "react-router-dom";
 import React, { useState, useMemo } from "react";
 import {
   AppBar,
@@ -70,6 +75,7 @@ export default function Root(props) {
                 </Button>
               ))}
             </Box>
+            <Button color="inherit">Logout</Button>
           </Toolbar>
           <Box
             sx={{

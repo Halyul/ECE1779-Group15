@@ -9,7 +9,7 @@ import {
   Divider
 } from "@mui/material";
 import { red, blue } from "@mui/material/colors";
-import { BasicCard } from "../components/card.jsx";
+import { BasicCard } from "@/components/card.jsx";
 
 const members = [
   {

@@ -8,7 +8,8 @@ URL            |  Method | Content Type        | Body
 
 ## TODO
 - [ ] Login/Signup
-- [ ] Thumbnails page
+- [ ] Thumbnails page/Album
+    - [ ] Change Key page
 - [ ] Tag filter
 - [ ] Share image
     - [ ] Number of access

@@ -8,9 +8,9 @@ import {
   Typography
 } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { retrieveKeys } from "../libs/api";
-import { RefreshCard } from "../components/card";
-import SubmissionPrompt from "../components/submission-prompt";
+import { retrieveKeys } from "@/libs/api";
+import { RefreshCard } from "@/components/card";
+import SubmissionPrompt from "@/components/submission-prompt";
 
 export async function loader({ params }) {
   const response = await retrieveKeys();
@@ -27,7 +27,7 @@ export async function action({ request, params }) {
   return;
 }
 
-export default function Keys() {
+export default function Album() {
   const loaderResponse = useLoaderData();
   const [keyList, setKeyList] = useState(loaderResponse.data?.keys);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -89,7 +89,7 @@ export default function Keys() {
   );
 }
 
-export const KeysRoute = {
-  name: "Keys",
-  path: "keys",
+export const AlbumRoute = {
+  name: "Album",
+  path: "album",
 };

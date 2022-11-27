@@ -9,8 +9,8 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import { retrieveImage } from "../libs/api";
-import { TooltipOnError } from "../components/tooltip";
+import { retrieveImage } from "@/libs/api";
+import { TooltipOnError } from "@/components/tooltip";
 
 export async function loader({ params }) {
   const response = await retrieveImage(params.key);

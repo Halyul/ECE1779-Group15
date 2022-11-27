@@ -18,9 +18,9 @@ import {
   CardActions,
   CardMedia,
 } from "@mui/material";
-import { upload } from "../libs/api";
-import SubmissionPrompt from "../components/submission-prompt";
-import { TooltipOnError } from "../components/tooltip";
+import { upload } from "@/libs/api";
+import SubmissionPrompt from "@/components/submission-prompt";
+import { TooltipOnError } from "@/components/tooltip";
 
 export async function action({ request, params }) {
   const formData = await request.formData();

@@ -6,7 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useRouteError } from "react-router-dom";
-import { BasicCard } from "../components/card";
+import { BasicCard } from "@/components/card";
 
 export default function ErrorPage() {
   const error = useRouteError();
