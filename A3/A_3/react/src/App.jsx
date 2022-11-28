@@ -32,6 +32,10 @@ import Album, {
   loader as albumLoader,
   action as albumAction,
 } from "@/routes/user/album";
+import Protected from '@/components/protected';
+import store, { persistor } from '@/libs/store';
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
 import 'reset-css';
 import '@/App.css';
 import Config from "../config";
@@ -53,7 +57,13 @@ const router = createBrowserRouter(
       errorElement={<ErrorPage />}
     >
       <Route errorElement={<ErrorPage />}>
-        <Route index element={<Index />} />
+        <Route index element={
+          <Protected
+            permission="all"
+          >
+            <Index />
+          </Protected>
+        } />
         <Route
           path={LoginRoute.path}
           element={<Login />}
@@ -64,18 +74,36 @@ const router = createBrowserRouter(
         />
         <Route
           path={UploadRoute.path}
-          element={<Upload />}
+          element={
+            <Protected
+              permission="user"
+            >
+              <Upload />
+            </Protected>
+          }
           action={uploadAction}
         />
         <Route
           path={ImageRoute.path}
-          element={<Image />}
+          element={
+            <Protected
+              permission="user"
+            >
+              <Image />
+            </Protected>
+          }
           loader={imageLoader}
           action={imageAction}
         />
         <Route
           path={AlbumRoute.path}
-          element={<Album />}
+          element={
+            <Protected
+              permission="user"
+            >
+              <Album />
+            </Protected>
+          }
           loader={albumLoader}
           action={albumAction}
         />
@@ -87,7 +115,11 @@ const router = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
-        <RouterProvider router={router} />
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+            <RouterProvider router={router} />
+        </PersistGate>
+      </Provider>
     </StyledEngineProvider>
   </React.StrictMode>
 )
