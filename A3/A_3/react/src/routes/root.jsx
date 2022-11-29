@@ -51,15 +51,16 @@ export default function Root(props) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {!token ? <Outlet /> : (
-        <Box
-          sx={{
-            display: "flex",
-            minHeight: "inherit",
-          }}
-        >
-          <AppBar component="nav">
-            <Toolbar>
+      <Box
+        sx={{
+          display: "flex",
+          minHeight: "inherit",
+        }}
+      >
+        <AppBar component="nav">
+
+          <Toolbar>
+            {token && (
               <IconButton
                 color="inherit"
                 aria-label="open drawer"
@@ -69,32 +70,40 @@ export default function Root(props) {
               >
                 <MenuIcon />
               </IconButton>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                {props.title}
-              </Typography>
-              <Box sx={{ display: { xs: "none", md: "block" } }}>
-                {props.destinations.map((item) => (
-                  <Button key={item.name} sx={{ color: "#fff" }}>
-                    <NavLink to={item.path}>{item.name}</NavLink>
-                  </Button>
-                ))}
-              </Box>
-              <Button
-                color="inherit"
-                onClick={() => dispatch(logout())}
-              >
-                Logout
-              </Button>
-            </Toolbar>
-            <Box
-              sx={{
-                width: "100%",
-              }}
-              hidden={navigation.state !== "loading"}
-            >
-              <LinearProgress />
-            </Box>
-          </AppBar>
+            )}
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              {props.title}
+            </Typography>
+            {token && (
+              <>
+                <Box sx={{ display: { xs: "none", md: "block" } }}>
+                  {props.destinations.map((item) => (
+                    <Button key={item.name} sx={{ color: "#fff" }}>
+                      <NavLink to={item.path}>{item.name}</NavLink>
+                    </Button>
+                  ))}
+                </Box>
+                <Button
+                  color="inherit"
+                  onClick={() => dispatch(logout())}
+                >
+                  Logout
+                </Button>
+              </>
+
+            )}
+          </Toolbar>
+
+          <Box
+            sx={{
+              width: "100%",
+            }}
+            hidden={navigation.state !== "loading"}
+          >
+            <LinearProgress />
+          </Box>
+        </AppBar>
+        {token && (
           <Box component="nav">
             <SwipeableDrawer
               container={document.body}
@@ -128,20 +137,20 @@ export default function Root(props) {
               </Box>
             </SwipeableDrawer>
           </Box>
-          <Box
-            component="main"
-            sx={{
-              height: "inherit",
-              width: "90vw",
-              maxWidth: "768px !important",
-              margin: "0 auto",
-            }}
-          >
-            <Toolbar sx={{ marginBottom: "16px" }} />
-            <Outlet />
-          </Box>
+        )}
+        <Box
+          component="main"
+          sx={{
+            height: "inherit",
+            width: "90vw",
+            maxWidth: "768px !important",
+            margin: "0 auto",
+          }}
+        >
+          <Toolbar sx={{ marginBottom: "16px" }} />
+          <Outlet />
         </Box>
-      )}
+      </Box>
     </ThemeProvider>
   );
 }

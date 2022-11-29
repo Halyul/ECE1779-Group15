@@ -5,11 +5,12 @@ import {
   ListItem,
   ListItemText,
   IconButton,
-  Typography
+  Typography,
 } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { retrieveKeys } from "@/libs/api";
-import { RefreshCard } from "@/components/card";
+import { FormCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
 
 export async function loader({ params }) {
@@ -39,28 +40,41 @@ export default function Album() {
 
   return (
     <>
-      <RefreshCard
+      <FormCard
+        id="album"
+        method="POST"
         title="Keys"
-        body={
+        header_action={
+          <IconButton
+            aria-label="refresh"
+            type="submit"
+            onClick={() => {
+              setIsRefreshing(true);
+            }}
+          >
+            <RefreshIcon />
+          </IconButton>
+        }
+        content={
           keyList && keyList.length > 0 ? (
             <List>
-            {keyList.map((key) => (
-              <ListItem
-                key={key}
-                secondaryAction={
-                  <NavLink to={`../image/${key}`}>
-                    <IconButton
-                      edge="end"
-                      aria-label={`Go to image with key ${key}`}
-                    >
-                      <NavigateNextIcon />
-                    </IconButton>
-                  </NavLink>
-                }
-              >
-                <ListItemText primary={key} />
-              </ListItem>
-            ))}
+              {keyList.map((key) => (
+                <ListItem
+                  key={key}
+                  secondaryAction={
+                    <NavLink to={`../image/${key}`}>
+                      <IconButton
+                        edge="end"
+                        aria-label={`Go to image with key ${key}`}
+                      >
+                        <NavigateNextIcon />
+                      </IconButton>
+                    </NavLink>
+                  }
+                >
+                  <ListItemText primary={key} />
+                </ListItem>
+              ))}
             </List>
           ) : (
             <Typography variant="body1">
@@ -68,9 +82,6 @@ export default function Album() {
             </Typography>
           )
         }
-        handleOnClick={() => {
-          setIsRefreshing(true);
-        }}
       />
       <SubmissionPrompt
         failed={{
@@ -83,7 +94,7 @@ export default function Album() {
           setOpen: setIsRefreshing,
         }}
         submittedText="Key retrieved successfully"
-        submissionStatus = {loaderResponse}
+        submissionStatus={loaderResponse}
       />
     </>
   );

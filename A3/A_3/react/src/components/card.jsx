@@ -7,9 +7,7 @@ import {
   CardActions,
   CardContent,
   Button,
-  IconButton,
 } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
 
 export function BasicCard(props) {
   return (
@@ -29,25 +27,28 @@ export function BasicCard(props) {
   );
 }
 
-export function RefreshCard(props) {
+export function FormCard(props) {
   return (
-    <Card sx={{ marginBottom: "1rem" }}>
-      <Form method="POST" id="image-form">
+    <Card sx={{ marginBottom: "1rem" , ...props.sx}}>
+      <Form
+        id={props.id}
+        method={props.method}
+        onSubmit={props.onSubmit}
+      >
         <CardHeader
-          action={
-            <IconButton
-              aria-label="refresh"
-              type="submit"
-              onClick={props.handleOnClick}
-            >
-              <RefreshIcon />
-            </IconButton>
-          }
-          title={props.title}
-          subheader={props.subtitle}
-        />
+        title={props.title}
+        subheader={props.subtitle}
+        action={props.header_action}
+      />
+        <CardContent>
+          {props.content}
+        </CardContent>
+        {props.actions && (
+        <CardActions disableSpacing>
+          {props.actions}
+          </CardActions>
+        )}
       </Form>
-      <CardContent>{props.body}</CardContent>
     </Card>
   );
 }

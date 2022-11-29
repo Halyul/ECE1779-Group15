@@ -1,6 +1,10 @@
 import request from "./request";
 
-export function check() {
+export function check_auth() {
+    return false;
+}
+
+export function check_permission() {
     return false;
 }
 
