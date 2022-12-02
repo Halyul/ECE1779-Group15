@@ -29,7 +29,10 @@ export function BasicCard(props) {
 
 export function FormCard(props) {
   return (
-    <Card sx={{ marginBottom: "1rem" , ...props.sx}}>
+    <Card sx={{ marginBottom: "1rem", ...props.sx }}>
+      {props.image && (
+        <CardMedia component="img" image={props.image.content} alt={props.image.key} />
+      )}
       <Form
         id={props.id}
         method={props.method}

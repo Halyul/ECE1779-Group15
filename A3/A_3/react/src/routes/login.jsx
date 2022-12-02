@@ -3,13 +3,15 @@ import {
   Navigate,
   useLocation,
   useActionData,
-  NavLink
+  NavLink,
+  useSearchParams,
 } from "react-router-dom";
 import {
   Box,
   Button,
   TextField,
   Grid,
+  Snackbar,
 } from "@mui/material";
 import { useSelector, useDispatch } from 'react-redux'
 import { TooltipOnError } from "@/components/tooltip";
@@ -20,8 +22,10 @@ import { login } from '@/reducers/auth'
 export default function Login() {
   const dispatch = useDispatch()
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const actionResponse = useActionData();
-  const token = useSelector((state) => state.user.token)
+  const token = useSelector((state) => state.user.token);
+  const [isRegistered, setIsRegistered] = useState(searchParams.get("register") === "true");
   const from = location.state?.from?.pathname || "/";
 
   const [submitted, setSubmitted] = useState(false);
@@ -30,6 +34,11 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
 
+  const handleSnackbarClose = () => {
+    setSearchParams({});
+    setIsRegistered(false);
+  };
+  
   if (token) {
     return <Navigate to={from} replace />
   }
@@ -130,6 +139,11 @@ export default function Login() {
         }}
         submittedText="Changes committed successfully"
         submissionStatus={actionResponse}
+      />
+      <Snackbar
+        open={isRegistered}
+        message="You are now registered! Please login."
+        onClose={handleSnackbarClose}
       />
     </>
   );

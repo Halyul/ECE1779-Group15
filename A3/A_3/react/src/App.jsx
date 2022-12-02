@@ -14,19 +14,23 @@ import Login, {
 } from "@/routes/login";
 import Register, {
   RegisterRoute,
+  action as registerAction,
 } from "@/routes/register";
 import Index, {
   IndexRoute
-} from "@/routes/index";
+} from "@/routes/user/index";
 import Upload, {
   UploadRoute,
   action as uploadAction,
 } from "@/routes/user/upload";
 import Image, {
   ImageRoute,
+  PublicRoute,
+  PublicWithShareKeyRoute,
   loader as imageLoader,
   action as imageAction,
-} from "@/routes/user/image";
+  publicAction as publicAction,
+} from "@/routes/image";
 import Album, {
   AlbumRoute,
   loader as albumLoader,
@@ -57,21 +61,42 @@ const router = createBrowserRouter(
       errorElement={<ErrorPage />}
     >
       <Route errorElement={<ErrorPage />}>
-        <Route index element={
-          <Protected
-            permission="all"
-          >
-            <Index />
-          </Protected>
-        } />
-        <Route
+      <Route
+          path={PublicRoute.path}
+          element={
+            <Image
+              route={PublicRoute.path}
+            />
+          }
+          action={publicAction}
+        />
+      <Route
+          path={PublicWithShareKeyRoute.path}
+          element={
+            <Image
+              route={PublicWithShareKeyRoute.path}
+            />
+          }
+          loader={imageLoader}
+          action={publicAction}
+        />
+      <Route
           path={LoginRoute.path}
           element={<Login />}
         />
         <Route
           path={RegisterRoute.path}
           element={<Register />}
+          action={registerAction}
         />
+        <Route index element={
+          <Protected
+            permission="all"
+            destination="/public"
+          >
+            <Index />
+          </Protected>
+        } />
         <Route
           path={UploadRoute.path}
           element={
@@ -89,7 +114,9 @@ const router = createBrowserRouter(
             <Protected
               permission="user"
             >
-              <Image />
+              <Image 
+                route={ImageRoute.path}
+              />
             </Protected>
           }
           loader={imageLoader}

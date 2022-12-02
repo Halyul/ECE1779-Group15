@@ -2,9 +2,13 @@ import {
   Outlet,
   NavLink,
   useNavigation,
+  useLocation
 } from "react-router-dom";
 import React, { useState, useMemo } from "react";
-import { useSelector, useDispatch } from 'react-redux'
+import {
+  useSelector,
+  useDispatch
+} from 'react-redux'
 import {
   AppBar,
   Box,
@@ -30,6 +34,7 @@ const drawerWidth = 240;
 export default function Root(props) {
   const navigation = useNavigation();
   const dispatch = useDispatch()
+  const location = useLocation();
   const token = useSelector((state) => state.user.token)
   const [isDrawerOpen, setisDrawerOpen] = useState(false);
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -72,8 +77,15 @@ export default function Root(props) {
               </IconButton>
             )}
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              {props.title}
+              <NavLink to="/">{props.title}</NavLink>
             </Typography>
+            {!token && location.pathname !== "/login" && (
+              <Button
+                  color="inherit"
+                >
+                  <NavLink to="/login">Login</NavLink>
+              </Button>
+            )}
             {token && (
               <>
                 <Box sx={{ display: { xs: "none", md: "block" } }}>
@@ -90,7 +102,6 @@ export default function Root(props) {
                   Logout
                 </Button>
               </>
-
             )}
           </Toolbar>
 

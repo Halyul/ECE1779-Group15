@@ -52,3 +52,5 @@ URL                   | Method  | Content Type        | Body        | Response |
         - [ ] Create/Delete
     - [ ] To modify user info? PUT /api/users
 - [ ] Public page to access shared photo
+    - [x] Design
+    - [ ] Functionalities

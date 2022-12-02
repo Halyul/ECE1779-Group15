@@ -32,9 +32,9 @@ export async function retrieveKeys() {
   }
 }
 
-export async function retrieveImage(key) {
+export async function retrieveImage(key, shareKey) {
   const data = await request(
-    `/api/key/${key}`,
+    `/api/${key ? "key" : "public"}/${key || shareKey}`,
     {
       method: "POST",
     },

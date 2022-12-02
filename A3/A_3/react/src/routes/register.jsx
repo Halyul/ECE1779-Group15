@@ -3,7 +3,8 @@ import {
   Navigate,
   useLocation,
   useActionData,
-  NavLink
+  NavLink,
+  redirect
 } from "react-router-dom";
 import {
   Box,
@@ -15,6 +16,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import { TooltipOnError } from "@/components/tooltip";
 import { FormCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
+
+export async function action({ request, params }) {
+  console.log(123)
+  return redirect("/login?register=true");
+}
 
 export default function Register() {
   const actionResponse = useActionData();
