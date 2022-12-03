@@ -3,6 +3,7 @@ import {
   useLoaderData,
   redirect,
   NavLink,
+  useNavigate,
 } from "react-router-dom";
 import {
   Button,
@@ -44,8 +45,10 @@ export async function publicAction({ request, params }) {
   return redirect(`/public/${updates.key}`);
 }
 
-export default function Image({route}) {
+export default function Image({ route }) {
   const loaderResponse = useLoaderData();
+  const navigate = useNavigate();
+
   const [keyError, setKeyError] = useState(false);
   const [keyValue, setKeyValue] = useState("");
   let image = null;
@@ -60,14 +63,14 @@ export default function Image({route}) {
   }
 
   return (
-      <FormCard
-        id="image"
-        method="POST"
-        title={(error && `${error?.status} ${error.details?.statusText}`) || (route === ImageRoute.path ? "Image Key" : "Share Key")}
-        subheader={
-          (image && image.key) || (error && error.details?.message) || "Key is not presented. Please provide a key."
-        }
-        image={image}
+    <FormCard
+      id="image"
+      method="POST"
+      title={(error && `${error?.status} ${error.details?.statusText}`) || (route === ImageRoute.path ? "Image Key" : "Share Key")}
+      subheader={
+        (image && image.key) || (error && error.details?.message) || "Key is not presented. Please provide a key."
+      }
+      image={image}
       content={
         <>
           <TooltipOnError
@@ -96,36 +99,50 @@ export default function Image({route}) {
               />
             }
           />
-          </>
-          
-        }
-        actions={
-          <>
-            <Button
-              size="small"
-              type="submit"
-              onClick={(e) => {
-                if (keyValue === "" || keyValue.includes(" ") || keyValue.length > 48) {
-                  setKeyError(true);
-                  e.preventDefault();
-                }
+        </>
+
+      }
+      actions={
+        <>
+          <Button
+            size="small"
+            type="submit"
+            onClick={(e) => {
+              if (keyValue === "" || keyValue.includes(" ") || keyValue.length > 48) {
+                setKeyError(true);
+                e.preventDefault();
+              }
+            }}
+          >
+            Submit
+          </Button>
+          {image && route === ImageRoute.path && (
+            <NavLink
+              to={`/upload/?key=${image.key}`}
+              style={{
+                marginLeft: "auto",
               }}
             >
-              Submit
-            </Button>
-            {image && route === ImageRoute.path && (
-              <NavLink
-                to={`../upload/?key=${image.key}`}
-                style={{
-                  marginLeft: "auto",
-                }}
-              >
-                <Button size="small">Re-upload</Button>
-              </NavLink>
-            )}
-          </>
-        }
-      />
+              <Button size="small">Re-upload</Button>
+            </NavLink>
+          )}
+          {route !== PublicRoute.path && (
+            <Button
+            size="small"
+            style={{
+                marginLeft: "auto",
+              }}
+            onClick={() => {
+              navigate(-1, { replace: true });
+            }}
+          >
+            Back
+          </Button>
+          )}
+          
+        </>
+      }
+    />
   );
 }
 

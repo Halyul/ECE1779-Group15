@@ -9,7 +9,7 @@ export default function Protected({ permission, destination, children }) {
   const location = useLocation();
   console.log(permission)
   if (!token) {
-    return <Navigate to={destination || "/login"} state={{ from: location }} replace />;
+    return <Navigate to={destination || "/"} state={{ from: location }} replace />;
   }
 
   return children;

@@ -31,11 +31,16 @@ import Image, {
   action as imageAction,
   publicAction as publicAction,
 } from "@/routes/image";
-import Album, {
-  AlbumRoute,
-  loader as albumLoader,
-  action as albumAction,
-} from "@/routes/user/album";
+import Photos, {
+  PhotosRoute,
+  loader as photosLoader,
+  action as photosAction,
+} from "@/routes/user/photos";
+import Share, {
+  ShareRoute,
+  loader as shareLoader,
+  action as shareAction,
+} from "@/routes/user/share";
 import Protected from '@/components/protected';
 import store, { persistor } from '@/libs/store';
 import { Provider } from 'react-redux'
@@ -54,7 +59,8 @@ const router = createBrowserRouter(
           destinations={[
             IndexRoute,
             UploadRoute,
-            AlbumRoute,
+            PhotosRoute,
+            ShareRoute,
           ]}
         />
       }
@@ -123,16 +129,28 @@ const router = createBrowserRouter(
           action={imageAction}
         />
         <Route
-          path={AlbumRoute.path}
+          path={PhotosRoute.path}
           element={
             <Protected
               permission="user"
             >
-              <Album />
+              <Photos />
             </Protected>
           }
-          loader={albumLoader}
-          action={albumAction}
+          loader={photosLoader}
+          action={photosAction}
+        />
+        <Route
+          path={ShareRoute.path}
+          element={
+            <Protected
+              permission="user"
+            >
+              <Share />
+            </Protected>
+          }
+          loader={shareLoader}
+          action={shareAction}
         />
       </Route>
     </Route>

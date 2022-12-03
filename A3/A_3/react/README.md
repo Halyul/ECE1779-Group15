@@ -28,14 +28,21 @@ URL                   | Method  | Content Type        | Body        | Response |
 - [ ] Login/Signup
     - [x] Design
     - [ ] Functionalities
-- [ ] Thumbnails page/Album
+- [ ] Photos page
+    - [x] Re-design
+    - [ ] Functionalities
+    - [x] Tag
+    - [x] is shared
+- [ ] Image page
+    - [ ] Show Tag
+    - [ ] Show is shared
+    - [ ] Create Share
+- [ ] Tag page
     - [ ] Design
     - [ ] Functionalities
-    - [ ] Tag filter
-    - [ ] is shared
 - [ ] Share Page
-    - [ ] Number of access
-    - [ ] Design
+    - [x] Number of access
+    - [x] Design
     - [ ] Functionalities
 - [ ] Permission (User/Manager)
     - [ ] Design
