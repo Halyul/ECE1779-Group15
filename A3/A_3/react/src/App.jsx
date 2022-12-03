@@ -26,10 +26,7 @@ import Upload, {
 import Image, {
   ImageRoute,
   PublicRoute,
-  PublicWithShareKeyRoute,
   loader as imageLoader,
-  action as imageAction,
-  publicAction as publicAction,
 } from "@/routes/image";
 import Photos, {
   PhotosRoute,
@@ -74,17 +71,7 @@ const router = createBrowserRouter(
               route={PublicRoute.path}
             />
           }
-          action={publicAction}
-        />
-      <Route
-          path={PublicWithShareKeyRoute.path}
-          element={
-            <Image
-              route={PublicWithShareKeyRoute.path}
-            />
-          }
           loader={imageLoader}
-          action={publicAction}
         />
       <Route
           path={LoginRoute.path}
@@ -98,7 +85,7 @@ const router = createBrowserRouter(
         <Route index element={
           <Protected
             permission="all"
-            destination="/public"
+            destination="/login"
           >
             <Index />
           </Protected>
@@ -126,7 +113,6 @@ const router = createBrowserRouter(
             </Protected>
           }
           loader={imageLoader}
-          action={imageAction}
         />
         <Route
           path={PhotosRoute.path}

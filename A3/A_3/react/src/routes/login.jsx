@@ -3,7 +3,7 @@ import {
   Navigate,
   useLocation,
   useActionData,
-  NavLink,
+  Link,
   useSearchParams,
 } from "react-router-dom";
 import {
@@ -118,7 +118,7 @@ export default function Login() {
               size="small"
               sx={{ marginLeft: "auto" }}
             >
-              <NavLink to="/register" state={{ from: location }}>Register</NavLink>
+              <Link to="/register" state={{ from: location }}>Register</Link>
             </Button>
           </>
         }

@@ -3,7 +3,7 @@ import {
   Navigate,
   useLocation,
   useActionData,
-  NavLink,
+  Link,
   redirect
 } from "react-router-dom";
 import {
@@ -169,7 +169,7 @@ export default function Register() {
               size="small"
               sx={{ marginLeft: "auto" }}
             >
-              <NavLink to={from}>Back</NavLink>
+              <Link to={from}>Back</Link>
             </Button>
           </>
         }

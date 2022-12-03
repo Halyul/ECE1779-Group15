@@ -4,10 +4,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 import {
-  Box,
-  List,
-  ListItem,
-  ListItemText,
   IconButton,
   Typography,
   ImageList,
@@ -40,7 +36,7 @@ export async function loader({ params }) {
           isShared: true,
         },
         {
-          key: "aaa8", // the image key
+          key: "gura", // the image key
           thumbnail: "https://gura.ch/images/0.jpg",
           tag: "nan",
           isShared: false,
@@ -105,15 +101,17 @@ export default function Photos() {
           keyList && keyList.length > 0 ? (
             <ImageList cols={window.innerWidth > 768 ? 3 : (window.innerWidth > 500 ? 2 : 1)} gap={8} variant="masonry">
               {keyList.map((key) => (
-                <ImageListItem key={key.key}>
+                <ImageListItem
+                  key={key.key}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                      navigate(`/image/${key.key}`);
+                    }}
+                >
                   <img
                     src={key.thumbnail}
                     alt={key.tag}
                     loading="lazy"
-                    onClick={() => {
-                      navigate(`/image/${key.key}`);
-                    }}
-                    style={{ cursor: "pointer" }}
                   />
                   <ImageListItemBar
                     title={key.key}

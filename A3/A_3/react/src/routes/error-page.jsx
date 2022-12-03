@@ -4,6 +4,7 @@ import {
 import {
   Container,
   Typography,
+  Button,
 } from "@mui/material";
 import { useRouteError } from "react-router-dom";
 import { BasicCard } from "@/components/card";
@@ -27,20 +28,24 @@ export default function ErrorPage() {
     >
       <BasicCard
         title={`${error.status} ${error.data ? error.statusText : ""}`}
-        body={
+        content={
           <Typography variant="body1">
             {error.data ? error.data : error.statusText}
           </Typography>
         }
-        actions={[
-          {
-            label: "Go back",
-            content: "Go back",
-            onClick: () => {
-              navigate(-1);
-            }
-          }
-        ]}
+        actions={
+          <Button
+            size="small"
+            style={{
+              marginLeft: "auto",
+            }}
+            onClick={() => {
+              navigate(-1, { replace: true });
+            }}
+          >
+            Back
+          </Button>
+        }
       />
     </Container>
   );

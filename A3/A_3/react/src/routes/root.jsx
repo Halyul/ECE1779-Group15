@@ -1,8 +1,10 @@
 import {
   Outlet,
+  Link,
   NavLink,
   useNavigation,
-  useLocation
+  useLocation,
+  useNavigate
 } from "react-router-dom";
 import React, { useState, useMemo } from "react";
 import {
@@ -22,8 +24,13 @@ import {
   Typography,
   Button,
   LinearProgress,
+  SpeedDial,
+  SpeedDialAction
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import SpeedDialIcon from '@mui/material/SpeedDialIcon';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -33,6 +40,7 @@ const drawerWidth = 240;
 
 export default function Root(props) {
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const dispatch = useDispatch()
   const location = useLocation();
   const token = useSelector((state) => state.user.token)
@@ -48,6 +56,11 @@ export default function Root(props) {
       }),
     [prefersDarkMode]
   );
+
+  const fabActions = [
+    { icon: <ArrowBackIcon />, name: "Back", onClick: () => navigate(-1) },
+    { icon: <ArrowForwardIcon />, name: "Forward", onClick: () => navigate(1) },
+  ];
 
   const handleDrawerToggle = () => {
     setisDrawerOpen(!isDrawerOpen);
@@ -77,22 +90,29 @@ export default function Root(props) {
               </IconButton>
             )}
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <NavLink to="/">{props.title}</NavLink>
+              <Link to="/">{props.title}</Link>
             </Typography>
             {!token && location.pathname !== "/login" && (
               <Button
-                  color="inherit"
-                >
-                  <NavLink to="/login">Login</NavLink>
+                color="inherit"
+              >
+                <Link to="/login">Login</Link>
               </Button>
             )}
             {token && (
               <>
                 <Box sx={{ display: { xs: "none", md: "block" } }}>
                   {props.destinations.map((item) => (
-                    <Button key={item.name} sx={{ color: "#fff" }}>
-                      <NavLink to={item.path}>{item.name}</NavLink>
-                    </Button>
+
+                    <NavLink to={item.path} key={item.name}>
+                    {({ isActive }) => (
+                        <Button
+                          color={isActive ? "secondary" : "inherit"}
+                        >
+                        {item.name}
+                      </Button>
+                    )}
+                    </NavLink>
                   ))}
                 </Box>
                 <Button
@@ -137,11 +157,13 @@ export default function Root(props) {
                 <List>
                   {props.destinations.map((item) => (
                     <NavLink to={item.path} key={item.name}>
-                      <ListItem disablePadding>
-                        <ListItemButton sx={{ textAlign: "center" }}>
+                      {({ isActive }) => (
+                        <ListItemButton
+                          selected={isActive}
+                          sx={{ textAlign: "center" }}>
                           <ListItemText primary={item.name} />
                         </ListItemButton>
-                      </ListItem>
+                      )}
                     </NavLink>
                   ))}
                 </List>
@@ -161,6 +183,21 @@ export default function Root(props) {
           <Toolbar sx={{ marginBottom: "16px" }} />
           <Outlet />
         </Box>
+        <SpeedDial
+          ariaLabel="SpeedDial playground example"
+          icon={<SpeedDialIcon />}
+          direction="up"
+          sx={{ position: "absolute", bottom: 32, right: 32 }}
+        >
+          {fabActions.map((action) => (
+            <SpeedDialAction
+              key={action.name}
+              icon={action.icon}
+              tooltipTitle={action.name}
+              onClick={action.onClick}
+            />
+          ))}
+        </SpeedDial>
       </Box>
     </ThemeProvider>
   );

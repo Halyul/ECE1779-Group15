@@ -5,7 +5,7 @@ import {
 import {
   useLoaderData,
   redirect,
-  NavLink,
+  Link,
 } from "react-router-dom";
 import {
   List,
@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from '@mui/icons-material/Delete';
+import ShareIcon from '@mui/icons-material/Share';
 import { retrieveKeys } from "@/libs/api";
 import { FormCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
@@ -45,7 +46,7 @@ export async function action({ request, params }) {
 
 export default function Share() {
   const loaderResponse = useLoaderData();
-  const [keyList, setKeyList] = useState(loaderResponse.data?.keys);  
+  const [keyList, setKeyList] = useState(loaderResponse.data?.keys);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
@@ -77,15 +78,27 @@ export default function Share() {
                 <ListItem
                   key={key.key}
                   secondaryAction={
-                    <IconButton edge="end" aria-label="delete">
-                      <DeleteIcon />
-                    </IconButton>
+                    <>
+                      <IconButton
+                        edge="end"
+                        aria-label="share"
+                        sx={{ mr: 1 }}
+                      >
+                        <ShareIcon />
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </>
+
                   }
                   disablePadding
                 >
-                  <NavLink to={`/image/${key.key}`} style={{ width: "100%" }}>
+                  <Link to={`/image/${key.key}`} style={{ width: "100%" }}>
                     <ListItemButton>
-
                       <ListItemAvatar>
                         <Avatar
                           src={`${key.thumbnail}`}
@@ -99,7 +112,7 @@ export default function Share() {
                       />
 
                     </ListItemButton>
-                  </NavLink>
+                  </Link>
                 </ListItem>
               )
               )}

@@ -5,7 +5,7 @@ import {
 import {
   Form,
   useActionData,
-  NavLink,
+  Link,
   useSearchParams
 } from "react-router-dom";
 import {
@@ -148,7 +148,7 @@ export default function Upload() {
               Submit
             </Button>
             {navigateToUploaded && (
-              <NavLink
+              <Link
                 to={`../image/${keyValue}`}
                 style={{
                   marginLeft: "auto",
@@ -159,7 +159,7 @@ export default function Upload() {
                 >
                   Take a look
                 </Button>
-              </NavLink>
+              </Link>
             )}
           </CardActions>
         </Form>

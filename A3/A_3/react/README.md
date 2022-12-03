@@ -34,9 +34,9 @@ URL                   | Method  | Content Type        | Body        | Response |
     - [x] Tag
     - [x] is shared
 - [ ] Image page
-    - [ ] Show Tag
-    - [ ] Show is shared
-    - [ ] Create Share
+    - [x] Show Tag
+    - [x] Show is shared
+    - [x] Create Share
 - [ ] Tag page
     - [ ] Design
     - [ ] Functionalities

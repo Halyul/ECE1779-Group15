@@ -34,7 +34,7 @@ export default function Index() {
     <>
       <BasicCard
         title="Welcome"
-        body={
+        content={
           <Typography variant="body1">
             Please select a destination from the menu.
           </Typography>
@@ -42,7 +42,7 @@ export default function Index() {
       />
       <BasicCard
       title="Members"
-      body={
+      content={
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
           {members.map((member) => (
             <Box key={member.name}>

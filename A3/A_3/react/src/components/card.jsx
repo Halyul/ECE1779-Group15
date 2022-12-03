@@ -3,26 +3,33 @@ import {
 } from "react-router-dom";
 import {
   Card,
+  CardMedia,
   CardHeader,
   CardActions,
   CardContent,
-  Button,
 } from "@mui/material";
 
 export function BasicCard(props) {
   return (
-    <Card sx={{ marginBottom: "1rem" }}>
-      <CardHeader title={props.title} />
-      <CardContent>{props.body}</CardContent>
-      {props.actions && (
-        <CardActions>
-          {props.actions.map((action) => (
-            <Button key={action.label} size="small" onClick={action.onClick}>
-              {action.content}
-            </Button>
-          ))}
-        </CardActions>
+    <Card sx={{ marginBottom: "1rem", ...props.sx }}>
+      {props.image && (
+        <CardMedia component="img" image={props.image.content} alt={props.image.key} />
       )}
+        {(props.title || props.subheader || props.header_action) && (
+          <CardHeader
+            title={props.title}
+            subheader={props.subheader}
+            action={props.header_action}
+          />
+        )}
+        {props.content && (
+          <CardContent>{props.content}</CardContent>
+        )}
+        {props.actions && (
+          <CardActions disableSpacing>
+            {props.actions}
+          </CardActions>
+        )}
     </Card>
   );
 }
@@ -38,17 +45,19 @@ export function FormCard(props) {
         method={props.method}
         onSubmit={props.onSubmit}
       >
-        <CardHeader
-        title={props.title}
-        subheader={props.subtitle}
-        action={props.header_action}
-      />
-        <CardContent>
-          {props.content}
-        </CardContent>
+        {(props.title || props.subheader || props.header_action) && (
+          <CardHeader
+            title={props.title}
+            subheader={props.subheader}
+            action={props.header_action}
+          />
+        )}
+        {props.content && (
+          <CardContent>{props.content}</CardContent>
+        )}
         {props.actions && (
-        <CardActions disableSpacing>
-          {props.actions}
+          <CardActions disableSpacing>
+            {props.actions}
           </CardActions>
         )}
       </Form>

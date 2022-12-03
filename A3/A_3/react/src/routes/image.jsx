@@ -1,53 +1,63 @@
 import { useState } from "react";
 import {
   useLoaderData,
-  redirect,
-  NavLink,
+  useSubmit,
+  Link as RouterLink,
   useNavigate,
 } from "react-router-dom";
 import {
   Button,
-  TextField,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Divider,
+  Box,
+  Link,
 } from "@mui/material";
+import ShareIcon from '@mui/icons-material/Share';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
 import { retrieveImage } from "@/libs/api";
 import { FormCard } from "@/components/card";
-import { TooltipOnError } from "@/components/tooltip";
 
 export async function loader({ params }) {
-  const response = await retrieveImage(params.key, params.shareKey);
-  if (response.status !== 200) {
-    return {
-      status: response.status,
-      details: {
-        message: response.data.message,
-        statusText: response.statusText
-      }
-    }
-  }
+  // const response = await retrieveImage(params.key, params.shareKey);
+  // if (response.status !== 200) {
+  //   return {
+  //     status: response.status,
+  //     details: {
+  //       message: response.data.message,
+  //       statusText: response.statusText
+  //     }
+  //   }
+  // }
+  // return {
+  //   status: 200,
+  //   image: {
+  //     content: response.data.content,
+  //     key: params.key,
+  //   }
+  // };
+  console.log("loaded")
   return {
     status: 200,
     image: {
-      content: response.data.content,
-      key: params.key,
+      content: "https://gura.ch/images/0.jpg",
+      key: "gura",
+      tag: "test",
+      shard_link: "123"
     }
   };
-}
-
-export async function action({ request, params }) {
-  const formData = await request.formData();
-  const updates = Object.fromEntries(formData);
-  return redirect(`/image/${updates.key}`);
-}
-
-export async function publicAction({ request, params }) {
-  const formData = await request.formData();
-  const updates = Object.fromEntries(formData);
-  return redirect(`/public/${updates.key}`);
 }
 
 export default function Image({ route }) {
   const loaderResponse = useLoaderData();
   const navigate = useNavigate();
+  const submit = useSubmit();
+
+  const [shareMenuAnchorEl, setShareMenuAnchor] = useState(null);
+  const shareMenuOpen = Boolean(shareMenuAnchorEl);
 
   const [keyError, setKeyError] = useState(false);
   const [keyValue, setKeyValue] = useState("");
@@ -62,87 +72,128 @@ export default function Image({ route }) {
     }
   }
 
-  return (
-    <FormCard
-      id="image"
-      method="POST"
-      title={(error && `${error?.status} ${error.details?.statusText}`) || (route === ImageRoute.path ? "Image Key" : "Share Key")}
-      subheader={
-        (image && image.key) || (error && error.details?.message) || "Key is not presented. Please provide a key."
-      }
-      image={image}
-      content={
-        <>
-          <TooltipOnError
-            open={keyError}
-            handleClose={() => setKeyError(false)}
-            title="Please enter a key wihtout spaces. More than 48 characters are NOT allowed."
-            body={
-              <TextField
-                id="image-text-field"
-                name="key"
-                label={
-                  ((image || error) && "Enter another key") || "Enter an key"
-                }
-                variant="outlined"
-                fullWidth
-                error={keyError}
-                value={keyValue}
-                onChange={(e) => {
-                  if (e.target.value.includes(" ") || e.target.value.length > 48) {
-                    setKeyError(true);
-                  } else {
-                    setKeyValue(e.target.value);
-                    setKeyError(false);
-                  }
-                }}
-              />
-            }
-          />
-        </>
+  const handleShareMenuOpen = (event) => {
+    setShareMenuAnchor(event.currentTarget);
+  };
 
-      }
-      actions={
-        <>
-          <Button
-            size="small"
-            type="submit"
-            onClick={(e) => {
-              if (keyValue === "" || keyValue.includes(" ") || keyValue.length > 48) {
-                setKeyError(true);
-                e.preventDefault();
-              }
-            }}
+  const handleShareMenuClose = () => {
+    setShareMenuAnchor(null);
+  };
+
+  return (
+    <>
+      <FormCard
+        image={image}
+        id="image"
+        method="POST"
+        title={(error && `${error?.status} ${error.details?.statusText}`) || `Key: ${image.key}`}
+        subheader={
+          <Link
+            component={RouterLink}
+            to={`/tag/${image.tag}`}
           >
-            Submit
-          </Button>
-          {image && route === ImageRoute.path && (
-            <NavLink
-              to={`/upload/?key=${image.key}`}
-              style={{
-                marginLeft: "auto",
-              }}
-            >
-              <Button size="small">Re-upload</Button>
-            </NavLink>
-          )}
-          {route !== PublicRoute.path && (
+            {(image.tag && `Tag: ${image.tag}`) || (error && error.details?.message)}
+          </Link>
+        }
+        header_action={
+          route === ImageRoute.path ? (
+            image.shard_link ? (
+              <>
+                <Button
+                  aria-controls={shareMenuOpen ? "share-menu" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={shareMenuOpen ? "true" : undefined}
+                  onClick={handleShareMenuOpen}
+                  startIcon={<ShareIcon />}
+                >
+                  Manage Share
+                </Button>
+                <Menu
+                  id="share-menu"
+                  anchorEl={shareMenuAnchorEl}
+                  open={shareMenuOpen}
+                  onClose={handleShareMenuClose}
+                  MenuListProps={{
+                    "aria-labelledby": "basic-button",
+                  }}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                >
+                  {image.shard_link && (
+                    <Box>
+                      <MenuItem onClick={handleShareMenuClose}>
+                        <ListItemIcon>
+                          <ContentCopyIcon fontSize="small" />
+                        </ListItemIcon>
+                        Copy
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          handleShareMenuClose();
+                          submit(null);
+                        }}
+                      >
+                        <ListItemIcon>
+                          <DeleteIcon fontSize="small" />
+                        </ListItemIcon>
+                        Delete
+                      </MenuItem>
+                    </Box>
+                  )}
+                  <Divider sx={{ my: 0.5 }} />
+                  <MenuItem onClick={handleShareMenuClose}>
+                    <ListItemIcon>
+                      <CloseIcon fontSize="small" />
+                    </ListItemIcon>
+                    Close
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Button
+                startIcon={<ShareIcon />}
+              >
+                Create Share
+              </Button>
+            )
+          ) : (
             <Button
-            size="small"
-            style={{
-                marginLeft: "auto",
-              }}
-            onClick={() => {
-              navigate(-1, { replace: true });
-            }}
-          >
-            Back
-          </Button>
-          )}
-          
-        </>
-      }
-    />
+              startIcon={<ShareIcon />}
+            >
+              Copy Link
+            </Button>
+          )
+        }
+        actions={
+          route === ImageRoute.path && (
+            <>
+              <RouterLink
+                to={`/upload/?key=${image.key}`}
+              >
+                <Button size="small">Re-upload</Button>
+              </RouterLink>
+              <Button
+                size="small"
+                style={{
+                  marginLeft: "auto",
+                }}
+                onClick={() => {
+                  navigate(-1, { replace: true });
+                }}
+              >
+                Back
+              </Button>
+            </>
+          )
+        }
+      />
+    </>
   );
 }
 
@@ -153,10 +204,5 @@ export const ImageRoute = {
 
 export const PublicRoute = {
   name: "Public",
-  path: "public",
-};
-
-export const PublicWithShareKeyRoute = {
-  name: "Public with Share Key",
   path: "public/:shareKey",
 };
