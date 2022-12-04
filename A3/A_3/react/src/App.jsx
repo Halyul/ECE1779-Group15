@@ -11,6 +11,7 @@ import Root from "@/routes/root";
 import ErrorPage from "@/routes/error-page";
 import Login, {
   LoginRoute,
+  action as loginAction,
 } from "@/routes/login";
 import Register, {
   RegisterRoute,
@@ -31,13 +32,19 @@ import Image, {
 import Photos, {
   PhotosRoute,
   loader as photosLoader,
-  action as photosAction,
 } from "@/routes/user/photos";
 import Share, {
   ShareRoute,
   loader as shareLoader,
-  action as shareAction,
 } from "@/routes/user/share";
+import Tags, {
+  TagsRoute,
+  loader as tagsLoader,
+} from "@/routes/user/tags";
+import Tag, {
+  TagRoute,
+  loader as tagLoader,
+} from "@/routes/user/tag";
 import Protected from '@/components/protected';
 import store, { persistor } from '@/libs/store';
 import { Provider } from 'react-redux'
@@ -58,6 +65,7 @@ const router = createBrowserRouter(
             UploadRoute,
             PhotosRoute,
             ShareRoute,
+            TagsRoute,
           ]}
         />
       }
@@ -76,6 +84,7 @@ const router = createBrowserRouter(
       <Route
           path={LoginRoute.path}
           element={<Login />}
+          action={loginAction}
         />
         <Route
           path={RegisterRoute.path}
@@ -124,7 +133,6 @@ const router = createBrowserRouter(
             </Protected>
           }
           loader={photosLoader}
-          action={photosAction}
         />
         <Route
           path={ShareRoute.path}
@@ -136,7 +144,28 @@ const router = createBrowserRouter(
             </Protected>
           }
           loader={shareLoader}
-          action={shareAction}
+        />
+        <Route
+          path={TagsRoute.path}
+          element={
+            <Protected
+              permission="user"
+            >
+              <Tags />
+            </Protected>
+          }
+          loader={tagsLoader}
+        />
+        <Route
+          path={TagRoute.path}
+          element={
+            <Protected
+              permission="user"
+            >
+              <Tag />
+            </Protected>
+          }
+          loader={tagLoader}
         />
       </Route>
     </Route>

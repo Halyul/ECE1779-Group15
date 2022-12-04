@@ -13,7 +13,6 @@ import {
   ListItemText,
   IconButton,
   Typography,
-  Checkbox,
   ListItemButton,
   ListItemAvatar,
   Avatar,
@@ -23,6 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 import { retrieveKeys } from "@/libs/api";
 import { FormCard } from "@/components/card";
+import { Tooltip } from "@/components/tooltip";
 import SubmissionPrompt from "@/components/submission-prompt";
 
 export async function loader({ params }) {
@@ -40,19 +40,10 @@ export async function loader({ params }) {
   };
 }
 
-export async function action({ request, params }) {
-  return;
-}
-
 export default function Share() {
   const loaderResponse = useLoaderData();
   const [keyList, setKeyList] = useState(loaderResponse.data?.keys);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    setIsRefreshing(false);
-    setKeyList(loaderResponse.data?.keys);
-  }, [loaderResponse]);
 
   return (
     <>
@@ -61,15 +52,25 @@ export default function Share() {
         method="POST"
         title="Shared Images"
         header_action={
-          <IconButton
-            aria-label="refresh"
-            type="submit"
-            onClick={() => {
-              setIsRefreshing(true);
-            }}
-          >
-            <RefreshIcon />
-          </IconButton>
+          <Tooltip
+            title="Refresh"
+            body={
+              <IconButton
+                aria-label="refresh"
+                onClick={() => {
+                  setIsRefreshing(true);
+                  loader({
+                    params: {}
+                  }).then((response) => {
+                    setIsRefreshing(false);
+                  })
+                }}
+              >
+                <RefreshIcon />
+              </IconButton>
+            }
+          />
+
         }
         content={
           keyList && keyList.length > 0 ? (
@@ -79,21 +80,32 @@ export default function Share() {
                   key={key.key}
                   secondaryAction={
                     <>
-                      <IconButton
-                        edge="end"
-                        aria-label="share"
-                        sx={{ mr: 1 }}
-                      >
-                        <ShareIcon />
-                      </IconButton>
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </>
+                      <Tooltip
+                        title="Share"
+                        body={
+                          <IconButton
+                            edge="end"
+                            aria-label="share"
+                            sx={{ mr: 1 }}
+                          >
+                            <ShareIcon />
+                          </IconButton>
+                        }
+                      />
+                      <Tooltip
+                        title="Delete"
+                        body={
+                          <IconButton
+                            edge="end"
+                            aria-label="delete"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        }
+                      />
 
+
+                    </>
                   }
                   disablePadding
                 >
@@ -106,11 +118,10 @@ export default function Share() {
                         />
                       </ListItemAvatar>
                       <ListItemText
-                        id={`${key.key}`}
+                        id={key.key}
                         primary={`Key: ${key.key}`}
                         secondary={`Accesses: ${key.accesses}`}
                       />
-
                     </ListItemButton>
                   </Link>
                 </ListItem>

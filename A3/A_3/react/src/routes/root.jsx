@@ -75,7 +75,7 @@ export default function Root(props) {
           minHeight: "inherit",
         }}
       >
-        <AppBar component="nav">
+        <AppBar component="nav" position="fixed">
 
           <Toolbar>
             {token && (
@@ -187,7 +187,7 @@ export default function Root(props) {
           ariaLabel="SpeedDial playground example"
           icon={<SpeedDialIcon />}
           direction="up"
-          sx={{ position: "absolute", bottom: 32, right: 32 }}
+          sx={{ position: "fixed", bottom: 32, right: 32 }}
         >
           {fabActions.map((action) => (
             <SpeedDialAction

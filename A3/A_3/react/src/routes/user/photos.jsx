@@ -9,11 +9,12 @@ import {
   ImageList,
   ImageListItem,
   ImageListItemBar,
+  Tooltip,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import ShareIcon from '@mui/icons-material/Share';
 import { retrieveKeys } from "@/libs/api";
-import { FormCard } from "@/components/card";
+import { BasicCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
 
 export async function loader({ params }) {
@@ -60,7 +61,7 @@ export async function loader({ params }) {
           isShared: true,
         },
         {
-          key: "1", // the image key
+          key: Math.random().toString(), // the image key
           thumbnail: "https://gura.ch/images/414.jpg",
           tag: "nan",
           isShared: false,
@@ -68,10 +69,6 @@ export async function loader({ params }) {
       ]
     }
   };
-}
-
-export async function action({ request, params }) {
-  return;
 }
 
 export default function Photos() {
@@ -82,16 +79,20 @@ export default function Photos() {
 
   return (
     <>
-      <FormCard
+      <BasicCard
         id="photos"
-        method="POST"
         title="Photos"
         header_action={
           <IconButton
             aria-label="refresh"
-            type="submit"
             onClick={() => {
               setIsRefreshing(true);
+              loader({
+                params: {}
+              }).then((response) => {
+                setIsRefreshing(false);
+                setKeyList(response.data?.keys);
+              })
             }}
           >
             <RefreshIcon />
@@ -118,11 +119,13 @@ export default function Photos() {
                     subtitle={key.tag}
                     actionIcon={
                       key.isShared && (
+                        <Tooltip title="Shared">
                         <IconButton
                           sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
                         >
                           <ShareIcon />
-                        </IconButton>
+                          </IconButton>
+                        </Tooltip>
                       )}
                   />
                 </ImageListItem>

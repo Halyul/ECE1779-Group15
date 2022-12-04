@@ -23,23 +23,21 @@ export async function loader({ params }) {
   return {
     status: 200,
     data: {
-      keys: [
-        {
-          key: "ajksdfghbuiagda", // the image key
-          thumbnail: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-          accesses: 0,
-        }
+      tags: [
+        { text: 'Hey', value: 1 },
+        { text: 'lol', value: 2 },
+        { text: 'first impression', value: 4 },
+        { text: 'very cool', value: 2 },
+        { text: 'duck', value: 10 },
+        { text: '1duck', value: 1 },
+        { text: '2duck', value: 5 },
       ]
     }
   };
 }
 
-export async function action({ params }) {
-  return
-}
 
-
-export default function Tag() {
+export default function Tags() {
   const navigate = useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const loaderResponse = useLoaderData();
@@ -48,7 +46,7 @@ export default function Tag() {
   return (
     <>
       <BasicCard
-        title="Tags"
+        title="Tag"
         header_action={
 
           <Tooltip
@@ -139,7 +137,7 @@ export default function Tag() {
   );
 }
 
-export const TagRoute = {
-  name: "Tag",
-  path: "tag/:tag",
+export const TagsRoute = {
+  name: "Tags",
+  path: "tags",
 };

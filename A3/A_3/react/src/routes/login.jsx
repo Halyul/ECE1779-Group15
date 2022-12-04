@@ -7,7 +7,6 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import {
-  Box,
   Button,
   TextField,
   Grid,
@@ -18,6 +17,11 @@ import { TooltipOnError } from "@/components/tooltip";
 import { FormCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
 import { login } from '@/reducers/auth'
+
+export async function action({ request, params }) {
+  console.log(123)
+  return redirect("/login?register=true");
+}
 
 export default function Login() {
   const dispatch = useDispatch()
@@ -35,7 +39,7 @@ export default function Login() {
   const [passwordError, setPasswordError] = useState(false);
 
   const handleSnackbarClose = () => {
-    setSearchParams({});
+    setSearchParams({}, { replace: true });
     setIsRegistered(false);
   };
   

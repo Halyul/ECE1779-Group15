@@ -10,57 +10,71 @@ import {
 } from "@mui/material";
 
 export function BasicCard(props) {
+  const body = [];
+
+  if (props.title || props.subheader || props.header_action) {
+    body.push(
+      <CardHeader
+        title={props.title}
+        subheader={props.subheader}
+        action={props.header_action}
+        key="header"
+      />
+    );
+  }
+
+  if (props.content) {
+    body.push(
+      <CardContent
+        key="content"
+      >
+        {props.content}
+      </CardContent>
+    );
+  }
+
+  if (props.actions) {
+    body.push(
+      <CardActions
+        key="actions"
+      >
+        {props.actions}
+      </CardActions>
+    );
+  }
+
   return (
     <Card sx={{ marginBottom: "1rem", ...props.sx }}>
       {props.image && (
-        <CardMedia component="img" image={props.image.content} alt={props.image.key} />
+        <CardMedia component="img" image={props.image} />
       )}
-        {(props.title || props.subheader || props.header_action) && (
-          <CardHeader
-            title={props.title}
-            subheader={props.subheader}
-            action={props.header_action}
-          />
-        )}
-        {props.content && (
-          <CardContent>{props.content}</CardContent>
-        )}
-        {props.actions && (
-          <CardActions disableSpacing>
-            {props.actions}
-          </CardActions>
-        )}
+      {props.media && (
+        <CardMedia>
+          {props.media}
+        </CardMedia>
+      )}
+      {props.subcomponent ? (
+        <props.subcomponent.el {...props.subcomponent.props}>
+          {body}
+        </props.subcomponent.el>
+      ) : body}
     </Card>
   );
 }
 
 export function FormCard(props) {
   return (
-    <Card sx={{ marginBottom: "1rem", ...props.sx }}>
-      {props.image && (
-        <CardMedia component="img" image={props.image.content} alt={props.image.key} />
-      )}
-      <Form
-        id={props.id}
-        method={props.method}
-        onSubmit={props.onSubmit}
-      >
-        {(props.title || props.subheader || props.header_action) && (
-          <CardHeader
-            title={props.title}
-            subheader={props.subheader}
-            action={props.header_action}
-          />
-        )}
-        {props.content && (
-          <CardContent>{props.content}</CardContent>
-        )}
-        {props.actions && (
-          <CardActions disableSpacing>
-            {props.actions}
-          </CardActions>
-        )}
-      </Form>
-    </Card>
+    <BasicCard
+      {...props}
+      subcomponent={{
+        el: Form,
+        props: {
+          id: props.id,
+          method: props.method,
+          encType: props.encType,
+          onSubmit: props.onSubmit,
+        },
+      }}
+    />
   );
 }

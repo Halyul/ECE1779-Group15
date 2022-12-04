@@ -13,11 +13,13 @@ import {
   Divider,
   Box,
   Link,
+  Chip
 } from "@mui/material";
 import ShareIcon from '@mui/icons-material/Share';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
+import { Tooltip } from "@/components/tooltip";
 import { retrieveImage } from "@/libs/api";
 import { FormCard } from "@/components/card";
 
@@ -83,17 +85,27 @@ export default function Image({ route }) {
   return (
     <>
       <FormCard
-        image={image}
+        image={image.content}
         id="image"
         method="POST"
         title={(error && `${error?.status} ${error.details?.statusText}`) || `Key: ${image.key}`}
         subheader={
-          <Link
-            component={RouterLink}
-            to={`/tag/${image.tag}`}
-          >
-            {(image.tag && `Tag: ${image.tag}`) || (error && error.details?.message)}
-          </Link>
+          error ? (error.details?.message): (
+            image.tag ? (
+              <Tooltip
+            title="Tag"
+            body={
+              <Chip
+                onClick={() => { navigate(`/tag/${image.tag}`) }}
+                label={image.tag}
+                sx={{ mt: 1 }}
+              >
+
+              </Chip>
+            }
+          />
+            ) : ("")
+          )
         }
         header_action={
           route === ImageRoute.path ? (
@@ -174,7 +186,8 @@ export default function Image({ route }) {
           route === ImageRoute.path && (
             <>
               <RouterLink
-                to={`/upload/?key=${image.key}`}
+                to={`/upload`}
+                state={{ image: image }}
               >
                 <Button size="small">Re-upload</Button>
               </RouterLink>

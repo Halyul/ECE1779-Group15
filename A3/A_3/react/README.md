@@ -37,6 +37,9 @@ URL                   | Method  | Content Type        | Body        | Response |
     - [x] Show Tag
     - [x] Show is shared
     - [x] Create Share
+- [ ] Tags page
+    - [x] Design
+    - [ ] Functionalities
 - [ ] Tag page
     - [ ] Design
     - [ ] Functionalities
@@ -45,7 +48,6 @@ URL                   | Method  | Content Type        | Body        | Response |
     - [x] Design
     - [ ] Functionalities
 - [ ] Permission (User/Manager)
-    - [ ] Design
     - [ ] Functionalities
 - [ ] Admin
     - [ ] Design

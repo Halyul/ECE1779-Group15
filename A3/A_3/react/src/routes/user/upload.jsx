@@ -3,22 +3,17 @@ import {
   useEffect
 } from "react";
 import {
-  Form,
   useActionData,
   Link,
-  useSearchParams
+  useLocation,
 } from "react-router-dom";
 import {
   Grid,
   TextField,
   Button,
-  Card,
-  CardHeader,
-  CardContent,
-  CardActions,
-  CardMedia,
 } from "@mui/material";
 import { upload } from "@/libs/api";
+import { FormCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
 import { TooltipOnError } from "@/components/tooltip";
 
@@ -34,10 +29,11 @@ export async function action({ request, params }) {
 
 export default function Upload() {
   const actionResponse = useActionData();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const [isReupload, setIsReupload] = useState(location.state?.image ? true : false);
   const [filename, setFilename] = useState("Select a file");
-  const [image, setImage] = useState(null);
-  const [keyValue, setKeyValue] = useState(searchParams.get("key") || "");
+  const [image, setImage] = useState(location.state?.image.content);
+  const [keyValue, setKeyValue] = useState(location.state?.image.key || "");
   const [submitted, setSubmitted] = useState(false);
   const [keyError, setKeyError] = useState(false);
   const [fileError, setFileError] = useState(false);
@@ -53,84 +49,82 @@ export default function Upload() {
 
   return (
     <>
-      <Card>
-        {image && (
-          <CardMedia component="img" image={image} />
-        )}
-        <CardHeader title="Upload" />
-        <Form
-          method="POST"
-          id="upload-form"
-          encType="multipart/form-data"
-          onSubmit={(e) => {
-            setSubmitted(true);
-          }}
-        >
-          <CardContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12} key="key">
-                <TooltipOnError
-                  open={keyError}
-                  handleClose={() => setKeyError(false)}
-                  title="Please enter a key, spaces are NOT allowed. More than 48 characters are NOT allowed."
-                  body={
-                    <TextField
-                      id="upload-form-key"
-                      name="key"
-                      label="Enter a key"
-                      variant="outlined"
-                      fullWidth
-                      error={keyError}
-                      value={keyValue}
+      <FormCard
+        image={image}
+        id="upload"
+        method="POST"
+        encType="multipart/form-data"
+        onSubmit={(e) => {
+          setSubmitted(true);
+        }}
+        title={isReupload ? "Reupload an Image" : "Upload an Image"}
+        content={
+          <Grid container spacing={2}>
+            <Grid item xs={12} key="key">
+              <TooltipOnError
+                open={keyError}
+                handleClose={() => setKeyError(false)}
+                title="Please enter a key, spaces are NOT allowed. More than 48 characters are NOT allowed."
+                body={
+                  <TextField
+                    id="upload-form-key"
+                    name="key"
+                    label="Enter a key"
+                    variant="outlined"
+                    fullWidth
+                    error={keyError}
+                    value={keyValue}
+                    disabled={isReupload}
+                    onChange={(e) => {
+                      if (e.target.value.includes(" ") || e.target.value.length > 48) {
+                        setKeyError(true);
+                      } else {
+                        setKeyValue(e.target.value);
+                        setKeyError(false);
+                      }
+                    }}
+                  />
+                }
+              />
+            </Grid>
+            <Grid item xs={12} key="file">
+              <TooltipOnError
+                open={fileError}
+                handleClose={() => setFileError(false)}
+                title="Please select a file"
+                body={
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    fullWidth
+                    color={fileError ? "error" : "primary"}
+                  >
+                    {filename}
+                    <input
+                      hidden
+                      accept="image/*"
+                      type="file"
+                      name="file"
                       onChange={(e) => {
-                        if (e.target.value.includes(" ") || e.target.value.length > 48) {
-                          setKeyError(true);
+                        if (e.target.files.length > 0) {
+                          setFilename(`Selected: ${e.target.files[0].name}`);
+                          setImage(URL.createObjectURL(e.target.files[0]));
+                          setFileError(false);
                         } else {
-                          setKeyValue(e.target.value);
-                          setKeyError(false);
+                          setFilename("Select a file");
+                          setImage(null);
+                          setFileError(true);
                         }
                       }}
                     />
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} key="file">
-                <TooltipOnError
-                  open={fileError}
-                  handleClose={() => setFileError(false)}
-                  title="Please select a file"
-                  body={
-                    <Button
-                      variant="outlined"
-                      component="label"
-                      fullWidth
-                      color={fileError ? "error" : "primary"}
-                    >
-                      {filename}
-                      <input
-                        hidden
-                        accept="image/*"
-                        type="file"
-                        name="file"
-                        onChange={(e) => {
-                          if (e.target.files.length > 0) {
-                            setFilename(`Selected: ${e.target.files[0].name}`);
-                            setImage(URL.createObjectURL(e.target.files[0]));
-                            setFileError(false);
-                          } else {
-                            setFilename("Select a file");
-                            setImage(null);
-                            setFileError(true);
-                          }
-                        }}
-                      />
-                    </Button>
-                  }
-                />
-              </Grid>
+                  </Button>
+                }
+              />
             </Grid>
-          </CardContent>
-          <CardActions>
+          </Grid>
+        }
+        actions={
+          <>
             <Button
               size="small"
               type="submit"
@@ -147,9 +141,9 @@ export default function Upload() {
             >
               Submit
             </Button>
-            {navigateToUploaded && (
+            {navigateToUploaded ? (
               <Link
-                to={`../image/${keyValue}`}
+                to={`/image/${keyValue}`}
                 style={{
                   marginLeft: "auto",
                 }}
@@ -160,10 +154,28 @@ export default function Upload() {
                   Take a look
                 </Button>
               </Link>
+            ) : (
+              <Button
+                size="small"
+                onClick={() => {
+                  setImage(null)
+                  setFilename("Select a file")
+                  setKeyValue("")
+                  setIsReupload(false)
+                }}
+                style={{
+                  marginLeft: "auto",
+                }}
+              >
+                Reset
+              </Button>
             )}
-          </CardActions>
-        </Form>
-      </Card>
+          </>
+
+        }
+      >
+
+      </FormCard>
       <SubmissionPrompt
         failed={{
           title: "Failed to upload the image",
