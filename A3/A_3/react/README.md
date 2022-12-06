@@ -41,14 +41,15 @@ URL                   | Method  | Content Type        | Body        | Response |
     - [x] Design
     - [ ] Functionalities
 - [ ] Tag page
-    - [ ] Design
+    - [x] Design
     - [ ] Functionalities
 - [ ] Share Page
     - [x] Number of access
     - [x] Design
     - [ ] Functionalities
+- [ ] Merge share and tags page into photos and use data-table
 - [ ] Permission (User/Manager)
-    - [ ] Functionalities
+    - [x] Functionalities
 - [ ] Admin
     - [ ] Design
     - [ ] Functionalities

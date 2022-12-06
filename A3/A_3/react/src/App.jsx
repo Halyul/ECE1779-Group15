@@ -7,6 +7,7 @@ import {
   Route
 } from "react-router-dom";
 import { StyledEngineProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import Root from "@/routes/root";
 import ErrorPage from "@/routes/error-page";
 import Login, {
@@ -19,7 +20,7 @@ import Register, {
 } from "@/routes/register";
 import Index, {
   IndexRoute
-} from "@/routes/user/index";
+} from "@/routes/index";
 import Upload, {
   UploadRoute,
   action as uploadAction,
@@ -45,11 +46,18 @@ import Tag, {
   TagRoute,
   loader as tagLoader,
 } from "@/routes/user/tag";
+import Stats, {
+  StatsRoute,
+  loader as statsLoader,
+} from "@/routes/admin/stats";
+import Images, {
+  ImagesRoute,
+  loader as imagesLoader,
+} from "@/routes/admin/images";
 import Protected from '@/components/protected';
 import store, { persistor } from '@/libs/store';
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import 'reset-css';
 import '@/App.css';
 import Config from "../config";
 
@@ -60,19 +68,25 @@ const router = createBrowserRouter(
       element={
         <Root
           title={Config.appName}
-          destinations={[
-            IndexRoute,
-            UploadRoute,
-            PhotosRoute,
-            ShareRoute,
-            TagsRoute,
-          ]}
+          destinations={{
+            all: [IndexRoute,],
+            user: [
+              UploadRoute,
+              PhotosRoute,
+              ShareRoute,
+              TagsRoute,
+            ],
+            admin: [
+              StatsRoute,
+              ImagesRoute,
+            ]
+          }}
         />
       }
       errorElement={<ErrorPage />}
     >
       <Route errorElement={<ErrorPage />}>
-      <Route
+        <Route
           path={PublicRoute.path}
           element={
             <Image
@@ -81,7 +95,7 @@ const router = createBrowserRouter(
           }
           loader={imageLoader}
         />
-      <Route
+        <Route
           path={LoginRoute.path}
           element={<Login />}
           action={loginAction}
@@ -116,7 +130,7 @@ const router = createBrowserRouter(
             <Protected
               permission="user"
             >
-              <Image 
+              <Image
                 route={ImageRoute.path}
               />
             </Protected>
@@ -167,6 +181,28 @@ const router = createBrowserRouter(
           }
           loader={tagLoader}
         />
+        <Route
+          path={StatsRoute.path}
+          element={
+            <Protected
+              permission="admin"
+            >
+              <Stats />
+            </Protected>
+          }
+          loader={statsLoader}
+        />
+        <Route
+          path={ImagesRoute.path}
+          element={
+            <Protected
+              permission="admin"
+            >
+              <Images />
+            </Protected>
+          }
+          loader={imagesLoader}
+        />
       </Route>
     </Route>
   )
@@ -174,10 +210,11 @@ const router = createBrowserRouter(
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <CssBaseline />
     <StyledEngineProvider injectFirst>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-            <RouterProvider router={router} />
+          <RouterProvider router={router} />
         </PersistGate>
       </Provider>
     </StyledEngineProvider>

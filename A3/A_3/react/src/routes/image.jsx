@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   useLoaderData,
-  useSubmit,
   Link as RouterLink,
   useNavigate,
 } from "react-router-dom";
@@ -12,7 +11,7 @@ import {
   ListItemIcon,
   Divider,
   Box,
-  Link,
+  Snackbar,
   Chip
 } from "@mui/material";
 import ShareIcon from '@mui/icons-material/Share';
@@ -21,7 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import { Tooltip } from "@/components/tooltip";
 import { retrieveImage } from "@/libs/api";
-import { FormCard } from "@/components/card";
+import { BasicCard } from "@/components/card";
 
 export async function loader({ params }) {
   // const response = await retrieveImage(params.key, params.shareKey);
@@ -41,7 +40,6 @@ export async function loader({ params }) {
   //     key: params.key,
   //   }
   // };
-  console.log("loaded")
   return {
     status: 200,
     image: {
@@ -56,10 +54,12 @@ export async function loader({ params }) {
 export default function Image({ route }) {
   const loaderResponse = useLoaderData();
   const navigate = useNavigate();
-  const submit = useSubmit();
 
   const [shareMenuAnchorEl, setShareMenuAnchor] = useState(null);
   const shareMenuOpen = Boolean(shareMenuAnchorEl);
+
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const [keyError, setKeyError] = useState(false);
   const [keyValue, setKeyValue] = useState("");
@@ -84,10 +84,8 @@ export default function Image({ route }) {
 
   return (
     <>
-      <FormCard
+      <BasicCard
         image={image.content}
-        id="image"
-        method="POST"
         title={(error && `${error?.status} ${error.details?.statusText}`) || `Key: ${image.key}`}
         subheader={
           error ? (error.details?.message): (
@@ -139,7 +137,12 @@ export default function Image({ route }) {
                 >
                   {image.shard_link && (
                     <Box>
-                      <MenuItem onClick={handleShareMenuClose}>
+                      <MenuItem onClick={() => {
+                        navigator.clipboard.writeText(image.shard_link);
+                        setSnackbarOpen(true);
+                        setSnackbarMessage("Link Copied to clipboard");
+                        handleShareMenuClose()
+                      }}>
                         <ListItemIcon>
                           <ContentCopyIcon fontSize="small" />
                         </ListItemIcon>
@@ -148,7 +151,6 @@ export default function Image({ route }) {
                       <MenuItem
                         onClick={() => {
                           handleShareMenuClose();
-                          submit(null);
                         }}
                       >
                         <ListItemIcon>
@@ -205,6 +207,12 @@ export default function Image({ route }) {
             </>
           )
         }
+      />
+      <Snackbar
+        open={snackbarOpen}
+        message={snackbarMessage}
+        autoHideDuration={6000}
+        onClose={() => {setSnackbarOpen(false)}}
       />
     </>
   );

@@ -106,8 +106,8 @@ export default function Photos() {
                   key={key.key}
                   style={{ cursor: "pointer" }}
                   onClick={() => {
-                      navigate(`/image/${key.key}`);
-                    }}
+                    navigate(`/image/${key.key}`);
+                  }}
                 >
                   <img
                     src={key.thumbnail}
@@ -120,10 +120,11 @@ export default function Photos() {
                     actionIcon={
                       key.isShared && (
                         <Tooltip title="Shared">
-                        <IconButton
-                          sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                        >
-                          <ShareIcon />
+                          <IconButton
+                            disableRipple
+                            sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                          >
+                            <ShareIcon />
                           </IconButton>
                         </Tooltip>
                       )}

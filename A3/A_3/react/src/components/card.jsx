@@ -36,6 +36,7 @@ export function BasicCard(props) {
   if (props.actions) {
     body.push(
       <CardActions
+        disableSpacing
         key="actions"
       >
         {props.actions}

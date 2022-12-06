@@ -32,7 +32,7 @@ export default function Upload() {
   const location = useLocation();
   const [isReupload, setIsReupload] = useState(location.state?.image ? true : false);
   const [filename, setFilename] = useState("Select a file");
-  const [image, setImage] = useState(location.state?.image.content);
+  const [image, setImage] = useState(location.state?.image.content || null);
   const [keyValue, setKeyValue] = useState(location.state?.image.key || "");
   const [submitted, setSubmitted] = useState(false);
   const [keyError, setKeyError] = useState(false);
@@ -156,7 +156,8 @@ export default function Upload() {
               </Link>
             ) : (
               <Button
-                size="small"
+                  size="small"
+                  disabled={image === null && keyValue === ""}
                 onClick={() => {
                   setImage(null)
                   setFilename("Select a file")

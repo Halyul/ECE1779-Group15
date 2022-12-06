@@ -12,8 +12,7 @@ import { BasicCard } from "@/components/card";
 export default function ErrorPage() {
   const error = useRouteError();
   const navigate = useNavigate();
-  console.error(error);
-
+  console.log(error)
   return (
     <Container
       sx={{

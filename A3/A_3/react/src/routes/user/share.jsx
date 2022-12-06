@@ -1,10 +1,8 @@
 import {
   useState,
-  useEffect,
 } from "react";
 import {
   useLoaderData,
-  redirect,
   Link,
 } from "react-router-dom";
 import {
@@ -103,8 +101,6 @@ export default function Share() {
                           </IconButton>
                         }
                       />
-
-
                     </>
                   }
                   disablePadding

@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import {
   useLoaderData,
   Link,
-  useNavigate,
 } from "react-router-dom";
-import WordCloud from 'react-d3-cloud';
 import {
   IconButton,
   Typography,
@@ -12,6 +10,8 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
+  ListItemAvatar,
+  Avatar,
   Chip
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -21,9 +21,10 @@ import SubmissionPrompt from "@/components/submission-prompt";
 
 export async function loader({ params }) {
   return {
+    tag: params.tag,
     status: 200,
     data: {
-      keys: [
+      images: [
         {
           key: "ajksdfghbuiagda", // the image key
           thumbnail: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
@@ -34,23 +35,17 @@ export async function loader({ params }) {
   };
 }
 
-export async function action({ params }) {
-  return
-}
-
-
 export default function Tag() {
-  const navigate = useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const loaderResponse = useLoaderData();
-  const [tags, setTags] = useState(loaderResponse.data?.tags);
+  const tag = loaderResponse.tag;
+  const [images, setImages] = useState(loaderResponse.data?.images);
 
   return (
     <>
       <BasicCard
-        title="Tags"
+        title={`Tag: ${tag}`}
         header_action={
-
           <Tooltip
             title="Refresh"
             body={
@@ -62,7 +57,7 @@ export default function Tag() {
                     params: {}
                   }).then((response) => {
                     setIsRefreshing(false);
-                    setTags(response.data?.tags);
+                    setImages(response.data?.images);
                   })
                 }}
               >
@@ -71,43 +66,25 @@ export default function Tag() {
             }
           />
         }
-        media={
-          <WordCloud
-            data={tags}
-            font="sans-serif"
-            width={640}
-            height={360}
-            fontSize={(word) => Math.sqrt(word.value * 500)}
-            spiral="archimedean"
-            onWordClick={(event, d) => {
-              navigate(`/tag/${d.text}`);
-            }}
-          />
-        }
         content={
-          tags && tags.length > 0 ? (
+          images && images.length > 0 ? (
             <List>
-              {tags.map((tag) => (
+              {images.map((image) => (
                 <ListItem
-                  key={tag.text}
-                  secondaryAction={
-                    <Tooltip
-                      title="Count"
-                      body={
-                        <Chip
-                          label={tag.value}
-                          size="small"
-                        />
-                      }
-                    />
-                  }
+                  key={image.key}
                   disablePadding
                 >
-                  <Link to={`/tag/${tag.text}`} style={{ width: "100%" }}>
-                    <ListItemButton>
+                  <Link to={`/image/${image.key}`} style={{ width: "100%" }}>
+                  <ListItemButton>
+                      <ListItemAvatar>
+                        <Avatar
+                          src={image.thumbnail}
+                          variant="square"
+                        />
+                      </ListItemAvatar>
                       <ListItemText
-                        id={tag.text}
-                        primary={tag.text}
+                        id={image.key}
+                        primary={image.key}
                       />
                     </ListItemButton>
                   </Link>
@@ -117,14 +94,14 @@ export default function Tag() {
             </List>
           ) : (
             <Typography variant="body1">
-              No tags found.
+              No images found.
             </Typography>
           )
         }
       />
       <SubmissionPrompt
         failed={{
-          title: "Failed to retrieve keys",
+          title: "Failed to retrieve images",
           text: loaderResponse?.statusText,
         }}
         submitting={{
@@ -132,7 +109,7 @@ export default function Tag() {
           open: isRefreshing,
           setOpen: setIsRefreshing,
         }}
-        submittedText="Key retrieved successfully"
+        submittedText="Images retrieved successfully"
         submissionStatus={loaderResponse}
       />
     </>
