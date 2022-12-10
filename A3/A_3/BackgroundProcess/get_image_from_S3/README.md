@@ -41,7 +41,7 @@
           8. type in 'key', then click the little tick, choose 'Required' for it
     8. goto 'Settings' on the left menu
           1. in the button, click 'Add Binary Media Type'
-          2. type in '*/*', then click 'Save Changes'
+          2. type in `*/*`, then click 'Save Changes'
     9. goto 'Resources' on the left menu, click 'Actions' again, choose 'Deploy API'
           1. choose '[New Stage]' for Deployment stage, use anything for the Stage name (I used 'dev')
           2. click Deploy
