@@ -58,5 +58,4 @@ URL                   | Method  | Content Type        | Body        | Response |
 - [ ] Public page to access shared photo
     - [x] Design
     - [ ] Functionalities
-
-# AWS Cognito
+- [ ] Cognito README

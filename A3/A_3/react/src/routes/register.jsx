@@ -14,12 +14,19 @@ import {
 } from "@mui/material";
 import { useSelector, useDispatch } from 'react-redux'
 import { TooltipOnError } from "@/components/tooltip";
-import { FormCard } from "@/components/card";
+import { BasicCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
+import {
+  signUp,
+  confirmSignUp,
+  resendConfirmationCode,
+} from "@/libs/auth";
 
 export async function action({ request, params }) {
-  console.log(123)
-  return redirect("/login?register=true");
+  const formData = await request.formData();
+  const updates = Object.fromEntries(formData);
+  await signUp(updates.username, updates.password, updates.email);
+  // return redirect("/login?register=true");
 }
 
 export default function Register() {
@@ -37,6 +44,9 @@ export default function Register() {
   const [passwordError, setPasswordError] = useState(false);
   const [password2, setPassword2] = useState("");
   const [password2Error, setPassword2Error] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(true);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationCodeError, setVerificationCodeError] = useState(false);
 
   if (token) {
     return <Navigate to={from} replace />
@@ -44,7 +54,7 @@ export default function Register() {
 
   return (
     <>
-      <FormCard
+      <BasicCard
         id="register"
         method="POST"
         title="Register an Account"
@@ -149,22 +159,69 @@ export default function Register() {
                 }
               />
             </Grid>
+            {showConfirmation && (
+              <>
+                <Grid item xs={10}>
+                  <TooltipOnError
+                    open={verificationCodeError}
+                    handleClose={() => setVerificationCodeError(false)}
+                    title="Maximum length is 6 and only numbers are allowed."
+                    body={
+                      <TextField
+                        id="verification_code"
+                        name="verification_code"
+                        label="Verification Code"
+                        variant="outlined"
+                        value={verificationCode}
+                        fullWidth
+                        onChange={(e) => {
+                          try {
+                            const value = parseInt(e.target.value);
+                            setVerificationCode(value < 0 ? "" : (
+                              isNaN(value) ? "" : (value >= Math.pow(10, 6) ? verificationCode : value)
+                            ));
+                            if (value >= 0 && value <= Math.pow(10, 6)) {
+                              setVerificationCodeError(false);
+                            } else {
+                              setVerificationCodeError(true);
+                            }
+                          } catch {
+                            setVerificationCode(0);
+                            setVerificationCodeError(true);
+                          }
+                        }}
+                        error={verificationCodeError}
+                      />
+                    }
+                  />
+                </Grid>
+                <Grid item xs={2} sx={{ display: "flex" }}>
+                  <Button
+
+                  >
+                    Resend
+                  </Button>
+                </Grid>
+              </>
+            )}
           </Grid>
         }
         actions={
           <>
-            <Button
-              size="small"
-              type="submit"
-              onClick={(e) => {
-                // dispatch(login({
-                //   username: username,
-                //   password: password,
-                // }))
-              }}
-            >
-              Register
-            </Button>
+            {showConfirmation ? (
+              <Button
+                size="small"
+                onClick={() => confirmSignUp("test", "862744")}
+              >
+                Confirm
+              </Button>
+            ) : (
+              <Button
+                size="small"
+              >
+                Register
+              </Button>
+            )}
             <Button
               size="small"
               sx={{ marginLeft: "auto" }}
