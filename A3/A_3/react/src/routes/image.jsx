@@ -40,15 +40,26 @@ export async function loader({ params }) {
   //     key: params.key,
   //   }
   // };
-  return {
-    status: 200,
-    image: {
-      content: "https://gura.ch/images/0.jpg",
-      key: "gura",
-      tag: "test",
-      shard_link: "123"
+  return [
+    {
+      status: 200,
+      image: {
+        content: "https://gura.ch/images/0.jpg",
+        key: "gura",
+        tag: "nan",
+        shard_link: "123"
+      }
+    },
+    {
+      status: 200,
+      image: {
+        content: "https://gura.ch/images/404.jpg",
+        key: "gura",
+        tag: "test",
+        shard_link: null
+      }
     }
-  };
+  ][Math.floor(Math.random() * 2)];
 }
 
 export default function Image({ route }) {
@@ -88,20 +99,22 @@ export default function Image({ route }) {
         image={image.content}
         title={(error && `${error?.status} ${error.details?.statusText}`) || `Key: ${image.key}`}
         subheader={
-          error ? (error.details?.message): (
+          error ? (error.details?.message) : (
             image.tag ? (
               <Tooltip
-            title="Tag"
-            body={
-              <Chip
-                onClick={() => { navigate(`/tag/${image.tag}`) }}
-                label={image.tag}
-                sx={{ mt: 1 }}
-              >
-
-              </Chip>
-            }
-          />
+                title="Tag"
+                body={
+                  <RouterLink
+                    to={`/photos`}
+                    state={{ tag: image.tag }}
+                  >
+                    <Chip
+                      label={image.tag}
+                      sx={{ mt: 1 }}
+                    />
+                  </RouterLink>
+                }
+              />
             ) : ("")
           )
         }
@@ -212,7 +225,7 @@ export default function Image({ route }) {
         open={snackbarOpen}
         message={snackbarMessage}
         autoHideDuration={6000}
-        onClose={() => {setSnackbarOpen(false)}}
+        onClose={() => { setSnackbarOpen(false) }}
       />
     </>
   );

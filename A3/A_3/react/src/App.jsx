@@ -34,18 +34,6 @@ import Photos, {
   PhotosRoute,
   loader as photosLoader,
 } from "@/routes/user/photos";
-import Share, {
-  ShareRoute,
-  loader as shareLoader,
-} from "@/routes/user/share";
-import Tags, {
-  TagsRoute,
-  loader as tagsLoader,
-} from "@/routes/user/tags";
-import Tag, {
-  TagRoute,
-  loader as tagLoader,
-} from "@/routes/user/tag";
 import Stats, {
   StatsRoute,
   loader as statsLoader,
@@ -73,8 +61,6 @@ const router = createBrowserRouter(
             user: [
               UploadRoute,
               PhotosRoute,
-              ShareRoute,
-              TagsRoute,
             ],
             admin: [
               StatsRoute,
@@ -147,39 +133,6 @@ const router = createBrowserRouter(
             </Protected>
           }
           loader={photosLoader}
-        />
-        <Route
-          path={ShareRoute.path}
-          element={
-            <Protected
-              permission="user"
-            >
-              <Share />
-            </Protected>
-          }
-          loader={shareLoader}
-        />
-        <Route
-          path={TagsRoute.path}
-          element={
-            <Protected
-              permission="user"
-            >
-              <Tags />
-            </Protected>
-          }
-          loader={tagsLoader}
-        />
-        <Route
-          path={TagRoute.path}
-          element={
-            <Protected
-              permission="user"
-            >
-              <Tag />
-            </Protected>
-          }
-          loader={tagLoader}
         />
         <Route
           path={StatsRoute.path}

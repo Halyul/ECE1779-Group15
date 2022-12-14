@@ -6,6 +6,7 @@ import {
   useLoaderData,
 } from "react-router-dom";
 import {
+  CardMedia,
   Button,
   IconButton,
   Radio,
@@ -70,7 +71,7 @@ export default function Images() {
           <Radio checked={selectionModel[0] === params.id} value={params.id} />
         )
       },
-      { field: "user", headerName: "User", flex: 1, },
+      { field: "user", headerName: "User", flex: 0.5, },
       { field: "key", headerName: "Key", flex: 1, },
       { field: "tag", headerName: "Tag", flex: 0.5, },
       { field: "is_shared", headerName: "Shared", type: "boolean", flex: 0.25, },
@@ -106,50 +107,48 @@ export default function Images() {
         onSelectionModelChange={(newSelectionModel) => {
           setSelectionModel(newSelectionModel);
         }}
-        children={
-          <BasicCard
-            image={selectedImage.src}
-            actions={
-              <>
+        content={
+          <>
+            <CardMedia component="img"
+              image={selectedImage.src}
+              sx={{ marginTop: "8px" }}
+            />
+            <TableContainer>
+              <Table>
+                <TableBody>
+                  {selectedImage.mapping.map((row) => (
+                    <TableRow
+                      key={row.name}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.name}
+                      </TableCell>
+                      <TableCell align="right">{(row.value).toString()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
+        }
+        actions={
+          <>
+            <Button
+              color="error"
+            >
+              Delete Image
+            </Button>
+            {
+              selectedImage.image.is_shared && (
                 <Button
                   color="error"
                 >
-                  Delete Image
+                  Delete Share
                 </Button>
-                {
-                  selectedImage.image.is_shared && (
-                    <Button
-                      color="error"
-                    >
-                      Delete Share
-                    </Button>
-                  )
-                }
-              </>
+              )
             }
-            content={
-              <TableContainer>
-                <Table>
-                  <TableBody>
-                    {selectedImage.mapping.map((row) => (
-                      <TableRow
-                        key={row.name}
-                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                      >
-                        <TableCell component="th" scope="row">
-                          {row.name}
-                        </TableCell>
-                        <TableCell align="right">{(row.value).toString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            }
-            sx={{
-              maxWidth: "unset",
-            }}
-          />
+          </>
         }
       />
       <SubmissionPrompt
