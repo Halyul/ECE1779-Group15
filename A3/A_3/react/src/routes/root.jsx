@@ -56,6 +56,12 @@ export default function Root(props) {
   const [adminMenuAnchorEl, setAdminMenuAnchor] = useState(null);
   const adminMenuOpen = Boolean(adminMenuAnchorEl);
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+  const [mainCSS, setMainCSS] = useState({
+    height: "inherit",
+    width: "90vw",
+    margin: "0 auto",
+  })
+
 
   const theme = useMemo(
     () =>
@@ -267,15 +273,10 @@ export default function Root(props) {
         )}
         <Box
           component="main"
-          sx={{
-            height: "inherit",
-            width: "90vw",
-            maxWidth: "768px !important",
-            margin: "0 auto",
-          }}
+          sx={mainCSS}
         >
           <Toolbar sx={{ marginBottom: "16px" }} />
-          <Outlet />
+          <Outlet context={[mainCSS, setMainCSS]} />
         </Box>
         <SpeedDial
           ariaLabel="SpeedDial playground example"

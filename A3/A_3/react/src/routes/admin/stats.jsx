@@ -67,6 +67,7 @@ export default function Stats() {
             <Box sx={{ height: "61.8vh", maxHeight: 768 }}>
               <DataGrid
                 getRowId={(r) => r.name}
+                loading={isRefreshing}
                 rows={statsList}
                 columns={columns}
                 disableSelectionOnClick />

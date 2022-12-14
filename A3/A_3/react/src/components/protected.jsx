@@ -8,7 +8,7 @@ export default function Protected({ permission, destination, children }) {
   const token = useSelector((state) => state.user.token)
   const role = useSelector((state) => state.user.role)
   const location = useLocation();
-  console.log(permission)
+
   if (!token) {
     return <Navigate to={destination || "/"} state={{ from: location }} replace />;
   }

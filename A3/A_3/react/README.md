@@ -19,9 +19,6 @@ URL                   | Method  | Content Type        | Body        | Response |
 /api/images           | GET     |                     |             |          |
 /api/images           | DELETE  |                     |             |          |
 /api/stats            | GET     |                     |             |          |
-/api/users            | GET     |                     |             |          |
-/api/users            | POST    |                     |             |          |
-/api/users            | DELETE  |                     |             |          |
 /api/public           | GET     |                     |             |          |
 
 ## TODO
@@ -51,16 +48,15 @@ URL                   | Method  | Content Type        | Body        | Response |
 - [ ] Permission (User/Manager)
     - [x] Functionalities
 - [ ] Admin
-    - [ ] Design
+    - [x] Design
     - [ ] Functionalities
-    - [ ] Stats
+    - [x] Stats
     - [ ] All images
-        - [ ] Delete image
-        - [ ] Delete share
-    - [ ] All users
-        - [ ] Assign roles
-        - [ ] Create/Delete
-    - [ ] To modify user info? PUT /api/users
+        - [x] Delete image
+        - [x] Delete share
+        - [ ] Functionalities
 - [ ] Public page to access shared photo
     - [x] Design
     - [ ] Functionalities
+
+# AWS Cognito

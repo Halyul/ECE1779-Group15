@@ -45,7 +45,7 @@ export function BasicCard(props) {
   }
 
   return (
-    <Card sx={{ marginBottom: "1rem", ...props.sx }}>
+    <Card sx={{ margin: "1rem auto", maxWidth: "768px", ...props.sx }}>
       {props.image && (
         <CardMedia component="img" image={props.image} />
       )}

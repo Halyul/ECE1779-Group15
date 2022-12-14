@@ -16,6 +16,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import { retrieveKeys } from "@/libs/api";
 import { BasicCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
+import DataTable from "@/components/data-table";
 
 export async function loader({ params }) {
   const response = await retrieveKeys();
