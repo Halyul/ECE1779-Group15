@@ -47,7 +47,6 @@ import store, { persistor } from '@/libs/store';
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import '@/App.css';
-import Config from "../config";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -55,7 +54,7 @@ const router = createBrowserRouter(
       path="/"
       element={
         <Root
-          title={Config.appName}
+          title={import.meta.env.VITE_APP_NAME}
           destinations={{
             all: [IndexRoute,],
             user: [
