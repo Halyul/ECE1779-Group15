@@ -10,6 +10,7 @@ import {
   Grid,
   Snackbar,
 } from "@mui/material";
+import LoadingButton from '@mui/lab/LoadingButton';
 import { useSelector, useDispatch } from 'react-redux'
 import { TooltipOnError } from "@/components/tooltip";
 import { BasicCard } from "@/components/card";
@@ -29,6 +30,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [successfulLoggedIn, setSuccessfulLoggedIn] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
   
   if (isLoggedIn) {
     return <Navigate to={from} replace />
@@ -95,13 +97,16 @@ export default function Login() {
         }
         actions={
           <>
-            <Button
+            <LoadingButton
               size="small"
+              loading={loginLoading}
               onClick={(e) => {
+                setLoginLoading(true)
                 setSnackbarMessage("Validing your credentials...")
                 setSnackbarOpen(true)
                 signIn(username, password).then((response) => {
                   setSnackbarMessage(response.status ? "You are now logged in!" : response.error)
+                  setLoginLoading(false)
                   if (response.status) {
                     dispatch(successfulLogin({
                       username: response.username,
@@ -116,7 +121,7 @@ export default function Login() {
               }}
             >
               Login
-            </Button>
+            </LoadingButton>
             <Button
               size="small"
               sx={{ marginLeft: "auto" }}

@@ -12,6 +12,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import LoadingButton from '@mui/lab/LoadingButton';
 import { upload } from "@/libs/api";
 import { FormCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
@@ -125,9 +126,10 @@ export default function Upload() {
         }
         actions={
           <>
-            <Button
+            <LoadingButton
               size="small"
               type="submit"
+              loading={submitted}
               onClick={(e) => {
                 if (keyValue === "" || keyValue.includes(" ") || keyValue.length > 48) {
                   setKeyError(true);
@@ -140,7 +142,7 @@ export default function Upload() {
               }}
             >
               Submit
-            </Button>
+            </LoadingButton>
             {navigateToUploaded ? (
               <Link
                 to={`/image/${keyValue}`}

@@ -10,7 +10,8 @@ import {
   Grid,
   Snackbar,
 } from "@mui/material";
-import { useSelector, useDispatch } from 'react-redux'
+import LoadingButton from '@mui/lab/LoadingButton';
+import { useSelector } from 'react-redux'
 import { TooltipOnError } from "@/components/tooltip";
 import { BasicCard } from "@/components/card";
 import {
@@ -39,6 +40,10 @@ export default function Register() {
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationCodeError, setVerificationCodeError] = useState(false);
   const [registered, setRegistered] = useState(false);
+
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   if (isLoggedIn) {
     return <Navigate to={from} replace />
@@ -192,16 +197,19 @@ export default function Register() {
                   />
                 </Grid>
                 <Grid item xs={2} sx={{ display: "flex" }}>
-                  <Button
+                  <LoadingButton
+                    loading={resendLoading}
                     onClick={() => {
+                      setResendLoading(true);
                       resendConfirmationCode(username).then((response) => {
                         setSnackbarMessage(response.status ? "Verification code sent!" : response.error);
                         setSnackbarOpen(true);
+                        setResendLoading(false);
                       })
                     }}
                   >
                     Resend
-                  </Button>
+                  </LoadingButton>
                 </Grid>
               </>
             )}
@@ -210,32 +218,38 @@ export default function Register() {
         actions={
           <>
             {showConfirmation ? (
-              <Button
+              <LoadingButton
                 size="small"
+                loading={confirmLoading}
                 onClick={() => {
+                  setConfirmLoading(true);
                   confirmSignUp(username, verificationCode).then((response) => {
                     setSnackbarMessage(response.status ? "Registered successfully!" : response.error);
                     setSnackbarOpen(true);
                     setRegistered(response.status);
+                    setConfirmLoading(false);
                   })
                 }}
               >
                 Confirm
-              </Button>
+              </LoadingButton>
             ) : (
-              <Button
+              <LoadingButton
                   size="small"
+                  loading={registerLoading}
                   onClick={() => {
+                    setRegisterLoading(true);
                     setSnackbarMessage("Registering...");
                     setSnackbarOpen(true);
                     signUp(username, password, email).then((response) => {
                       setSnackbarMessage(response.status ? "Please check your mailbox for verification code!" : response.error);
                       setShowConfirmation(response.status);
+                      setRegisterLoading(false);
                     })
                   }}
               >
                 Register
-              </Button>
+              </LoadingButton>
             )}
             <Button
               size="small"

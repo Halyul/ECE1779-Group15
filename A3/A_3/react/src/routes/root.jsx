@@ -31,6 +31,7 @@ import {
   SpeedDial,
   SpeedDialAction
 } from "@mui/material";
+import LoadingButton from '@mui/lab/LoadingButton';
 import MenuIcon from "@mui/icons-material/Menu";
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -63,6 +64,7 @@ export default function Root(props) {
     width: "90vw",
     margin: "0 auto",
   })
+  const [logoutLoading, setLogoutLoading] = useState(false)
 
   const theme = useMemo(
     () =>
@@ -101,7 +103,6 @@ export default function Root(props) {
         }}
       >
         <AppBar component="nav" position="fixed">
-
           <Toolbar>
             {isLoggedIn && (
               <IconButton
@@ -191,16 +192,19 @@ export default function Root(props) {
                     </>
                   )}
                 </Box>
-                <Button
+                <LoadingButton
                   color="inherit"
+                  loading={logoutLoading}
                   onClick={() => {
+                    setLogoutLoading(true)
                     signOut().then((resp) => {
                       dispatch(successfulLogout());
+                      setLogoutLoading(false)
                     })
                   }}
                 >
                   Logout
-                </Button>
+                </LoadingButton>
               </>
             )}
           </Toolbar>

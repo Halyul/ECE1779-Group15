@@ -14,6 +14,7 @@ import {
   Snackbar,
   Chip
 } from "@mui/material";
+import LoadingButton from '@mui/lab/LoadingButton';
 import ShareIcon from '@mui/icons-material/Share';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -52,6 +53,8 @@ export default function Image({ route }) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const [image, setImage] = useState(loaderResponse.data?.image);
+  const [deleteImageLoading, setDeleteImageLoading] = useState(false);
+  const [createShareLoading, setCreateShareLoading] = useState(false);
 
   let error = null;
 
@@ -195,32 +198,36 @@ export default function Image({ route }) {
                 </Menu>
               </>
             ) : (
-              <Button
-                  startIcon={<ShareIcon />}
-                  size="small"
-                  onClick={() => {
-                    createShare(image.key).then((response) => {
-                      if (response.status === 200) {
-                        setImage(response.data.image);
-                        copyToClipboard(response.data.image.share_link);
-                        setSnackbarOpen(true);
-                        setSnackbarMessage("Share link created and the link is copied to clipboard");
-                      }
-                    });
-                  }}
+              <LoadingButton
+                startIcon={<ShareIcon />}
+                size="small"
+                loading={createShareLoading}
+                loadingPosition="start"
+                onClick={() => {
+                  setCreateShareLoading(true);
+                  createShare(image.key).then((response) => {
+                    if (response.status === 200) {
+                      setImage(response.data.image);
+                      copyToClipboard(response.data.image.share_link);
+                      setSnackbarOpen(true);
+                      setSnackbarMessage("Share link created and the link is copied to clipboard");
+                    }
+                    setCreateShareLoading(false);
+                  });
+                }}
               >
                 Create Share
-              </Button>
+              </LoadingButton>
             )
           ) : (
             <Button
-                startIcon={<ShareIcon />}
-                size="small"
-                onClick={() => {
-                  copyToClipboard(image.share_link);
-                  setSnackbarOpen(true);
-                  setSnackbarMessage("Link Copied to clipboard");
-                }}
+              startIcon={<ShareIcon />}
+              size="small"
+              onClick={() => {
+                copyToClipboard(image.share_link);
+                setSnackbarOpen(true);
+                setSnackbarMessage("Link Copied to clipboard");
+              }}
             >
               Copy Link
             </Button>
@@ -235,19 +242,22 @@ export default function Image({ route }) {
               >
                 <Button size="small">Re-upload</Button>
               </RouterLink>
-              <Button
+              <LoadingButton
                 color="error"
                 size="small"
+                loading={deleteImageLoading}
                 onClick={() => {
-                deleteImage(image.key).then((response) => {
-                  if (response.status === 200) {
-                    navigate("/photos", { replace: true });
-                  }
-                });
-              }}
+                  setDeleteImageLoading(true);
+                  deleteImage(image.key).then((response) => {
+                    if (response.status === 200) {
+                      navigate("/photos", { replace: true });
+                    }
+                    setDeleteImageLoading(false);
+                  });
+                }}
               >
                 Delete Image
-              </Button>
+              </LoadingButton>
               <Button
                 size="small"
                 style={{

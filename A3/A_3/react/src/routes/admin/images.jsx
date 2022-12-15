@@ -16,6 +16,7 @@ import {
   TableContainer,
   TableRow,
 } from "@mui/material";
+import LoadingButton from '@mui/lab/LoadingButton';
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   retrieveKeys,
@@ -40,6 +41,9 @@ export default function Images() {
   const [imagesList, setImagesList] = useState(loaderResponse.data.images);
   const [selectionModel, setSelectionModel] = useState([imagesList[0].key]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [deleteImageLoading, setDeleteImageLoading] = useState(false);
+  const [deleteShareLoading, setDeleteShareLoading] = useState(false);
 
   const selectedImage = useMemo(() => {
     const image = imagesList.find((image) => image.key === selectionModel[0]);
@@ -136,36 +140,42 @@ export default function Images() {
         }
         actions={
           <>
-            <Button
+            <LoadingButton
               color="error"
               size="small"
+              loading={deleteImageLoading}
               onClick={() => {
+                setDeleteImageLoading(true);
                 deleteImage(selectedImage.image.key, true).then((response) => {
                   if (response.status === 200) {
                     refreshList()
                   }
+                  setDeleteImageLoading(false);
                 });
               }}
             >
               Delete Image
-            </Button>
+            </LoadingButton>
             {
               selectedImage.image.is_shared && (
-                <Button
+                <LoadingButton
                   color="error"
                   size="small"
+                  loading={deleteShareLoading}
                   onClick={() => {
+                    setDeleteShareLoading(true);
                     deleteImage(selectedImage.image.key, true).then((response) => {
                       if (response.status === 200) {
                         setImagesList(imagesList.map((image) => {
                           image.key === selectedImage.image.key ? response.data.image : image
                         }))
                       }
+                      setDeleteShareLoading(false);
                     });
                   }}
                 >
                   Delete Share
-                </Button>
+                </LoadingButton>
               )
             }
           </>

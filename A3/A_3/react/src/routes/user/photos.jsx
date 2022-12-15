@@ -36,14 +36,15 @@ export default function Photos() {
   const filteredTag = location.state?.tag || null;
   const [keyList, setKeyList] = useState(loaderResponse.data?.images);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectionModel, setSelectionModel] = useState(
-    filteredTag ?
-      keyList.filter((image) => image.tag === filteredTag).map((image) => image.key) :
-      keyList.map((image) => image.key)
-  );
+  const [selectionModel, setSelectionModel] = useState(keyList.map((image) => image.key));
+
   const selectedImages = useMemo(() => {
     return keyList.filter((image) => selectionModel.includes(image.key));
   }, [keyList, selectionModel]);
+
+  if (filteredTag) {
+    setSelectionModel(keyList.filter((image) => image.tag === filteredTag).map((image) => image.key));
+  }
 
   const columns = [
     { field: "key", headerName: "Key", flex: 1, },
@@ -64,8 +65,8 @@ export default function Photos() {
                 params: {}
               }).then((response) => {
                 setIsRefreshing(false);
-                setKeyList(response.data?.keys);
-                setSelectionModel(response.data?.keys.map((image) => { return image.key }));
+                setKeyList(response.data?.images);
+                setSelectionModel(response.data?.images.map((image) => { return image.key }));
               })
             }}
           >
