@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Navigate,
   useLocation,
-  useActionData,
   Link,
   redirect
 } from "react-router-dom";
@@ -11,6 +10,7 @@ import {
   Button,
   TextField,
   Grid,
+  Snackbar,
 } from "@mui/material";
 import { useSelector, useDispatch } from 'react-redux'
 import { TooltipOnError } from "@/components/tooltip";
@@ -22,20 +22,14 @@ import {
   resendConfirmationCode,
 } from "@/libs/auth";
 
-export async function action({ request, params }) {
-  const formData = await request.formData();
-  const updates = Object.fromEntries(formData);
-  await signUp(updates.username, updates.password, updates.email);
-  // return redirect("/login?register=true");
-}
-
 export default function Register() {
-  const actionResponse = useActionData();
   const token = useSelector((state) => state.user.token)
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
 
-  const [submitted, setSubmitted] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [username, setUsername] = useState("");
@@ -44,12 +38,17 @@ export default function Register() {
   const [passwordError, setPasswordError] = useState(false);
   const [password2, setPassword2] = useState("");
   const [password2Error, setPassword2Error] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(true);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationCodeError, setVerificationCodeError] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   if (token) {
     return <Navigate to={from} replace />
+  }
+
+  if (registered) {
+    return <Navigate to="/login" replace state={{ isRegistered: true }} />
   }
 
   return (
@@ -74,6 +73,7 @@ export default function Register() {
                     type="email"
                     value={email}
                     fullWidth
+                    disabled={showConfirmation}
                     onChange={(e) => {
                       let value = e.target.value;
                       setEmailError(value.includes(" "));
@@ -97,6 +97,7 @@ export default function Register() {
                     variant="outlined"
                     value={username}
                     fullWidth
+                    disabled={showConfirmation}
                     onChange={(e) => {
                       let value = e.target.value;
                       setUsernameError(value.includes(" "));
@@ -121,6 +122,7 @@ export default function Register() {
                     value={password}
                     type="password"
                     fullWidth
+                    disabled={showConfirmation}
                     onChange={(e) => {
                       let value = e.target.value;
                       setPasswordError(value.includes(" "));
@@ -147,7 +149,7 @@ export default function Register() {
                     variant="outlined"
                     value={password2}
                     type="password"
-                    disabled={password === "" && password2 === ""}
+                    disabled={(password === "" && password2 === "") || showConfirmation}
                     fullWidth
                     onChange={(e) => {
                       let value = e.target.value;
@@ -197,7 +199,12 @@ export default function Register() {
                 </Grid>
                 <Grid item xs={2} sx={{ display: "flex" }}>
                   <Button
-
+                    onClick={() => {
+                      resendConfirmationCode(username).then((response) => {
+                        setSnackbarMessage(response.status ? "Verification code sent!" : `Failed to send verification code: ${response.error}`);
+                        setSnackbarOpen(true);
+                      })
+                    }}
                   >
                     Resend
                   </Button>
@@ -211,13 +218,27 @@ export default function Register() {
             {showConfirmation ? (
               <Button
                 size="small"
-                onClick={() => confirmSignUp("test", "862744")}
+                onClick={() => {
+                  confirmSignUp(username, verificationCode).then((response) => {
+                    setSnackbarMessage(response.status ? "Registered successfully!" : `Failed to confirm: ${response.error}`);
+                    setSnackbarOpen(true);
+                    setRegistered(response.status);
+                  })
+                }}
               >
                 Confirm
               </Button>
             ) : (
               <Button
-                size="small"
+                  size="small"
+                  onClick={() => {
+                    setSnackbarMessage("Registering...");
+                    setSnackbarOpen(true);
+                    signUp(username, password, email).then((response) => {
+                      setSnackbarMessage(response.status ? "Please check your mailbox for verification code!" : `Failed to register: ${response.error}`);
+                      setShowConfirmation(response.status);
+                    })
+                  }}
               >
                 Register
               </Button>
@@ -235,18 +256,11 @@ export default function Register() {
           margin: "0 auto",
         }}
       />
-      <SubmissionPrompt
-        failed={{
-          title: "Failed to commit changes",
-          text: actionResponse?.statusText,
-        }}
-        submitting={{
-          text: "Commiting changes...",
-          open: submitted,
-          setOpen: setSubmitted,
-        }}
-        submittedText="Changes committed successfully"
-        submissionStatus={actionResponse}
+      <Snackbar
+        open={snackbarOpen}
+        message={snackbarMessage}
+        autoHideDuration={6000}
+        onClose={() => { setSnackbarOpen(false) }}
       />
     </>
   );

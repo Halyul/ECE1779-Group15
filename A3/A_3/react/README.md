@@ -25,6 +25,7 @@ URL                   | Method  | Content Type        | Body        | Response |
 - [ ] Login/Signup
     - [x] Design
     - [ ] Functionalities
+    - [ ] No indication for password policy
 - [ ] Photos page
     - [x] Re-design
     - [ ] Functionalities

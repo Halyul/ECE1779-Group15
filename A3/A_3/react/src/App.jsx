@@ -16,7 +16,6 @@ import Login, {
 } from "@/routes/login";
 import Register, {
   RegisterRoute,
-  action as registerAction,
 } from "@/routes/register";
 import Index, {
   IndexRoute
@@ -88,7 +87,6 @@ const router = createBrowserRouter(
         <Route
           path={RegisterRoute.path}
           element={<Register />}
-          action={registerAction}
         />
         <Route index element={
           <Protected

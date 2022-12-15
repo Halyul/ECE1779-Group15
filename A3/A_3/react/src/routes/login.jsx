@@ -4,7 +4,6 @@ import {
   useLocation,
   useActionData,
   Link,
-  useSearchParams,
 } from "react-router-dom";
 import {
   Button,
@@ -26,10 +25,9 @@ export async function action({ request, params }) {
 export default function Login() {
   const dispatch = useDispatch()
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
   const actionResponse = useActionData();
   const token = useSelector((state) => state.user.token);
-  const [isRegistered, setIsRegistered] = useState(searchParams.get("register") === "true");
+  const [isRegistered, setIsRegistered] = useState(location.state?.isRegistered);
   const from = location.state?.from?.pathname || "/";
 
   const [submitted, setSubmitted] = useState(false);
@@ -39,7 +37,6 @@ export default function Login() {
   const [passwordError, setPasswordError] = useState(false);
 
   const handleSnackbarClose = () => {
-    setSearchParams({}, { replace: true });
     setIsRegistered(false);
   };
   

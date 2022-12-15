@@ -57,26 +57,38 @@ export async function signUp(username, password, email) {
         console.log('error signing up:', error);
         return {
             status: false,
-            error: error.message
+            error: error
         }
     }
 }
 
 export async function confirmSignUp(username, code) {
     try {
-        await Auth.confirmSignUp(username, code);
-        console.log('success');
+        await Auth.confirmSignUp(username, code.toString());
+        return {
+            status: true,
+        }
     } catch (error) {
         console.log('error confirming sign up', error);
+        return {
+            status: false,
+            error: error
+        }
     }
 }
 
 export async function resendConfirmationCode(username) {
     try {
         await Auth.resendSignUp(username);
-        console.log('code resent successfully');
+        return {
+            status: true,
+        }
     } catch (err) {
         console.log('error resending code: ', err);
+        return {
+            status: false,
+            error: err
+        }
     }
 }
 
