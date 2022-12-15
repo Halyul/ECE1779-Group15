@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Navigate,
   useLocation,
-  useActionData,
   Link,
 } from "react-router-dom";
 import {
@@ -13,42 +12,35 @@ import {
 } from "@mui/material";
 import { useSelector, useDispatch } from 'react-redux'
 import { TooltipOnError } from "@/components/tooltip";
-import { FormCard } from "@/components/card";
-import SubmissionPrompt from "@/components/submission-prompt";
-import { login } from '@/reducers/auth'
-
-export async function action({ request, params }) {
-  console.log(123)
-  return redirect("/login?register=true");
-}
+import { BasicCard } from "@/components/card";
+import { successfulLogin } from '@/reducers/auth'
+import { signIn } from '@/libs/auth'
 
 export default function Login() {
   const dispatch = useDispatch()
   const location = useLocation();
-  const actionResponse = useActionData();
-  const token = useSelector((state) => state.user.token);
-  const [isRegistered, setIsRegistered] = useState(location.state?.isRegistered);
+  const isLoggedIn = useSelector((state) => state.user.username);
+  const [snackbarMessage, setSnackbarMessage] = useState("You are now registered! Please login.");
+  const [snackbarOpen, setSnackbarOpen] = useState(location.state?.isRegistered);
   const from = location.state?.from?.pathname || "/";
 
-  const [submitted, setSubmitted] = useState(false);
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
-
-  const handleSnackbarClose = () => {
-    setIsRegistered(false);
-  };
+  const [successfulLoggedIn, setSuccessfulLoggedIn] = useState(false);
   
-  if (token) {
+  if (isLoggedIn) {
     return <Navigate to={from} replace />
+  }
+
+  if (successfulLoggedIn) {
+    return <Navigate to="/" state={{ isLoggedIn: true }} replace />
   }
 
   return (
     <>
-      <FormCard
-        id="login"
-        method="POST"
+      <BasicCard
         title="Login into an Account"
         content={
           <Grid container spacing={2}>
@@ -105,12 +97,22 @@ export default function Login() {
           <>
             <Button
               size="small"
-              type="submit"
               onClick={(e) => {
-                dispatch(login({
-                  username: username,
-                  password: password,
-                }))
+                setSnackbarMessage("Validing your credentials...")
+                setSnackbarOpen(true)
+                signIn(username, password).then((response) => {
+                  setSnackbarMessage(response.status ? "You are now logged in!" : response.error)
+                  if (response.status) {
+                    dispatch(successfulLogin({
+                      username: response.username,
+                      role: response.role,
+                      accessToken: response.accessToken,
+                      idToken: response.idToken,
+                      refreshToken: response.refreshToken,
+                    }))
+                    setSuccessfulLoggedIn(true)
+                  }
+                })
               }}
             >
               Login
@@ -128,23 +130,11 @@ export default function Login() {
           margin: "0 auto",
         }}
       />
-      <SubmissionPrompt
-        failed={{
-          title: "Failed to commit changes",
-          text: actionResponse?.statusText,
-        }}
-        submitting={{
-          text: "Commiting changes...",
-          open: submitted,
-          setOpen: setSubmitted,
-        }}
-        submittedText="Changes committed successfully"
-        submissionStatus={actionResponse}
-      />
       <Snackbar
-        open={isRegistered}
-        message="You are now registered! Please login."
-        onClose={handleSnackbarClose}
+        open={snackbarOpen}
+        message={snackbarMessage}
+        autoHideDuration={6000}
+        onClose={() => { setSnackbarOpen(false) }}
       />
     </>
   );

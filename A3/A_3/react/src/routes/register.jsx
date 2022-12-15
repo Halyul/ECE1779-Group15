@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Navigate,
   useLocation,
   Link,
-  redirect
 } from "react-router-dom";
 import {
-  Box,
   Button,
   TextField,
   Grid,
@@ -15,7 +13,6 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import { TooltipOnError } from "@/components/tooltip";
 import { BasicCard } from "@/components/card";
-import SubmissionPrompt from "@/components/submission-prompt";
 import {
   signUp,
   confirmSignUp,
@@ -23,7 +20,7 @@ import {
 } from "@/libs/auth";
 
 export default function Register() {
-  const token = useSelector((state) => state.user.token)
+  const isLoggedIn = useSelector((state) => state.user.username);
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
 
@@ -43,7 +40,7 @@ export default function Register() {
   const [verificationCodeError, setVerificationCodeError] = useState(false);
   const [registered, setRegistered] = useState(false);
 
-  if (token) {
+  if (isLoggedIn) {
     return <Navigate to={from} replace />
   }
 
@@ -201,7 +198,7 @@ export default function Register() {
                   <Button
                     onClick={() => {
                       resendConfirmationCode(username).then((response) => {
-                        setSnackbarMessage(response.status ? "Verification code sent!" : `Failed to send verification code: ${response.error}`);
+                        setSnackbarMessage(response.status ? "Verification code sent!" : response.error);
                         setSnackbarOpen(true);
                       })
                     }}
@@ -220,7 +217,7 @@ export default function Register() {
                 size="small"
                 onClick={() => {
                   confirmSignUp(username, verificationCode).then((response) => {
-                    setSnackbarMessage(response.status ? "Registered successfully!" : `Failed to confirm: ${response.error}`);
+                    setSnackbarMessage(response.status ? "Registered successfully!" : response.error);
                     setSnackbarOpen(true);
                     setRegistered(response.status);
                   })
@@ -235,7 +232,7 @@ export default function Register() {
                     setSnackbarMessage("Registering...");
                     setSnackbarOpen(true);
                     signUp(username, password, email).then((response) => {
-                      setSnackbarMessage(response.status ? "Please check your mailbox for verification code!" : `Failed to register: ${response.error}`);
+                      setSnackbarMessage(response.status ? "Please check your mailbox for verification code!" : response.error);
                       setShowConfirmation(response.status);
                     })
                   }}

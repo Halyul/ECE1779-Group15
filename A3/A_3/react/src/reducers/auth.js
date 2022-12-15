@@ -3,23 +3,28 @@ import { createSlice } from '@reduxjs/toolkit'
 export const userSlice = createSlice({
     name: "user",
     initialState: {
-        token: null,
+        refreshToken: null,
+        idToken: null,
+        accessToken: null,
         username: null,
         role: null,
     },
     reducers: {
-        login: (state, actions) => {
+        successfulLogin: (state, actions) => {
             // Redux Toolkit allows us to write "mutating" logic in reducers. It
             // doesn't actually mutate the state because it uses the Immer library,
             // which detects changes to a "draft state" and produces a brand new
             // immutable state based off those changes
-            console.log(actions)
-            state.token = 123
-            state.username = "test"
-            state.role = "admin"
+            state.accessToken = actions.payload.accessToken
+            state.idToken = actions.payload.idToken
+            state.refreshToken = actions.payload.refreshToken
+            state.username = actions.payload.username
+            state.role = actions.payload.role
         },
-        logout: (state) => {
-            state.token = null
+        successfulLogout: (state) => {
+            state.accessToken = null
+            state.idToken = null
+            state.refreshToken = null
             state.username = null
             state.role = null
         },
@@ -27,6 +32,6 @@ export const userSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { login, logout } = userSlice.actions
+export const { successfulLogin, successfulLogout } = userSlice.actions
 
 export default userSlice.reducer

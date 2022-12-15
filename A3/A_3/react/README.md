@@ -22,9 +22,9 @@ URL                   | Method  | Content Type        | Body        | Response |
 /api/public           | GET     |                     |             |          |
 
 ## TODO
-- [ ] Login/Signup
+- [x] Login/Signup
     - [x] Design
-    - [ ] Functionalities
+    - [x] Functionalities
     - [ ] No indication for password policy
 - [ ] Photos page
     - [x] Re-design
@@ -45,7 +45,7 @@ URL                   | Method  | Content Type        | Body        | Response |
     - [x] Number of access
     - [x] Design
     - [ ] Functionalities
-- [ ] Merge share and tags page into photos and use data-table
+- [x] Merge share and tags page into photos and use data-table
 - [ ] Permission (User/Manager)
     - [x] Functionalities
 - [ ] Admin

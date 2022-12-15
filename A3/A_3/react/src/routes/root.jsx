@@ -4,7 +4,8 @@ import {
   NavLink,
   useNavigation,
   useLocation,
-  useNavigate
+  useNavigate,
+  Navigate
 } from "react-router-dom";
 import React, { useState, useMemo } from "react";
 import {
@@ -40,7 +41,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { logout } from '@/reducers/auth'
+import { signOut } from '@/libs/auth'
+import { successfulLogout } from '@/reducers/auth'
 
 const drawerWidth = 240;
 
@@ -49,7 +51,7 @@ export default function Root(props) {
   const navigate = useNavigate();
   const dispatch = useDispatch()
   const location = useLocation();
-  const token = useSelector((state) => state.user.token);
+  const isLoggedIn = useSelector((state) => state.user.username);
   const role = useSelector((state) => state.user.role);
   const [isDrawerOpen, setisDrawerOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
@@ -61,7 +63,6 @@ export default function Root(props) {
     width: "90vw",
     margin: "0 auto",
   })
-
 
   const theme = useMemo(
     () =>
@@ -102,7 +103,7 @@ export default function Root(props) {
         <AppBar component="nav" position="fixed">
 
           <Toolbar>
-            {token && (
+            {isLoggedIn && (
               <IconButton
                 color="inherit"
                 aria-label="open drawer"
@@ -116,14 +117,14 @@ export default function Root(props) {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               <Link to="/">{props.title}</Link>
             </Typography>
-            {!token && location.pathname !== "/login" && (
+            {!isLoggedIn && location.pathname !== "/login" && (
               <Button
                 color="inherit"
               >
                 <Link to="/login">Login</Link>
               </Button>
             )}
-            {token && (
+            {isLoggedIn && (
               <>
                 <Box sx={{ display: { xs: "none", md: "block" } }}>
                   {[...props.destinations.all, ...props.destinations.user].map((item) => (
@@ -192,7 +193,11 @@ export default function Root(props) {
                 </Box>
                 <Button
                   color="inherit"
-                  onClick={() => dispatch(logout())}
+                  onClick={() => {
+                    signOut().then((resp) => {
+                      dispatch(successfulLogout());
+                    })
+                  }}
                 >
                   Logout
                 </Button>
@@ -209,7 +214,7 @@ export default function Root(props) {
             <LinearProgress />
           </Box>
         </AppBar>
-        {token && (
+        {isLoggedIn && (
           <Box component="nav">
             <SwipeableDrawer
               container={document.body}

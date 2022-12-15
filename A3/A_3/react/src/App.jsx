@@ -12,7 +12,6 @@ import Root from "@/routes/root";
 import ErrorPage from "@/routes/error-page";
 import Login, {
   LoginRoute,
-  action as loginAction,
 } from "@/routes/login";
 import Register, {
   RegisterRoute,
@@ -82,7 +81,6 @@ const router = createBrowserRouter(
         <Route
           path={LoginRoute.path}
           element={<Login />}
-          action={loginAction}
         />
         <Route
           path={RegisterRoute.path}
