@@ -4,6 +4,7 @@ import {
 } from "react";
 import {
   useLoaderData,
+  useOutletContext,
 } from "react-router-dom";
 import {
   CardMedia,
@@ -21,6 +22,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   retrieveKeys,
   deleteImage,
+  deleteShare,
 } from "@/libs/api";
 import SubmissionPrompt from "@/components/submission-prompt";
 import DataTable from "@/components/data-table";
@@ -38,6 +40,7 @@ export async function loader({ params }) {
 
 export default function Images() {
   const loaderResponse = useLoaderData();
+  const [bubble, setBubble] = useOutletContext();
   const [imagesList, setImagesList] = useState(loaderResponse.data.images);
   const [selectionModel, setSelectionModel] = useState([imagesList[0].key]);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -53,7 +56,7 @@ export default function Images() {
         { name: "User", value: image.user },
         { name: "Key", value: image.key },
         { name: "Tag", value: image.tag },
-        { name: "Shared", value: image.is_shared },
+        { name: "Shared", value: image.share_link ? true : false },
         { name: "Number of Access", value: image.number_of_access },
         { name: "Last Time Accessed", value: image.last_time_accessed },
       ]
@@ -75,7 +78,7 @@ export default function Images() {
       { field: "user", headerName: "User", flex: 0.5, },
       { field: "key", headerName: "Key", flex: 1, },
       { field: "tag", headerName: "Tag", flex: 0.5, },
-      { field: "is_shared", headerName: "Shared", type: "boolean", flex: 0.25, },
+      { field: "share_link", headerName: "Shared", type: "boolean", flex: 0.25, },
     ],
     [selectionModel],
   );
@@ -130,6 +133,7 @@ export default function Images() {
                       <TableCell component="th" scope="row">
                         {row.name}
                       </TableCell>
+                      {row.value === undefined && console.log(row.value)}
                       <TableCell align="right">{(row.value).toString()}</TableCell>
                     </TableRow>
                   ))}
@@ -148,7 +152,12 @@ export default function Images() {
                 setDeleteImageLoading(true);
                 deleteImage(selectedImage.image.key, true).then((response) => {
                   if (response.status === 200) {
-                    refreshList()
+                    const result = imagesList.filter((image) => image.key !== selectedImage.image.key)
+                    setImagesList(result)
+                    setSelectionModel([result[0].key]);
+                    setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Image deleted"})
+                  } else {
+                    setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to delete image"})
                   }
                   setDeleteImageLoading(false);
                 });
@@ -157,18 +166,21 @@ export default function Images() {
               Delete Image
             </LoadingButton>
             {
-              selectedImage.image.is_shared && (
+              selectedImage.image.share_link && (
                 <LoadingButton
                   color="error"
                   size="small"
                   loading={deleteShareLoading}
                   onClick={() => {
                     setDeleteShareLoading(true);
-                    deleteImage(selectedImage.image.key, true).then((response) => {
+                    deleteShare(selectedImage.image.key, true).then((response) => {
                       if (response.status === 200) {
-                        setImagesList(imagesList.map((image) => {
-                          image.key === selectedImage.image.key ? response.data.image : image
-                        }))
+                        const result = imagesList.map((image) => image.key === selectedImage.image.key ? response.data.image : image
+                        )
+                        setImagesList(result);
+                        setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Share link deleted"})
+                      } else {
+                        setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to delete share link"})
                       }
                       setDeleteShareLoading(false);
                     });

@@ -3,6 +3,7 @@ import {
   useLoaderData,
   Link as RouterLink,
   useNavigate,
+  useOutletContext,
 } from "react-router-dom";
 import {
   Button,
@@ -11,7 +12,6 @@ import {
   ListItemIcon,
   Divider,
   Box,
-  Snackbar,
   Chip
 } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -49,8 +49,7 @@ export default function Image({ route }) {
   const [shareMenuAnchorEl, setShareMenuAnchor] = useState(null);
   const shareMenuOpen = Boolean(shareMenuAnchorEl);
 
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [bubble, setBubble] = useOutletContext();
 
   const [image, setImage] = useState(loaderResponse.data?.image);
   const [deleteImageLoading, setDeleteImageLoading] = useState(false);
@@ -160,8 +159,7 @@ export default function Image({ route }) {
                     <Box>
                       <MenuItem onClick={() => {
                         navigator.clipboard.writeText(image.share_link);
-                        setSnackbarOpen(true);
-                        setSnackbarMessage("Link Copied to clipboard");
+                        setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Link Copied to clipboard"})
                         handleShareMenuClose()
                       }}>
                         <ListItemIcon>
@@ -175,8 +173,9 @@ export default function Image({ route }) {
                           deleteShare(image.key).then((response) => {
                             if (response.status === 200) {
                               setImage(response.data.image);
-                              setSnackbarOpen(true);
-                              setSnackbarMessage("Share link deleted");
+                              setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Share link deleted"})
+                            } else {
+                              setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to delete share link"})
                             }
                           });
                         }}
@@ -209,8 +208,9 @@ export default function Image({ route }) {
                     if (response.status === 200) {
                       setImage(response.data.image);
                       copyToClipboard(response.data.image.share_link);
-                      setSnackbarOpen(true);
-                      setSnackbarMessage("Share link created and the link is copied to clipboard");
+                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Share link created and the link is copied to clipboard"})
+                    } else {
+                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to create share link"})
                     }
                     setCreateShareLoading(false);
                   });
@@ -225,8 +225,7 @@ export default function Image({ route }) {
               size="small"
               onClick={() => {
                 copyToClipboard(image.share_link);
-                setSnackbarOpen(true);
-                setSnackbarMessage("Link Copied to clipboard");
+                setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Link Copied to clipboard"})
               }}
             >
               Copy Link
@@ -251,6 +250,9 @@ export default function Image({ route }) {
                   deleteImage(image.key).then((response) => {
                     if (response.status === 200) {
                       navigate("/photos", { replace: true });
+                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Image deleted"})
+                    } else {
+                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to delete image"})
                     }
                     setDeleteImageLoading(false);
                   });
@@ -272,12 +274,6 @@ export default function Image({ route }) {
             </>
           )
         }
-      />
-      <Snackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false) }}
       />
     </>
   );

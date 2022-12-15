@@ -1,3 +1,8 @@
+import { useEffect } from "react";
+import {
+  useLocation,
+  useOutletContext,
+} from "react-router-dom";
 import {
   Typography,
   List,
@@ -30,6 +35,15 @@ const members = [
 ];
 
 export default function Index() {
+  const location = useLocation();
+  const [bubble, setBubble] = useOutletContext();
+
+  useEffect(() => {
+    if (location.state?.isLoggedIn) {
+      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "You are now logged in!"})
+    }
+  }, [location])
+
   return (
     <>
       <BasicCard

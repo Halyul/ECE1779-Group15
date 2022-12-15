@@ -3,12 +3,12 @@ import {
   Navigate,
   useLocation,
   Link,
+  useOutletContext,
 } from "react-router-dom";
 import {
   Button,
   TextField,
   Grid,
-  Snackbar,
 } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useSelector } from 'react-redux'
@@ -25,8 +25,7 @@ export default function Register() {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
 
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [bubble, setBubble] = useOutletContext();
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
@@ -202,8 +201,7 @@ export default function Register() {
                     onClick={() => {
                       setResendLoading(true);
                       resendConfirmationCode(username).then((response) => {
-                        setSnackbarMessage(response.status ? "Verification code sent!" : response.error);
-                        setSnackbarOpen(true);
+                        setBubble({...bubble, snackbarOpen: true, snackbarMessage: response.status ? "Verification code sent!" : response.error});
                         setResendLoading(false);
                       })
                     }}
@@ -224,8 +222,7 @@ export default function Register() {
                 onClick={() => {
                   setConfirmLoading(true);
                   confirmSignUp(username, verificationCode).then((response) => {
-                    setSnackbarMessage(response.status ? "Registered successfully!" : response.error);
-                    setSnackbarOpen(true);
+                    setBubble({...bubble, snackbarOpen: true, snackbarMessage: response.status ? "Registered successfully!" : response.error});
                     setRegistered(response.status);
                     setConfirmLoading(false);
                   })
@@ -239,10 +236,9 @@ export default function Register() {
                   loading={registerLoading}
                   onClick={() => {
                     setRegisterLoading(true);
-                    setSnackbarMessage("Registering...");
-                    setSnackbarOpen(true);
+                    setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Registering..."})
                     signUp(username, password, email).then((response) => {
-                      setSnackbarMessage(response.status ? "Please check your mailbox for verification code!" : response.error);
+                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: response.status ? "Please check your mailbox for verification code!" : response.error});
                       setShowConfirmation(response.status);
                       setRegisterLoading(false);
                     })
@@ -263,12 +259,6 @@ export default function Register() {
           maxWidth: "480px",
           margin: "0 auto",
         }}
-      />
-      <Snackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false) }}
       />
     </>
   );

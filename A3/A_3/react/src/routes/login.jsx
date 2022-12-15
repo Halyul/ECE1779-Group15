@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Navigate,
   useLocation,
   Link,
+  useOutletContext,
 } from "react-router-dom";
 import {
   Button,
   TextField,
   Grid,
-  Snackbar,
 } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useSelector, useDispatch } from 'react-redux'
@@ -21,23 +21,23 @@ export default function Login() {
   const dispatch = useDispatch()
   const location = useLocation();
   const isLoggedIn = useSelector((state) => state.user.username);
-  const [snackbarMessage, setSnackbarMessage] = useState("You are now registered! Please login.");
-  const [snackbarOpen, setSnackbarOpen] = useState(location.state?.isRegistered);
   const from = location.state?.from?.pathname || "/";
+  const [bubble, setBubble] = useOutletContext();
 
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
-  const [successfulLoggedIn, setSuccessfulLoggedIn] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   
-  if (isLoggedIn) {
-    return <Navigate to={from} replace />
-  }
+  useEffect(() => {
+    if (location.state?.isRegistered) {
+      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "You are now registered! Please login."})
+    }
+  }, [location])
 
-  if (successfulLoggedIn) {
-    return <Navigate to="/" state={{ isLoggedIn: true }} replace />
+  if (isLoggedIn) {
+    return <Navigate to={from} state={{ isLoggedIn: true }} replace />
   }
 
   return (
@@ -102,10 +102,9 @@ export default function Login() {
               loading={loginLoading}
               onClick={(e) => {
                 setLoginLoading(true)
-                setSnackbarMessage("Validing your credentials...")
-                setSnackbarOpen(true)
+                setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Validing your credentials..."})
                 signIn(username, password).then((response) => {
-                  setSnackbarMessage(response.status ? "You are now logged in!" : response.error)
+                  setBubble({...bubble, snackbarOpen: true, snackbarMessage: response.status ? "You are now logged in!" : response.error})
                   setLoginLoading(false)
                   if (response.status) {
                     dispatch(successfulLogin({
@@ -115,7 +114,6 @@ export default function Login() {
                       idToken: response.idToken,
                       refreshToken: response.refreshToken,
                     }))
-                    setSuccessfulLoggedIn(true)
                   }
                 })
               }}
@@ -134,12 +132,6 @@ export default function Login() {
           maxWidth: "480px",
           margin: "0 auto",
         }}
-      />
-      <Snackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false) }}
       />
     </>
   );

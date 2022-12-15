@@ -29,7 +29,8 @@ import {
   MenuItem,
   LinearProgress,
   SpeedDial,
-  SpeedDialAction
+  SpeedDialAction,
+  Snackbar,
 } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 import MenuIcon from "@mui/icons-material/Menu";
@@ -59,12 +60,11 @@ export default function Root(props) {
   const [adminMenuAnchorEl, setAdminMenuAnchor] = useState(null);
   const adminMenuOpen = Boolean(adminMenuAnchorEl);
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-  const [mainCSS, setMainCSS] = useState({
-    height: "inherit",
-    width: "90vw",
-    margin: "0 auto",
-  })
   const [logoutLoading, setLogoutLoading] = useState(false)
+  const [bubble, setBubble] = useState({
+    snackbarMessage: null,
+    snackbarOpen: false,
+  })
 
   const theme = useMemo(
     () =>
@@ -200,6 +200,7 @@ export default function Root(props) {
                     signOut().then((resp) => {
                       dispatch(successfulLogout());
                       setLogoutLoading(false)
+                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "You have logged out!"})
                     })
                   }}
                 >
@@ -282,10 +283,14 @@ export default function Root(props) {
         )}
         <Box
           component="main"
-          sx={mainCSS}
+          sx={{
+            height: "inherit",
+            width: "90vw",
+            margin: "0 auto",
+          }}
         >
           <Toolbar sx={{ marginBottom: "16px" }} />
-          <Outlet context={[mainCSS, setMainCSS]} />
+          <Outlet context={[bubble, setBubble]} />
         </Box>
         <SpeedDial
           ariaLabel="SpeedDial playground example"
@@ -302,6 +307,12 @@ export default function Root(props) {
             />
           ))}
         </SpeedDial>
+        <Snackbar
+          open={bubble.snackbarOpen}
+          message={bubble.snackbarMessage}
+          autoHideDuration={6000}
+          onClose={() => { setBubble({ ...bubble, snackbarOpen: false }) }}
+        />
       </Box>
     </ThemeProvider>
   );

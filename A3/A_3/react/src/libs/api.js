@@ -33,7 +33,7 @@ export async function retrieveKeys(admin = false) {
           last_time_accessed: "27/11/2022 19:19:36",
           thumbnail: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
           tag: "test",
-          is_shared: true,
+          share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
         },
         {
           key: "gura", // the image key
@@ -42,7 +42,7 @@ export async function retrieveKeys(admin = false) {
           last_time_accessed: "27/11/2022 19:19:36",
           thumbnail: "https://gura.ch/images/0.jpg",
           tag: "nan",
-          is_shared: false,
+          share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
         },
         {
           key: "78", // the image key
@@ -51,7 +51,7 @@ export async function retrieveKeys(admin = false) {
           last_time_accessed: "27/11/2022 19:19:36",
           thumbnail: "https://gura.ch/images/404.jpg",
           tag: "nan",
-          is_shared: true,
+          share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
         },
         {
           key: "8", // the image key
@@ -60,7 +60,7 @@ export async function retrieveKeys(admin = false) {
           last_time_accessed: "27/11/2022 19:19:36",
           thumbnail: "https://gura.ch/images/200.jpg",
           tag: "nan",
-          is_shared: false,
+          share_link: null,
         },
         {
           key: "12381", // the image key
@@ -69,7 +69,7 @@ export async function retrieveKeys(admin = false) {
           last_time_accessed: "27/11/2022 19:19:36",
           thumbnail: "https://gura.ch/images/302.jpg",
           tag: "nan",
-          is_shared: true,
+          share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
         },
         {
           key: Math.random().toString(), // the image key
@@ -78,7 +78,7 @@ export async function retrieveKeys(admin = false) {
           last_time_accessed: "27/11/2022 19:19:36",
           thumbnail: "https://gura.ch/images/414.jpg",
           tag: "nan",
-          is_shared: false,
+          share_link: null,
         }
       ]
     }
@@ -151,6 +151,8 @@ export async function createShare(key) {
     data: {
       image: {
         content: "https://gura.ch/images/404.jpg",
+        thumbnail: "https://gura.ch/images/404.jpg",
+        user: "gura",
         key: "gura",
         tag: "test",
         share_link: "456",
@@ -175,7 +177,9 @@ export async function deleteShare(key, admin = false) {
     data: {
       image: {
         content: "https://gura.ch/images/0.jpg",
+        thumbnail: "https://gura.ch/images/0.jpg",
         key: "gura",
+        user: "gura",
         tag: "nan",
         share_link: null,
         number_of_access: -1,
