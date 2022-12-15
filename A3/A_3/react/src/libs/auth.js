@@ -11,14 +11,6 @@ Amplify.configure({
     // OPTIONAL - Amazon Cognito Web Client ID (26-char alphanumeric string)
     userPoolWebClientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
 
-    // OPTIONAL - Hosted UI configuration
-    oauth: {
-      domain: import.meta.env.VITE_COGNITO_DOMAIN,
-      scope: ['email', 'profile', 'openid', 'aws.cognito.signin.user.admin'],
-      redirectSignIn: 'http://localhost:3000/',
-      redirectSignOut: 'http://localhost:3000/',
-      responseType: 'code' // or 'token', note that REFRESH token will only be generated when the responseType is code
-    }
   }
 });
 
