@@ -29,11 +29,11 @@ export default function Protected({ permission, destination, children }) {
                 idToken: response.idToken,
                 refreshToken: response.refreshToken,
               }))
-              timer = setTimeout(loop, 5000)
+              timer = setTimeout(loop, 60 * 1000)
             }
           })
         } else {
-          timer = setTimeout(loop, 5000)
+          timer = setTimeout(loop, 60 * 1000)
         }
       });
     }

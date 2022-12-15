@@ -70,7 +70,6 @@ export default function Register() {
                     type="email"
                     value={email}
                     fullWidth
-                    disabled={showConfirmation}
                     onChange={(e) => {
                       let value = e.target.value;
                       setEmailError(value.includes(" "));
@@ -94,7 +93,6 @@ export default function Register() {
                     variant="outlined"
                     value={username}
                     fullWidth
-                    disabled={showConfirmation}
                     onChange={(e) => {
                       let value = e.target.value;
                       setUsernameError(value.includes(" "));
@@ -119,7 +117,6 @@ export default function Register() {
                     value={password}
                     type="password"
                     fullWidth
-                    disabled={showConfirmation}
                     onChange={(e) => {
                       let value = e.target.value;
                       setPasswordError(value.includes(" "));
@@ -146,7 +143,7 @@ export default function Register() {
                     variant="outlined"
                     value={password2}
                     type="password"
-                    disabled={(password === "" && password2 === "") || showConfirmation}
+                    disabled={(password === "" && password2 === "")}
                     fullWidth
                     onChange={(e) => {
                       let value = e.target.value;

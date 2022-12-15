@@ -8,7 +8,7 @@ import {
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { DataGrid } from "@mui/x-data-grid";
 import { BasicCard } from "@/components/card";
-// import { getStatus } from "@/libs/api";
+import { getStats } from "@/libs/api";
 import SubmissionPrompt from "@/components/submission-prompt";
 
 const columns = [
@@ -18,23 +18,8 @@ const columns = [
 
 
 export async function loader({ params }) {
-  // const response = await getStatus();
-  return {
-    status: 200,
-    data: {
-      stats: [
-        { name: 'Jon', value: true },
-        { name: 'Cersei', value: 42 },
-        { name: 'Jaime', value: 45 },
-        { name: 'Arya', value: 16 },
-        { name: 'Daenerys', value: null },
-        { name: "lol", value: 150 },
-        { name: 'Ferrara', value: 44 },
-        { name: 'Rossini', value: 36 },
-        { name: 'Harvey', value: 65 },
-      ]
-    }
-  };
+  const response = await getStats();
+  return response;
 }
 
 export default function Stats() {

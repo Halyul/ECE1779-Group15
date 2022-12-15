@@ -2,61 +2,46 @@
 
 ## Requests
 
-URL                   | Method  | Content Type        | Body        | Response |
-----------------------|---------|---------------------|-------------|----------|
-/api/login            | POST    | application/json    |             |          |
-/api/register         | POST    | application/json    |             |          |
-/api/renew            | PUT     | N/A                 |             |          |
-/api/logout           | POST    | N/A                 |             |          |
-/api/check_auth       | POST    | N/A                 |             |          |
-/api/check_permission | POST    | N/A                 |             |          |
-/api/photos           | GET     |                     |             |          |
-/api/upload           | POST    |                     |             |          |
-/api/shares           | GET     |                     |             |          |
-/api/share            | POST    |                     |             |          |
-/api/share            | DELETE  |                     |             |          |
-/api/tags             | GET     |                     |             |          |
-/api/images           | GET     |                     |             |          |
-/api/images           | DELETE  |                     |             |          |
-/api/stats            | GET     |                     |             |          |
-/api/public           | GET     |                     |             |          |
+URL                   | Method  | Content Type        | Body             | Response                                   |
+----------------------|---------|---------------------|------------------|------------------------------------------- |
+/api/photos           | GET     | `application/json`  | `{admin: false}` | `@see: routes/libs/api.js/retrieveKeys`    |
+/api/key/{key}        | GET     | `application/json`  | `N/A`            | `@see: routes/libs/api.js/retrieveImage`   |
+/api/key/{key}        | DELETE  | `application/json`  | `{admin: false}` | `@see: routes/libs/api.js/deleteImage`     |
+/api/upload           | POST    |`multipart/form-data`| `file`, `key`    | `@see: routes/libs/api.js/upload`          |
+/api/share            | POST    | `application/json`  | `key`            | `@see: routes/libs/api.js/createShare`     |
+/api/share            | DELETE  | `application/json`  | `key`, `{admin: false}`|`@see: routes/libs/api.js/deleteShare`|
+/api/photos           | GET     | `application/json`  | `{admin: true}`  | `@see: routes/libs/api.js/retrieveKeys`    |
+/api/key/{key}        | DELETE  | `application/json`  | `{admin: true}`  | `@see: routes/libs/api.js/deleteImage`     |
+/api/share            | DELETE  | `application/json`  | `key`, `{admin: true}`|`@see: routes/libs/api.js/deleteShare`|
+/api/stats            | GET     | `application/json`  | `N/A`            | `@see: routes/libs/api.js/getStats`        |
+/api/public/{key}     | GET     | `application/json`  | `N/A`            | `@see: routes/libs/api.js/retrieveImage`   |
 
 ## TODO
 - [x] Login/Signup
     - [x] Design
     - [x] Functionalities
-    - [ ] No indication for password policy
-- [ ] Photos page
+- [x] Photos page
     - [x] Re-design
-    - [ ] Functionalities
+    - [x] Functionalities
     - [x] Tag
     - [x] is shared
-- [ ] Image page
+- [x] Image page
     - [x] Show Tag
     - [x] Show is shared
     - [x] Create Share
-- [ ] Tags page
-    - [x] Design
-    - [ ] Functionalities
-- [ ] Tag page
-    - [x] Design
-    - [ ] Functionalities
-- [ ] Share Page
-    - [x] Number of access
-    - [x] Design
-    - [ ] Functionalities
 - [x] Merge share and tags page into photos and use data-table
-- [ ] Permission (User/Manager)
+- [x] Permission (User/Manager)
     - [x] Functionalities
-- [ ] Admin
+- [x] Admin
     - [x] Design
-    - [ ] Functionalities
+    - [x] Functionalities
     - [x] Stats
-    - [ ] All images
+    - [x] All images
         - [x] Delete image
         - [x] Delete share
-        - [ ] Functionalities
-- [ ] Public page to access shared photo
+        - [x] Functionalities
+- [x] Public page to access shared photo
     - [x] Design
-    - [ ] Functionalities
+    - [x] Functionalities
 - [ ] Cognito README
+- [ ] Integration

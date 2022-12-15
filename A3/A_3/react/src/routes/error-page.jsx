@@ -45,6 +45,9 @@ export default function ErrorPage() {
             Back
           </Button>
         }
+        sx={{
+          margin: "1rem"
+        }}
       />
     </Container>
   );

@@ -17,24 +17,22 @@ import {
   TableRow,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { retrieveKeys } from "@/libs/api";
+import {
+  retrieveKeys,
+  deleteImage,
+} from "@/libs/api";
 import SubmissionPrompt from "@/components/submission-prompt";
 import DataTable from "@/components/data-table";
-import {
-  BasicCard
-} from "@/components/card";
 
 export async function loader({ params }) {
-  // const response = await getStatus();
-  return {
-    status: 200,
-    data: {
-      images: [
-        { key: "1", user: 'Jon', tag: "test", is_shared: true, number_of_access: 1, last_time_accessed: "27/11/2022 19:19:36" },
-        { key: "2", user: 'Doe', tag: "123", is_shared: false, number_of_access: 1, last_time_accessed: "27/11/2022 19:19:36" },
-      ]
+  const response = await retrieveKeys(true);
+  if (response.status !== 200) {
+    return {
+      status: response.status,
+      statusText: response.statusText
     }
-  };
+  }
+  return response;
 }
 
 export default function Images() {
@@ -47,7 +45,6 @@ export default function Images() {
     const image = imagesList.find((image) => image.key === selectionModel[0]);
     return {
       image,
-      src: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
       mapping: [
         { name: "User", value: image.user },
         { name: "Key", value: image.key },
@@ -79,6 +76,17 @@ export default function Images() {
     [selectionModel],
   );
 
+  const refreshList = () => {
+    setIsRefreshing(true);
+    loader({
+      params: {}
+    }).then((response) => {
+      setIsRefreshing(false);
+      setImagesList(response.data?.images);
+      setSelectionModel([imagesList[0].key]);
+    })
+  }
+
   return (
     <>
       <DataTable
@@ -87,13 +95,7 @@ export default function Images() {
           <IconButton
             aria-label="refresh"
             onClick={() => {
-              setIsRefreshing(true);
-              loader({
-                params: {}
-              }).then((response) => {
-                setIsRefreshing(false);
-                setImagesList(response.data?.images);
-              })
+              refreshList()
             }}
           >
             <RefreshIcon />
@@ -110,7 +112,7 @@ export default function Images() {
         content={
           <>
             <CardMedia component="img"
-              image={selectedImage.src}
+              image={selectedImage.image.thumbnail}
               sx={{ marginTop: "8px" }}
             />
             <TableContainer>
@@ -136,6 +138,14 @@ export default function Images() {
           <>
             <Button
               color="error"
+              size="small"
+              onClick={() => {
+                deleteImage(selectedImage.image.key, true).then((response) => {
+                  if (response.status === 200) {
+                    refreshList()
+                  }
+                });
+              }}
             >
               Delete Image
             </Button>
@@ -143,6 +153,16 @@ export default function Images() {
               selectedImage.image.is_shared && (
                 <Button
                   color="error"
+                  size="small"
+                  onClick={() => {
+                    deleteImage(selectedImage.image.key, true).then((response) => {
+                      if (response.status === 200) {
+                        setImagesList(imagesList.map((image) => {
+                          image.key === selectedImage.image.key ? response.data.image : image
+                        }))
+                      }
+                    });
+                  }}
                 >
                   Delete Share
                 </Button>

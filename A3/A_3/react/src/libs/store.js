@@ -28,7 +28,6 @@ export const rootReducers = combineReducers({
 
 const persistedReducer = persistReducer(persistConfig, rootReducers)
 
-
 const store = configureStore({
     reducer: persistedReducer,
     // get rid of non-serializable values warning

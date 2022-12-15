@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { retrieveKeys } from "@/libs/api";
-import { BasicCard } from "@/components/card";
 import SubmissionPrompt from "@/components/submission-prompt";
 import DataTable from "@/components/data-table";
 
@@ -27,50 +26,7 @@ export async function loader({ params }) {
       statusText: response.statusText
     }
   }
-  // return response;
-  return {
-    status: 200,
-    data: {
-      keys: [
-        {
-          key: "ajksdfghbuiagda", // the image key
-          thumbnail: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-          tag: "test",
-          is_shared: true,
-        },
-        {
-          key: "gura", // the image key
-          thumbnail: "https://gura.ch/images/0.jpg",
-          tag: "nan",
-          is_shared: false,
-        },
-        {
-          key: "78", // the image key
-          thumbnail: "https://gura.ch/images/404.jpg",
-          tag: "nan",
-          is_shared: true,
-        },
-        {
-          key: "8", // the image key
-          thumbnail: "https://gura.ch/images/200.jpg",
-          tag: "nan",
-          is_shared: false,
-        },
-        {
-          key: "12381", // the image key
-          thumbnail: "https://gura.ch/images/302.jpg",
-          tag: "nan",
-          is_shared: true,
-        },
-        {
-          key: Math.random().toString(), // the image key
-          thumbnail: "https://gura.ch/images/414.jpg",
-          tag: "nan",
-          is_shared: false,
-        }
-      ]
-    }
-  };
+  return response;
 }
 
 export default function Photos() {
@@ -78,7 +34,7 @@ export default function Photos() {
   const location = useLocation();
   const navigate = useNavigate();
   const filteredTag = location.state?.tag || null;
-  const [keyList, setKeyList] = useState(loaderResponse.data?.keys);
+  const [keyList, setKeyList] = useState(loaderResponse.data?.images);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectionModel, setSelectionModel] = useState(
     filteredTag ?

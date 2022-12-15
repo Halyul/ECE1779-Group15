@@ -19,47 +19,26 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import { Tooltip } from "@/components/tooltip";
-import { retrieveImage } from "@/libs/api";
+import {
+  retrieveImage,
+  deleteImage,
+  createShare,
+  deleteShare,
+} from "@/libs/api";
 import { BasicCard } from "@/components/card";
 
 export async function loader({ params }) {
-  // const response = await retrieveImage(params.key, params.shareKey);
-  // if (response.status !== 200) {
-  //   return {
-  //     status: response.status,
-  //     details: {
-  //       message: response.data.message,
-  //       statusText: response.statusText
-  //     }
-  //   }
-  // }
-  // return {
-  //   status: 200,
-  //   image: {
-  //     content: response.data.content,
-  //     key: params.key,
-  //   }
-  // };
-  return [
-    {
-      status: 200,
-      image: {
-        content: "https://gura.ch/images/0.jpg",
-        key: "gura",
-        tag: "nan",
-        shard_link: "123"
-      }
-    },
-    {
-      status: 200,
-      image: {
-        content: "https://gura.ch/images/404.jpg",
-        key: "gura",
-        tag: "test",
-        shard_link: null
+  const response = await retrieveImage(params.key, params.shareKey);
+  if (response.status !== 200) {
+    return {
+      status: response.status,
+      details: {
+        message: response.data.message,
+        statusText: response.statusText
       }
     }
-  ][Math.floor(Math.random() * 2)];
+  }
+  return response;
 }
 
 export default function Image({ route }) {
@@ -72,15 +51,12 @@ export default function Image({ route }) {
   const [snackbarMessage, setSnackbarMessage] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  const [keyError, setKeyError] = useState(false);
-  const [keyValue, setKeyValue] = useState("");
-  let image = null;
+  const [image, setImage] = useState(loaderResponse.data?.image);
+
   let error = null;
 
   if (loaderResponse) {
-    if (loaderResponse.status === 200) {
-      image = loaderResponse.image;
-    } else if (loaderResponse.status !== -1) {
+    if (loaderResponse.status !== -1 && loaderResponse.status !== 200) {
       error = loaderResponse;
     }
   }
@@ -93,34 +69,62 @@ export default function Image({ route }) {
     setShareMenuAnchor(null);
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+  };
+
   return (
     <>
       <BasicCard
         image={image.content}
-        title={(error && `${error?.status} ${error.details?.statusText}`) || `Key: ${image.key}`}
+        title={(error && `${error?.status} ${error.details?.statusText}`) || `${image.key}`}
         subheader={
           error ? (error.details?.message) : (
-            image.tag ? (
-              <Tooltip
-                title="Tag"
-                body={
-                  <RouterLink
-                    to={`/photos`}
-                    state={{ tag: image.tag }}
-                  >
+            <>
+              {image.tag && (
+                <Tooltip
+                  title="Tag"
+                  body={
+                    <RouterLink
+                      to={`/photos`}
+                      state={{ tag: image.tag }}
+                    >
+                      <Chip
+                        label={image.tag}
+                        sx={{ mt: 1 }}
+                      />
+                    </RouterLink>
+                  }
+                />
+              )}
+              {image.last_time_accessed && (
+                <Tooltip
+                  title="Last Time Accessed"
+                  body={
                     <Chip
-                      label={image.tag}
-                      sx={{ mt: 1 }}
+                      label={image.last_time_accessed}
+                      sx={{ mt: 1, ml: 1 }}
                     />
-                  </RouterLink>
-                }
-              />
-            ) : ("")
+                  }
+                />
+              )}
+              {image.share_link && (
+                <Tooltip
+                  title="Number of Access"
+                  body={
+                    <Chip
+                      label={image.number_of_access}
+                      sx={{ mt: 1, ml: 1 }}
+                    />
+                  }
+                />
+              )}
+            </>
           )
         }
         header_action={
           route === ImageRoute.path ? (
-            image.shard_link ? (
+            image.share_link ? (
               <>
                 <Button
                   aria-controls={shareMenuOpen ? "share-menu" : undefined}
@@ -128,6 +132,7 @@ export default function Image({ route }) {
                   aria-expanded={shareMenuOpen ? "true" : undefined}
                   onClick={handleShareMenuOpen}
                   startIcon={<ShareIcon />}
+                  size="small"
                 >
                   Manage Share
                 </Button>
@@ -148,10 +153,10 @@ export default function Image({ route }) {
                     horizontal: "right",
                   }}
                 >
-                  {image.shard_link && (
+                  {image.share_link && (
                     <Box>
                       <MenuItem onClick={() => {
-                        navigator.clipboard.writeText(image.shard_link);
+                        navigator.clipboard.writeText(image.share_link);
                         setSnackbarOpen(true);
                         setSnackbarMessage("Link Copied to clipboard");
                         handleShareMenuClose()
@@ -164,6 +169,13 @@ export default function Image({ route }) {
                       <MenuItem
                         onClick={() => {
                           handleShareMenuClose();
+                          deleteShare(image.key).then((response) => {
+                            if (response.status === 200) {
+                              setImage(response.data.image);
+                              setSnackbarOpen(true);
+                              setSnackbarMessage("Share link deleted");
+                            }
+                          });
                         }}
                       >
                         <ListItemIcon>
@@ -184,14 +196,31 @@ export default function Image({ route }) {
               </>
             ) : (
               <Button
-                startIcon={<ShareIcon />}
+                  startIcon={<ShareIcon />}
+                  size="small"
+                  onClick={() => {
+                    createShare(image.key).then((response) => {
+                      if (response.status === 200) {
+                        setImage(response.data.image);
+                        copyToClipboard(response.data.image.share_link);
+                        setSnackbarOpen(true);
+                        setSnackbarMessage("Share link created and the link is copied to clipboard");
+                      }
+                    });
+                  }}
               >
                 Create Share
               </Button>
             )
           ) : (
             <Button
-              startIcon={<ShareIcon />}
+                startIcon={<ShareIcon />}
+                size="small"
+                onClick={() => {
+                  copyToClipboard(image.share_link);
+                  setSnackbarOpen(true);
+                  setSnackbarMessage("Link Copied to clipboard");
+                }}
             >
               Copy Link
             </Button>
@@ -206,6 +235,19 @@ export default function Image({ route }) {
               >
                 <Button size="small">Re-upload</Button>
               </RouterLink>
+              <Button
+                color="error"
+                size="small"
+                onClick={() => {
+                deleteImage(image.key).then((response) => {
+                  if (response.status === 200) {
+                    navigate("/photos", { replace: true });
+                  }
+                });
+              }}
+              >
+                Delete Image
+              </Button>
               <Button
                 size="small"
                 style={{
