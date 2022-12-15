@@ -133,7 +133,6 @@ export default function Images() {
                       <TableCell component="th" scope="row">
                         {row.name}
                       </TableCell>
-                      {row.value === undefined && console.log(row.value)}
                       <TableCell align="right">{(row.value).toString()}</TableCell>
                     </TableRow>
                   ))}
@@ -155,9 +154,21 @@ export default function Images() {
                     const result = imagesList.filter((image) => image.key !== selectedImage.image.key)
                     setImagesList(result)
                     setSelectionModel([result[0].key]);
-                    setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Image deleted"})
+                    setBubble({
+                      ...bubble,
+                      snackbar: {
+                        open: true,
+                        message: "Image deleted"
+                      }
+                    })
                   } else {
-                    setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to delete image"})
+                    setBubble({
+                      ...bubble,
+                      snackbar: {
+                        open: true,
+                        message: "Failed to delete image"
+                      }
+                    })
                   }
                   setDeleteImageLoading(false);
                 });
@@ -175,12 +186,24 @@ export default function Images() {
                     setDeleteShareLoading(true);
                     deleteShare(selectedImage.image.key, true).then((response) => {
                       if (response.status === 200) {
-                        const result = imagesList.map((image) => image.key === selectedImage.image.key ? response.data.image : image
+                        const result = imagesList.map((image) => image.key === response.data.image.key ? response.data.image : image
                         )
                         setImagesList(result);
-                        setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Share link deleted"})
+                        setBubble({
+                          ...bubble,
+                          snackbar: {
+                            open: true,
+                            message: "Share link deleted"
+                          }
+                        })
                       } else {
-                        setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to delete share link"})
+                        setBubble({
+                          ...bubble,
+                          snackbar: {
+                            open: true,
+                            message: "Failed to delete share link"
+                          }
+                        })
                       }
                       setDeleteShareLoading(false);
                     });

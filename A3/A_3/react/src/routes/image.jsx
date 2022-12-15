@@ -159,7 +159,13 @@ export default function Image({ route }) {
                     <Box>
                       <MenuItem onClick={() => {
                         navigator.clipboard.writeText(image.share_link);
-                        setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Link Copied to clipboard"})
+                        setBubble({
+                          ...bubble,
+                          snackbar: {
+                            open: true,
+                            message: "Link Copied to clipboard"
+                          }
+                        })
                         handleShareMenuClose()
                       }}>
                         <ListItemIcon>
@@ -173,9 +179,21 @@ export default function Image({ route }) {
                           deleteShare(image.key).then((response) => {
                             if (response.status === 200) {
                               setImage(response.data.image);
-                              setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Share link deleted"})
+                              setBubble({
+                                ...bubble,
+                                snackbar: {
+                                  open: true,
+                                  message: "Share link deleted"
+                                }
+                              })
                             } else {
-                              setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to delete share link"})
+                              setBubble({
+                                ...bubble,
+                                snackbar: {
+                                  open: true,
+                                  message: "Failed to delete share link"
+                                }
+                              })
                             }
                           });
                         }}
@@ -208,9 +226,21 @@ export default function Image({ route }) {
                     if (response.status === 200) {
                       setImage(response.data.image);
                       copyToClipboard(response.data.image.share_link);
-                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Share link created and the link is copied to clipboard"})
+                      setBubble({
+                        ...bubble,
+                        snackbar: {
+                          open: true,
+                          message: "Share link created and the link is copied to clipboard"
+                        }
+                      })
                     } else {
-                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to create share link"})
+                      setBubble({
+                        ...bubble,
+                        snackbar: {
+                          open: true,
+                          message: "Failed to create share link"
+                        }
+                      })
                     }
                     setCreateShareLoading(false);
                   });
@@ -225,7 +255,13 @@ export default function Image({ route }) {
               size="small"
               onClick={() => {
                 copyToClipboard(image.share_link);
-                setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Link Copied to clipboard"})
+                setBubble({
+                  ...bubble,
+                  snackbar: {
+                    open: true,
+                    message: "Link Copied to clipboard"
+                  }
+                })
               }}
             >
               Copy Link
@@ -250,9 +286,21 @@ export default function Image({ route }) {
                   deleteImage(image.key).then((response) => {
                     if (response.status === 200) {
                       navigate("/photos", { replace: true });
-                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Image deleted"})
+                      setBubble({
+                        ...bubble,
+                        snackbar: {
+                          open: true,
+                          message: "Image deleted"
+                        }
+                      })
                     } else {
-                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Failed to delete image"})
+                      setBubble({
+                        ...bubble,
+                        snackbar: {
+                          open: true,
+                          message: "Failed to delete image"
+                        }
+                      })
                     }
                     setDeleteImageLoading(false);
                   });

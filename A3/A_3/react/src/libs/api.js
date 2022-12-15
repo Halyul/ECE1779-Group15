@@ -99,7 +99,7 @@ export async function retrieveImage(key, shareKey) {
       data: {
         image: {
           content: "https://gura.ch/images/0.jpg",
-          key: "gura",
+          key: key || shareKey,
           tag: "nan",
           share_link: "123",
           number_of_access: 1,
@@ -112,7 +112,7 @@ export async function retrieveImage(key, shareKey) {
       data: {
         image: {
           content: "https://gura.ch/images/404.jpg",
-          key: "gura",
+          key: key || shareKey,
           tag: "test",
           share_link: null,
           number_of_access: -1,
@@ -153,7 +153,7 @@ export async function createShare(key) {
         content: "https://gura.ch/images/404.jpg",
         thumbnail: "https://gura.ch/images/404.jpg",
         user: "gura",
-        key: "gura",
+        key: key,
         tag: "test",
         share_link: "456",
         number_of_access: 0,
@@ -178,7 +178,7 @@ export async function deleteShare(key, admin = false) {
       image: {
         content: "https://gura.ch/images/0.jpg",
         thumbnail: "https://gura.ch/images/0.jpg",
-        key: "gura",
+        key: key,
         user: "gura",
         tag: "nan",
         share_link: null,

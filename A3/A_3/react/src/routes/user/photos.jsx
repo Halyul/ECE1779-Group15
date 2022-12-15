@@ -36,20 +36,20 @@ export default function Photos() {
   const filteredTag = location.state?.tag || null;
   const [keyList, setKeyList] = useState(loaderResponse.data?.images);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectionModel, setSelectionModel] = useState(keyList.map((image) => image.key));
+  const [selectionModel, setSelectionModel] = useState(
+    filteredTag ?
+      keyList.filter((image) => image.tag === filteredTag).map((image) => image.key) :
+      keyList.map((image) => image.key)
+  );
 
   const selectedImages = useMemo(() => {
     return keyList.filter((image) => selectionModel.includes(image.key));
   }, [keyList, selectionModel]);
 
-  if (filteredTag) {
-    setSelectionModel(keyList.filter((image) => image.tag === filteredTag).map((image) => image.key));
-  }
-
   const columns = [
     { field: "key", headerName: "Key", flex: 1, },
     { field: "tag", headerName: "Tag", flex: 0.5, },
-    { field: "is_shared", headerName: "Shared", type: "boolean", flex: 0.25, },
+    { field: "share_link", headerName: "Shared", type: "boolean", flex: 0.25, },
   ];
 
   return (
@@ -66,7 +66,9 @@ export default function Photos() {
               }).then((response) => {
                 setIsRefreshing(false);
                 setKeyList(response.data?.images);
-                setSelectionModel(response.data?.images.map((image) => { return image.key }));
+                setSelectionModel(filteredTag ?
+                  response.data?.images.filter((image) => image.tag === filteredTag).map((image) => image.key) :
+                  response.data?.images.map((image) => image.key));
               })
             }}
           >
@@ -113,7 +115,7 @@ export default function Photos() {
               ))}
             </ImageList>
           ) : (
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ mt: 1 }}>
               No photo selected.
             </Typography>
           )

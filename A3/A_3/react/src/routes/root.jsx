@@ -5,7 +5,6 @@ import {
   useNavigation,
   useLocation,
   useNavigate,
-  Navigate
 } from "react-router-dom";
 import React, { useState, useMemo } from "react";
 import {
@@ -45,6 +44,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { signOut } from '@/libs/auth'
 import { successfulLogout } from '@/reducers/auth'
+import DOMPurify from 'dompurify';
 
 const drawerWidth = 240;
 
@@ -62,8 +62,10 @@ export default function Root(props) {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const [logoutLoading, setLogoutLoading] = useState(false)
   const [bubble, setBubble] = useState({
-    snackbarMessage: null,
-    snackbarOpen: false,
+    snackbar: {
+      open: false,
+      message: null,
+    }
   })
 
   const theme = useMemo(
@@ -200,7 +202,13 @@ export default function Root(props) {
                     signOut().then((resp) => {
                       dispatch(successfulLogout());
                       setLogoutLoading(false)
-                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "You have logged out!"})
+                      setBubble({
+                        ...bubble,
+                        snackbar: {
+                          open: true,
+                          message: "You have logged out!"
+                        }
+                      })
                     })
                   }}
                 >
@@ -308,10 +316,10 @@ export default function Root(props) {
           ))}
         </SpeedDial>
         <Snackbar
-          open={bubble.snackbarOpen}
-          message={bubble.snackbarMessage}
+          open={bubble.snackbar.open}
+          message={bubble.snackbar.message}
           autoHideDuration={6000}
-          onClose={() => { setBubble({ ...bubble, snackbarOpen: false }) }}
+          onClose={() => { setBubble({ ...bubble, snackbar: { ...bubble.snackbar, open: false } }) }}
         />
       </Box>
     </ThemeProvider>

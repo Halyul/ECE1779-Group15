@@ -29,10 +29,16 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
-  
+
   useEffect(() => {
     if (location.state?.isRegistered) {
-      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "You are now registered! Please login."})
+      setBubble({
+        ...bubble,
+        snackbar: {
+          open: true,
+          message: "You are now registered! Please login."
+        }
+      })
     }
   }, [location])
 
@@ -102,9 +108,21 @@ export default function Login() {
               loading={loginLoading}
               onClick={(e) => {
                 setLoginLoading(true)
-                setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Validing your credentials..."})
+                setBubble({
+                  ...bubble,
+                  snackbar: {
+                    open: true,
+                    message: "Validing your credentials..."
+                  }
+                })
                 signIn(username, password).then((response) => {
-                  setBubble({...bubble, snackbarOpen: true, snackbarMessage: response.status ? "You are now logged in!" : response.error})
+                  setBubble({
+                    ...bubble,
+                    snackbar: {
+                      open: true,
+                      message: response.status ? "You are now logged in!" : response.error
+                    }
+                  })
                   setLoginLoading(false)
                   if (response.status) {
                     dispatch(successfulLogin({

@@ -201,7 +201,13 @@ export default function Register() {
                     onClick={() => {
                       setResendLoading(true);
                       resendConfirmationCode(username).then((response) => {
-                        setBubble({...bubble, snackbarOpen: true, snackbarMessage: response.status ? "Verification code sent!" : response.error});
+                        setBubble({
+                          ...bubble,
+                          snackbar: {
+                            open: true,
+                            message: response.status ? "Verification code sent!" : response.error
+                          }
+                        });
                         setResendLoading(false);
                       })
                     }}
@@ -222,7 +228,13 @@ export default function Register() {
                 onClick={() => {
                   setConfirmLoading(true);
                   confirmSignUp(username, verificationCode).then((response) => {
-                    setBubble({...bubble, snackbarOpen: true, snackbarMessage: response.status ? "Registered successfully!" : response.error});
+                    setBubble({
+                      ...bubble,
+                      snackbar: {
+                        open: true,
+                        message: response.status ? "Registered successfully!" : response.error
+                      }
+                    });
                     setRegistered(response.status);
                     setConfirmLoading(false);
                   })
@@ -232,17 +244,29 @@ export default function Register() {
               </LoadingButton>
             ) : (
               <LoadingButton
-                  size="small"
-                  loading={registerLoading}
-                  onClick={() => {
-                    setRegisterLoading(true);
-                    setBubble({...bubble, snackbarOpen: true, snackbarMessage: "Registering..."})
-                    signUp(username, password, email).then((response) => {
-                      setBubble({...bubble, snackbarOpen: true, snackbarMessage: response.status ? "Please check your mailbox for verification code!" : response.error});
-                      setShowConfirmation(response.status);
-                      setRegisterLoading(false);
-                    })
-                  }}
+                size="small"
+                loading={registerLoading}
+                onClick={() => {
+                  setRegisterLoading(true);
+                  setBubble({
+                    ...bubble,
+                    snackbar: {
+                      open: true,
+                      message: "Registering..."
+                    }
+                  })
+                  signUp(username, password, email).then((response) => {
+                    setBubble({
+                      ...bubble,
+                      snackbar: {
+                        open: true,
+                        message: response.status ? "Please check your mailbox for verification code!" : response.error
+                      }
+                    });
+                    setShowConfirmation(response.status);
+                    setRegisterLoading(false);
+                  })
+                }}
               >
                 Register
               </LoadingButton>

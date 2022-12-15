@@ -40,7 +40,13 @@ export default function Index() {
 
   useEffect(() => {
     if (location.state?.isLoggedIn) {
-      setBubble({...bubble, snackbarOpen: true, snackbarMessage: "You are now logged in!"})
+      setBubble({
+        ...bubble,
+        snackbar: {
+          open: true,
+          message: "You are now logged in!"
+        }
+      })
     }
   }, [location])
 
