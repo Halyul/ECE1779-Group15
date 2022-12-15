@@ -1,4 +1,3 @@
-import { Callback, Context, PostConfirmationTriggerEvent } from "aws-lambda";
 import AWS from "aws-sdk";
 
 export async function main(event, _context, callback) {
@@ -29,5 +28,5 @@ export function addUserToGroup({
   };
 
   const cognitoIdp = new AWS.CognitoIdentityServiceProvider();
-  return cognitoIdp.addUserToGroup(params).promise();
+  return cognitoIdp.adminAddUserToGroup(params).promise();
 }
