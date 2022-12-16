@@ -2,15 +2,14 @@
 
 ## Requests
 
-URL         | Method | Content Type        | Body                     | Response                                    |
-------------|--------|---------------------|--------------------------|---------------------------------------------|
-/api/photos | POST   |`application/json`   |`user`, `role`, `admin`   | `@see: routes/libs/api.js/retrieveKeys`     |
-/api/key    | POST   |`application/json`   |`key`, `user`, `role`     | `@see: routes/libs/api.js/retrieveImage`    |
-/api/key    | DELETE |`application/json`   |`key`, `user`, `role`     | `@see: routes/libs/api.js/deleteImage`      |
-/api/upload | POST   |`multipart/form-data`|`file`,`key`,`user`,`role`| `@see: routes/libs/api.js/upload`           |
-/api/share  | POST   |`application/json`   |`key`,`user`,`role`       | `@see: routes/libs/api.js/createShare`      |
-/api/share  | DELETE |`application/json`   |`key`,`user`,`role`       | `@see: routes/libs/api.js/deleteShare`      |
-/api/stats  | POST   |`application/json`   |`user`,`role`             | `@see: routes/libs/api.js/getStats`         |
+URL         |Method| Content Type        | Body                     | Response                                  |
+------------|------|---------------------|--------------------------|-------------------------------------------|
+/api/photos | POST |`application/json`   |`user`, `role`, `admin`   | `@see: routes/libs/api.js/retrieveKeys`   |
+/api/key    | POST |`application/json`   |`key`, `user`, `role`     | `@see: routes/libs/api.js/retrieveImage`  |
+/api/key    |DELETE|`application/json`   |`key`, `user`, `role`     | `@see: routes/libs/api.js/deleteImage`    |
+/api/upload | POST |`multipart/form-data`|`file`,`key`,`user`,`role`| `@see: routes/libs/api.js/upload`         |
+/api/share  | POST |`application/json`   |`key`,`is_shared`,`user`,`role`| `@see: routes/libs/api.js/share`     |
+/api/stats  | POST |`application/json`   |`user`,`role`             | `@see: routes/libs/api.js/getStats`       |
 
 ## TODO
 - [x] Login/Signup
