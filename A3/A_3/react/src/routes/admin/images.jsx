@@ -8,7 +8,6 @@ import {
 } from "react-router-dom";
 import {
   CardMedia,
-  Button,
   IconButton,
   Radio,
   Table,
@@ -22,7 +21,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   retrieveKeys,
   deleteImage,
-  deleteShare,
+  share,
 } from "@/libs/api";
 import SubmissionPrompt from "@/components/submission-prompt";
 import DataTable from "@/components/data-table";
@@ -184,7 +183,7 @@ export default function Images() {
                   loading={deleteShareLoading}
                   onClick={() => {
                     setDeleteShareLoading(true);
-                    deleteShare(selectedImage.image.key, true).then((response) => {
+                    share(selectedImage.image.key, false).then((response) => {
                       if (response.status === 200) {
                         const result = imagesList.map((image) => image.key === response.data.image.key ? response.data.image : image
                         )

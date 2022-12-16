@@ -23,8 +23,7 @@ import { Tooltip } from "@/components/tooltip";
 import {
   retrieveImage,
   deleteImage,
-  createShare,
-  deleteShare,
+  share
 } from "@/libs/api";
 import { BasicCard } from "@/components/card";
 
@@ -63,6 +62,13 @@ export default function Image({ route }) {
     }
   }
 
+  if (route === PublicRoute.path && !image.share_link) {
+    throw new Response("No Found", {
+      status: 404,
+      statusText: "HTTP Not Found",
+    });
+  }
+
   const handleShareMenuOpen = (event) => {
     setShareMenuAnchor(event.currentTarget);
   };
@@ -78,12 +84,12 @@ export default function Image({ route }) {
   return (
     <>
       <BasicCard
-        image={image.content}
+        image={route === ImageRoute.path ? image.content : image.share_link} // change share linkx
         title={(error && `${error?.status} ${error.details?.statusText}`) || `${image.key}`}
         subheader={
           error ? (error.details?.message) : (
             <>
-              {image.tag && (
+              {image.tag && route === ImageRoute.path && (
                 <Tooltip
                   title="Tag"
                   body={
@@ -93,19 +99,19 @@ export default function Image({ route }) {
                     >
                       <Chip
                         label={image.tag}
-                        sx={{ mt: 1 }}
+                        sx={{ mt: 1, mr: 1 }}
                       />
                     </RouterLink>
                   }
                 />
               )}
-              {image.last_time_accessed && (
+              {image.last_time_accessed && route === ImageRoute.path && (
                 <Tooltip
                   title="Last Time Accessed"
                   body={
                     <Chip
                       label={image.last_time_accessed}
-                      sx={{ mt: 1, ml: 1 }}
+                      sx={{ mt: 1, mr: 1 }}
                     />
                   }
                 />
@@ -116,7 +122,7 @@ export default function Image({ route }) {
                   body={
                     <Chip
                       label={image.number_of_access}
-                      sx={{ mt: 1, ml: 1 }}
+                      sx={{ mt: 1, mr: 1 }}
                     />
                   }
                 />
@@ -158,7 +164,7 @@ export default function Image({ route }) {
                   {image.share_link && (
                     <Box>
                       <MenuItem onClick={() => {
-                        navigator.clipboard.writeText(image.share_link);
+                        copyToClipboard(`${window.location.origin}/public/${image.key}`);
                         setBubble({
                           ...bubble,
                           snackbar: {
@@ -176,7 +182,7 @@ export default function Image({ route }) {
                       <MenuItem
                         onClick={() => {
                           handleShareMenuClose();
-                          deleteShare(image.key).then((response) => {
+                          share(image.key, false).then((response) => {
                             if (response.status === 200) {
                               setImage(response.data.image);
                               setBubble({
@@ -222,10 +228,10 @@ export default function Image({ route }) {
                 loadingPosition="start"
                 onClick={() => {
                   setCreateShareLoading(true);
-                  createShare(image.key).then((response) => {
+                  share(image.key, true).then((response) => {
                     if (response.status === 200) {
                       setImage(response.data.image);
-                      copyToClipboard(response.data.image.share_link);
+                      copyToClipboard(`${window.location.origin}/public/${image.key}`);
                       setBubble({
                         ...bubble,
                         snackbar: {
@@ -254,7 +260,7 @@ export default function Image({ route }) {
               startIcon={<ShareIcon />}
               size="small"
               onClick={() => {
-                copyToClipboard(image.share_link);
+                copyToClipboard(`${window.location.origin}/public/${image.key}`);
                 setBubble({
                   ...bubble,
                   snackbar: {

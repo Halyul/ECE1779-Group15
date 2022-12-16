@@ -18,7 +18,7 @@ export async function retrieveKeys(admin = false) {
     "/api/photos",
     {
       method: "POST",
-      body: JSON.stringify({ admin })
+      body: { admin }
     }
   )
   // return responseAdapter(data);
@@ -85,11 +85,17 @@ export async function retrieveKeys(admin = false) {
   }
 }
 
-export async function retrieveImage(key, shareKey) {
+export async function retrieveImage(key, share_key) {
+  key = key || share_key;
   const data = await request(
-    `/api/${key ? "key" : "public"}/${key || shareKey}`,
+    `/api/key`,
     {
       method: "POST",
+      body: share_key ? {
+        key,
+        user: null,
+        role: null,
+      } : { key }
     }
   )
   // return responseAdapter(data);
@@ -99,7 +105,7 @@ export async function retrieveImage(key, shareKey) {
       data: {
         image: {
           content: "https://gura.ch/images/0.jpg",
-          key: key || shareKey,
+          key: key,
           tag: "nan",
           share_link: "123",
           number_of_access: 1,
@@ -112,7 +118,7 @@ export async function retrieveImage(key, shareKey) {
       data: {
         image: {
           content: "https://gura.ch/images/404.jpg",
-          key: key || shareKey,
+          key: key,
           tag: "test",
           share_link: null,
           number_of_access: -1,
@@ -123,12 +129,12 @@ export async function retrieveImage(key, shareKey) {
   ][Math.floor(Math.random() * 2)]
 }
 
-export async function deleteImage(key, admin = false) {
+export async function deleteImage(key) {
   const data = await request(
-    `/api/key/${key}`,
+    `/api/key`,
     {
       method: "DELETE",
-      body: JSON.stringify({ admin })
+      body: { key }
     }
   )
   // return responseAdapter(data);
@@ -137,16 +143,19 @@ export async function deleteImage(key, admin = false) {
   }
 }
 
-export async function createShare(key) {
+export async function share(key, is_shared = false) {
   const data = await request(
     `/api/share`,
     {
       method: "POST",
-      body: JSON.stringify({ key })
+      body: {
+        key,
+        is_shared
+      }
     }
   )
   // return responseAdapter(data);
-  return {
+  return is_shared ? ({
     status: 200,
     data: {
       image: {
@@ -160,19 +169,7 @@ export async function createShare(key) {
         last_time_accessed: "27/11/2022 19:19:36",
       }
     }
-  }
-}
-
-export async function deleteShare(key, admin = false) {
-  const data = await request(
-    `/api/share`,
-    {
-      method: "DELETE",
-      body: JSON.stringify({ key, admin })
-    }
-  )
-  // return responseAdapter(data);
-  return {
+  }) : ({
     status: 200,
     data: {
       image: {
@@ -186,14 +183,14 @@ export async function deleteShare(key, admin = false) {
         last_time_accessed: "27/11/2022 19:19:36",
       }
     }
-  }
+  })
 }
 
 export async function getStats() {
   const data = await request(
     `/api/stats`,
     {
-      method: "GET",
+      method: "POST",
     }
   )
   // return responseAdapter(data);
@@ -227,14 +224,18 @@ export default async function request(
 ) {
   const user = JSON.parse(JSON.parse(window.localStorage.getItem("persist:root")).user);
   return fetch(url, {
+    ...options,
     headers: {
+      ...options.headers,
       "X-Access-Token": user.accessToken,
       "X-Id-Token": user.idToken,
-      "X-Username": user.username,
-      "X-Role": user.role,
-      ...options.headers,
     },
-    ...options,
+    body: JSON.stringify({
+      
+      "user": user.username,
+      "role": user.role,
+      ...options.body,
+    }),
   })
     .then((res) => {
       if (res.ok) {

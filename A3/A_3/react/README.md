@@ -2,19 +2,15 @@
 
 ## Requests
 
-URL                   | Method  | Content Type        | Body             | Response                                   |
-----------------------|---------|---------------------|------------------|------------------------------------------- |
-/api/photos           | GET     | `application/json`  | `{admin: false}` | `@see: routes/libs/api.js/retrieveKeys`    |
-/api/key/{key}        | GET     | `application/json`  | `N/A`            | `@see: routes/libs/api.js/retrieveImage`   |
-/api/key/{key}        | DELETE  | `application/json`  | `{admin: false}` | `@see: routes/libs/api.js/deleteImage`     |
-/api/upload           | POST    |`multipart/form-data`| `file`, `key`    | `@see: routes/libs/api.js/upload`          |
-/api/share            | POST    | `application/json`  | `key`            | `@see: routes/libs/api.js/createShare`     |
-/api/share            | DELETE  | `application/json`  | `key`, `{admin: false}`|`@see: routes/libs/api.js/deleteShare`|
-/api/photos           | GET     | `application/json`  | `{admin: true}`  | `@see: routes/libs/api.js/retrieveKeys`    |
-/api/key/{key}        | DELETE  | `application/json`  | `{admin: true}`  | `@see: routes/libs/api.js/deleteImage`     |
-/api/share            | DELETE  | `application/json`  | `key`, `{admin: true}`|`@see: routes/libs/api.js/deleteShare`|
-/api/stats            | GET     | `application/json`  | `N/A`            | `@see: routes/libs/api.js/getStats`        |
-/api/public/{key}     | GET     | `application/json`  | `N/A`            | `@see: routes/libs/api.js/retrieveImage`   |
+URL         | Method | Content Type        | Body                     | Response                                    |
+------------|--------|---------------------|--------------------------|---------------------------------------------|
+/api/photos | POST   |`application/json`   |`user`, `role`, `admin`   | `@see: routes/libs/api.js/retrieveKeys`     |
+/api/key    | POST   |`application/json`   |`key`, `user`, `role`     | `@see: routes/libs/api.js/retrieveImage`    |
+/api/key    | DELETE |`application/json`   |`key`, `user`, `role`     | `@see: routes/libs/api.js/deleteImage`      |
+/api/upload | POST   |`multipart/form-data`|`file`,`key`,`user`,`role`| `@see: routes/libs/api.js/upload`           |
+/api/share  | POST   |`application/json`   |`key`,`user`,`role`       | `@see: routes/libs/api.js/createShare`      |
+/api/share  | DELETE |`application/json`   |`key`,`user`,`role`       | `@see: routes/libs/api.js/deleteShare`      |
+/api/stats  | POST   |`application/json`   |`user`,`role`             | `@see: routes/libs/api.js/getStats`         |
 
 ## TODO
 - [x] Login/Signup
@@ -43,5 +39,5 @@ URL                   | Method  | Content Type        | Body             | Respo
 - [x] Public page to access shared photo
     - [x] Design
     - [x] Functionalities
-- [ ] Cognito README
+- [x] Cognito README
 - [ ] Integration
