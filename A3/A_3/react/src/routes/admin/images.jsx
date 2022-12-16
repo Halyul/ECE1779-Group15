@@ -89,7 +89,7 @@ export default function Images() {
     }).then((response) => {
       setIsRefreshing(false);
       setImagesList(response.data?.images);
-      setSelectionModel([imagesList[0].key]);
+      setSelectionModel([selectionModel[0] || response.data?.images[0].key]);
     })
   }
 
