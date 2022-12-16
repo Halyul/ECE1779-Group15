@@ -40,7 +40,7 @@ export async function loader({ params }) {
 export default function Images() {
   const loaderResponse = useLoaderData();
   const [bubble, setBubble] = useOutletContext();
-  const [imagesList, setImagesList] = useState(loaderResponse.images);
+  const [imagesList, setImagesList] = useState(loaderResponse.image);
   const [selectionModel, setSelectionModel] = useState([imagesList[0]?.key]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -88,8 +88,8 @@ export default function Images() {
       params: {}
     }).then((response) => {
       setIsRefreshing(false);
-      setImagesList(response.images);
-      setSelectionModel([selectionModel[0] || response.images[0].key]);
+      setImagesList(response.image);
+      setSelectionModel([selectionModel[0] || response.image[0].key]);
     })
   }
 
