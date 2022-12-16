@@ -41,7 +41,7 @@ export default function Images() {
   const loaderResponse = useLoaderData();
   const [bubble, setBubble] = useOutletContext();
   const [imagesList, setImagesList] = useState(loaderResponse.data.images);
-  const [selectionModel, setSelectionModel] = useState([imagesList[0].key]);
+  const [selectionModel, setSelectionModel] = useState([imagesList[0]?.key]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [deleteImageLoading, setDeleteImageLoading] = useState(false);
@@ -49,7 +49,7 @@ export default function Images() {
 
   const selectedImage = useMemo(() => {
     const image = imagesList.find((image) => image.key === selectionModel[0]);
-    return {
+    return image ? {
       image,
       mapping: [
         { name: "User", value: image.user },
@@ -59,7 +59,7 @@ export default function Images() {
         { name: "Number of Access", value: image.number_of_access },
         { name: "Last Time Accessed", value: image.last_time_accessed },
       ]
-    }
+    } : null
   }, [imagesList, selectionModel]);
 
   const columns = useMemo(
@@ -116,103 +116,107 @@ export default function Images() {
           setSelectionModel(newSelectionModel);
         }}
         content={
-          <>
-            <CardMedia component="img"
-              image={selectedImage.image.thumbnail}
-              sx={{ marginTop: "8px" }}
-            />
-            <TableContainer>
-              <Table>
-                <TableBody>
-                  {selectedImage.mapping.map((row) => (
-                    <TableRow
-                      key={row.name}
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        {row.name}
-                      </TableCell>
-                      <TableCell align="right">{(row.value).toString()}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </>
+          selectedImage && (
+            <>
+              <CardMedia component="img"
+                image={selectedImage.image.thumbnail}
+                sx={{ marginTop: "8px" }}
+              />
+              <TableContainer>
+                <Table>
+                  <TableBody>
+                    {selectedImage.mapping.map((row) => (
+                      <TableRow
+                        key={row.name}
+                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                      >
+                        <TableCell component="th" scope="row">
+                          {row.name}
+                        </TableCell>
+                        <TableCell align="right">{(row.value).toString()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
+          )
         }
         actions={
-          <>
-            <LoadingButton
-              color="error"
-              size="small"
-              loading={deleteImageLoading}
-              onClick={() => {
-                setDeleteImageLoading(true);
-                deleteImage(selectedImage.image.key, true).then((response) => {
-                  if (response.status === 200) {
-                    const result = imagesList.filter((image) => image.key !== selectedImage.image.key)
-                    setImagesList(result)
-                    setSelectionModel([result[0].key]);
-                    setBubble({
-                      ...bubble,
-                      snackbar: {
-                        open: true,
-                        message: "Image deleted"
-                      }
-                    })
-                  } else {
-                    setBubble({
-                      ...bubble,
-                      snackbar: {
-                        open: true,
-                        message: "Failed to delete image"
-                      }
-                    })
-                  }
-                  setDeleteImageLoading(false);
-                });
-              }}
-            >
-              Delete Image
-            </LoadingButton>
-            {
-              selectedImage.image.share_link && (
-                <LoadingButton
-                  color="error"
-                  size="small"
-                  loading={deleteShareLoading}
-                  onClick={() => {
-                    setDeleteShareLoading(true);
-                    share(selectedImage.image.key, false).then((response) => {
-                      if (response.status === 200) {
-                        const result = imagesList.map((image) => image.key === response.data.image.key ? response.data.image : image
-                        )
-                        setImagesList(result);
-                        setBubble({
-                          ...bubble,
-                          snackbar: {
-                            open: true,
-                            message: "Share link deleted"
-                          }
-                        })
-                      } else {
-                        setBubble({
-                          ...bubble,
-                          snackbar: {
-                            open: true,
-                            message: "Failed to delete share link"
-                          }
-                        })
-                      }
-                      setDeleteShareLoading(false);
-                    });
-                  }}
-                >
-                  Delete Share
-                </LoadingButton>
-              )
-            }
-          </>
+          selectedImage && (
+            <>
+              <LoadingButton
+                color="error"
+                size="small"
+                loading={deleteImageLoading}
+                onClick={() => {
+                  setDeleteImageLoading(true);
+                  deleteImage(selectedImage.image.key, true).then((response) => {
+                    if (response.status === 200) {
+                      const result = imagesList.filter((image) => image.key !== selectedImage.image.key)
+                      setImagesList(result)
+                      setSelectionModel([result[0]?.key]);
+                      setBubble({
+                        ...bubble,
+                        snackbar: {
+                          open: true,
+                          message: "Image deleted"
+                        }
+                      })
+                    } else {
+                      setBubble({
+                        ...bubble,
+                        snackbar: {
+                          open: true,
+                          message: "Failed to delete image"
+                        }
+                      })
+                    }
+                    setDeleteImageLoading(false);
+                  });
+                }}
+              >
+                Delete Image
+              </LoadingButton>
+              {
+                selectedImage.image.share_link && (
+                  <LoadingButton
+                    color="error"
+                    size="small"
+                    loading={deleteShareLoading}
+                    onClick={() => {
+                      setDeleteShareLoading(true);
+                      share(selectedImage.image.key, false).then((response) => {
+                        if (response.status === 200) {
+                          const result = imagesList.map((image) => image.key === response.data.image.key ? response.data.image : image
+                          )
+                          setImagesList(result);
+                          setBubble({
+                            ...bubble,
+                            snackbar: {
+                              open: true,
+                              message: "Share link deleted"
+                            }
+                          })
+                        } else {
+                          setBubble({
+                            ...bubble,
+                            snackbar: {
+                              open: true,
+                              message: "Failed to delete share link"
+                            }
+                          })
+                        }
+                        setDeleteShareLoading(false);
+                      });
+                    }}
+                  >
+                    Delete Share
+                  </LoadingButton>
+                )
+              }
+            </>
+          )
         }
       />
       <SubmissionPrompt

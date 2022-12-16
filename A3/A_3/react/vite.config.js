@@ -15,6 +15,13 @@ export default defineConfig({
     },
   },
   build: {
-    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          mui: ['@mui/material'],
+          data_grid: ['@mui/x-data-grid'],
+        },
+      }
+    }
   },
 })

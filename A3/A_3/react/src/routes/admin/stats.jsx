@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useLoaderData } from "react-router-dom";
 import {
   Box,
-  Typography,
   IconButton,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -48,18 +47,14 @@ export default function Stats() {
           </IconButton>
         }
         content={
-          statsList.length > 0 ? (
-            <Box sx={{ height: "61.8vh", maxHeight: 768 }}>
-              <DataGrid
-                getRowId={(r) => r.name}
-                loading={isRefreshing}
-                rows={statsList}
-                columns={columns}
-                disableSelectionOnClick />
-            </Box>
-          ) : (
-            <Typography variant="body1">No stats found.</Typography>
-          )
+          <Box sx={{ height: "61.8vh", maxHeight: 768 }}>
+            <DataGrid
+              getRowId={(r) => r.name}
+              loading={isRefreshing}
+              rows={statsList}
+              columns={columns}
+              disableSelectionOnClick />
+          </Box>
         }
       />
       <SubmissionPrompt

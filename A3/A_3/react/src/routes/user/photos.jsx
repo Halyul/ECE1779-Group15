@@ -4,14 +4,11 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
-import { GridActionsCellItem } from '@mui/x-data-grid';
 import {
   IconButton,
-  Typography,
   ImageList,
   ImageListItem,
   ImageListItemBar,
-  Tooltip,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { retrieveKeys } from "@/libs/api";
@@ -92,7 +89,7 @@ export default function Photos() {
           },
         }}
         content={
-          selectedImages && selectedImages.length > 0 ? (
+          selectedImages.length > 0 && (
             <ImageList cols={window.innerWidth > 768 ? 3 : (window.innerWidth > 500 ? 2 : 1)} gap={8} variant="masonry">
               {selectedImages.map((key) => (
                 <ImageListItem
@@ -114,10 +111,6 @@ export default function Photos() {
                 </ImageListItem>
               ))}
             </ImageList>
-          ) : (
-            <Typography variant="body1" sx={{ mt: 1 }}>
-              No photo selected.
-            </Typography>
           )
         }
       />
