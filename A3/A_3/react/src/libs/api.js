@@ -223,7 +223,7 @@ export default async function request(
   options = {}
 ) {
   const user = JSON.parse(JSON.parse(window.localStorage.getItem("persist:root")).user);
-  return fetch(url, {
+  return fetch(import.meta.env.VITE_BACKEND_URL + url, {
     ...options,
     headers: {
       ...options.headers,
