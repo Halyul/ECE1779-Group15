@@ -1,6 +1,6 @@
 import base64, time
 from datetime import datetime
-
+import mimetypes
 import werkzeug
 from flask import request
 from flask_restful import reqparse
@@ -148,7 +148,7 @@ def list_all_multi_attributes():
 
     for item in image_meta:
         flag, thumbnail = BUCKET.object.get(item.get('thumbnail'))
-        thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+        thumbnail64 = "data:{};base64,".format(mimetypes.guess_type(item.get('thumbnail'))[0]) + base64.b64encode(thumbnail).decode("utf-8")
         item.update({"thumbnail": thumbnail64})
 
     return True, 200, dict(

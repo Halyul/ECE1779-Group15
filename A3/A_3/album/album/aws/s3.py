@@ -27,7 +27,7 @@ class Bucket:
                 resp = self.client.get_object(Bucket=self.bucket, Key=key)
                 if resp["ResponseMetadata"]["HTTPStatusCode"] == 200:
                     logging.info("Get S3 object")
-                    return True, resp["Body"].read().decode("utf-8")
+                    return True, resp["Body"].read()
                 logging.error("Get S3 object: {}".format(resp))
                 return False, resp
             except ClientError as e:
