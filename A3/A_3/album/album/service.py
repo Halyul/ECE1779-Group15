@@ -1,6 +1,9 @@
 import base64, time
+import math
 from datetime import datetime
 import mimetypes
+from decimal import Decimal
+
 import werkzeug
 from flask import request
 from flask_restful import reqparse
@@ -8,7 +11,7 @@ from flask_restful import reqparse
 from album.aws.dynamoDB_admin import db_get_image_by_key_admin, db_get_all_images_admin
 from album.aws.dynamoDB_common import db_upload_image, db_update_access_time, db_delete_image, \
     db_set_is_shared, CAPACITY, db_get_stats_from_table, IMAGE_NUMBER, USER_NUMBER, CALL_NUMBER, update_statistics, \
-    db_get_table_stats
+    db_get_table_stats, db_reset_share
 from album.aws.dynamoDB_user import db_is_allowed_get_shared_image, db_get_all_images_user, db_get_image_by_key_user
 
 from album.aws.s3 import Bucket
@@ -28,8 +31,13 @@ def upload_image():
     file = request.files["file"]
     file_content = file.read()
     extension = file.filename.rsplit('.', 1)[1].lower()
+<<<<<<< HEAD
     size = len(file_content)
     update_statistics(CAPACITY, size)
+=======
+    size = len(file.read()) / (1024 * 1024)
+    update_statistics(CAPACITY, round(Decimal(size), 2))
+>>>>>>> 69f2de021c4c04fee31a9d23a6252a72fe49eae1
     user = data["user"]
     role = data["role"]
 
@@ -52,6 +60,13 @@ def upload_image():
 
 
 def delete_image():
+    """
+    1. Get image meta from db based on key
+    2. Reduce capacity
+    3. Delete image from s3
+    4. Delete s3 from s3
+    5. Delete entry in database
+    """
     update_statistics(CALL_NUMBER, 1)
 
     key = request.get_json()["key"]
@@ -59,9 +74,20 @@ def delete_image():
     image_meta = db_get_image_by_key_admin(key)
     if image_meta:
         file_name = image_meta.get('image_name')
+        thumbnail_name = image_meta.get('thumbnail')
+
+        file = BUCKET.object.get(file_name)
+        size = len(file[1]) / (1024 * 1024)
+        # size = math.ceil(len(file.read())) / (1024 * 1024)
+        update_statistics(CAPACITY, -1 * round(Decimal(size), 2))
+
         BUCKET.object.delete(file_name)
+        BUCKET.object.delete(thumbnail_name)
         logging.info("Key deleted")
-    db_delete_image(key)
+
+        db_delete_image(key)
+    else:
+        return False, 400, "No such key"
     return True, 200, None
 
 
@@ -73,7 +99,8 @@ def share_image():
 
     db_set_is_shared(key, is_shared)
     image_meta = db_get_image_by_key_admin(key)
-    if not db_is_allowed_get_shared_image(key):
+    if db_is_allowed_get_shared_image(key) is False:
+        db_reset_share(key)
         image_meta.update({"number_of_access": -1})
         image_meta.update({"share_link": None})
 
