@@ -26,10 +26,11 @@ def upload_image():
     if " " in key or "" == key or len(key) > 48:
         return False, 400, "Key does not meet the requirement."
     file = request.files["file"]
+    extension = file.filename.rsplit('.', 1)[1].lower()
     user = data["user"]
     role = data["role"]
 
-    filename = "{}.{}".format(str(int(time.time() * 1000)), "s3")
+    filename = "{}.{}".format(str(int(time.time() * 1000)), extension)
     time_stamp = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
     image_meta = db_get_image_by_key_admin(key)
