@@ -40,7 +40,7 @@ export async function loader({ params }) {
 export default function Images() {
   const loaderResponse = useLoaderData();
   const [bubble, setBubble] = useOutletContext();
-  const [imagesList, setImagesList] = useState(loaderResponse.data.images);
+  const [imagesList, setImagesList] = useState(loaderResponse.images);
   const [selectionModel, setSelectionModel] = useState([imagesList[0]?.key]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -88,8 +88,8 @@ export default function Images() {
       params: {}
     }).then((response) => {
       setIsRefreshing(false);
-      setImagesList(response.data?.images);
-      setSelectionModel([selectionModel[0] || response.data?.images[0].key]);
+      setImagesList(response.images);
+      setSelectionModel([selectionModel[0] || response.images[0].key]);
     })
   }
 
@@ -188,7 +188,7 @@ export default function Images() {
                       setDeleteShareLoading(true);
                       share(selectedImage.image.key, false).then((response) => {
                         if (response.status === 200) {
-                          const result = imagesList.map((image) => image.key === response.data.image.key ? response.data.image : image
+                          const result = imagesList.map((image) => image.key === response.image[0].key ? response.image[0] : image
                           )
                           setImagesList(result);
                           setBubble({

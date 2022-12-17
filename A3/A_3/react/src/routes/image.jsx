@@ -33,7 +33,7 @@ export async function loader({ params }) {
     return {
       status: response.status,
       details: {
-        message: response.data.message,
+        message: response.message,
         statusText: response.statusText
       }
     }
@@ -50,7 +50,7 @@ export default function Image({ route }) {
 
   const [bubble, setBubble] = useOutletContext();
 
-  const [image, setImage] = useState(loaderResponse.data?.image);
+  const [image, setImage] = useState(loaderResponse.image[0]);
   const [deleteImageLoading, setDeleteImageLoading] = useState(false);
   const [createShareLoading, setCreateShareLoading] = useState(false);
 
@@ -184,7 +184,7 @@ export default function Image({ route }) {
                           handleShareMenuClose();
                           share(image.key, false).then((response) => {
                             if (response.status === 200) {
-                              setImage(response.data.image);
+                              setImage(response.image[0]);
                               setBubble({
                                 ...bubble,
                                 snackbar: {
@@ -230,7 +230,7 @@ export default function Image({ route }) {
                   setCreateShareLoading(true);
                   share(image.key, true).then((response) => {
                     if (response.status === 200) {
-                      setImage(response.data.image);
+                      setImage(response.image[0]);
                       copyToClipboard(`${window.location.origin}/public/${image.key}`);
                       setBubble({
                         ...bubble,

@@ -24,64 +24,62 @@ export async function retrieveKeys(admin = false) {
   // return responseAdapter(data);
   return {
     status: 200,
-    data: {
-      images: [
-        {
-          key: "ajksdfghbuiagda", // the image key
-          user: "gura",
-          number_of_access: 1,
-          last_time_accessed: "27/11/2022 19:19:36",
-          thumbnail: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-          tag: "test",
-          share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-        },
-        {
-          key: "gura", // the image key
-          user: "gura",
-          number_of_access: 1,
-          last_time_accessed: "27/11/2022 19:19:36",
-          thumbnail: "https://gura.ch/images/0.jpg",
-          tag: "nan",
-          share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-        },
-        {
-          key: "78", // the image key
-          user: "gura",
-          number_of_access: 1,
-          last_time_accessed: "27/11/2022 19:19:36",
-          thumbnail: "https://gura.ch/images/404.jpg",
-          tag: "nan",
-          share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-        },
-        {
-          key: "8", // the image key
-          user: "gura",
-          number_of_access: 1,
-          last_time_accessed: "27/11/2022 19:19:36",
-          thumbnail: "https://gura.ch/images/200.jpg",
-          tag: "nan",
-          share_link: null,
-        },
-        {
-          key: "12381", // the image key
-          user: "gura",
-          number_of_access: 1,
-          last_time_accessed: "27/11/2022 19:19:36",
-          thumbnail: "https://gura.ch/images/302.jpg",
-          tag: "nan",
-          share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-        },
-        {
-          key: Math.random().toString(), // the image key
-          user: "gura",
-          number_of_access: 1,
-          last_time_accessed: "27/11/2022 19:19:36",
-          thumbnail: "https://gura.ch/images/414.jpg",
-          tag: "nan",
-          share_link: null,
-        }
-      ]
-    }
+    images: [
+      {
+        key: "ajksdfghbuiagda", // the image key
+        user: "gura",
+        number_of_access: 1,
+        last_time_accessed: "27/11/2022 19:19:36",
+        thumbnail: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
+        tag: "test",
+        share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
+      },
+      {
+        key: "gura", // the image key
+        user: "gura",
+        number_of_access: 1,
+        last_time_accessed: "27/11/2022 19:19:36",
+        thumbnail: "https://gura.ch/images/0.jpg",
+        tag: "nan",
+        share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
+      },
+      {
+        key: "78", // the image key
+        user: "gura",
+        number_of_access: 1,
+        last_time_accessed: "27/11/2022 19:19:36",
+        thumbnail: "https://gura.ch/images/404.jpg",
+        tag: "nan",
+        share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
+      },
+      {
+        key: "8", // the image key
+        user: "gura",
+        number_of_access: 1,
+        last_time_accessed: "27/11/2022 19:19:36",
+        thumbnail: "https://gura.ch/images/200.jpg",
+        tag: "nan",
+        share_link: null,
+      },
+      {
+        key: "12381", // the image key
+        user: "gura",
+        number_of_access: 1,
+        last_time_accessed: "27/11/2022 19:19:36",
+        thumbnail: "https://gura.ch/images/302.jpg",
+        tag: "nan",
+        share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
+      },
+      {
+        key: Math.random().toString(), // the image key
+        user: "gura",
+        number_of_access: 1,
+        last_time_accessed: "27/11/2022 19:19:36",
+        thumbnail: "https://gura.ch/images/414.jpg",
+        tag: "nan",
+        share_link: null,
+      }
+    ]
   }
 }
 
@@ -102,8 +100,8 @@ export async function retrieveImage(key, share_key) {
   return [
     {
       status: 200,
-      data: {
-        image: {
+      image: [
+        {
           content: "https://gura.ch/images/0.jpg",
           key: key,
           tag: "nan",
@@ -111,12 +109,12 @@ export async function retrieveImage(key, share_key) {
           number_of_access: 1,
           last_time_accessed: "27/11/2022 19:19:36",
         }
-      }
+      ]
     },
     {
       status: 200,
-      data: {
-        image: {
+      image: [
+        {
           content: "https://gura.ch/images/404.jpg",
           key: key,
           tag: "test",
@@ -124,7 +122,7 @@ export async function retrieveImage(key, share_key) {
           number_of_access: -1,
           last_time_accessed: "27/11/2022 19:19:36",
         }
-      }
+      ]
     }
   ][Math.floor(Math.random() * 2)]
 }
@@ -157,8 +155,8 @@ export async function share(key, is_shared = false) {
   // return responseAdapter(data);
   return is_shared ? ({
     status: 200,
-    data: {
-      image: {
+    image: [
+      {
         content: "https://gura.ch/images/404.jpg",
         thumbnail: "https://gura.ch/images/404.jpg",
         user: "gura",
@@ -168,11 +166,11 @@ export async function share(key, is_shared = false) {
         number_of_access: 0,
         last_time_accessed: "27/11/2022 19:19:36",
       }
-    }
+    ]
   }) : ({
     status: 200,
-    data: {
-      image: {
+    image: [
+      {
         content: "https://gura.ch/images/0.jpg",
         thumbnail: "https://gura.ch/images/0.jpg",
         key: key,
@@ -182,7 +180,7 @@ export async function share(key, is_shared = false) {
         number_of_access: -1,
         last_time_accessed: "27/11/2022 19:19:36",
       }
-    }
+    ]
   })
 }
 
@@ -231,7 +229,7 @@ export default async function request(
       "X-Id-Token": user.idToken,
     },
     body: JSON.stringify({
-      
+
       "user": user.username,
       "role": user.role,
       ...options.body,
