@@ -8,6 +8,27 @@ def get_item_from_table(table_name, index_name, index_value):
     return item['Item']
     
 def update_shared_link_number_of_accesses(new_image):
+    # get the key name from key_image table
+    tableName = 'key_image'
+    indexName = 'ImageIndex'
+
+    table = dynamodb.Table(tableName)
+    response = table.scan(IndexName=indexName)
+    records = []
+    for i in response['Items']:
+        records.append(i)
+    while 'LastEvaluatedKey' in response:
+        response = table.scan(
+            IndexName=indexName,
+            ExclusiveStartKey=response['LastEvaluatedKey']
+        )
+        for i in response['Items']:
+            records.append(i)
+
+    for item in records:
+        if item['Image'] == new_image:
+            new_image = item['Key']
+
     # update the 'Number of accesses' in dynamo db
     tableName = 'shared_link'
     table = dynamodb.Table(tableName)

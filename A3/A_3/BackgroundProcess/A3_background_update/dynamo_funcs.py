@@ -9,7 +9,7 @@ dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 
 def get_new_key_from_image(new_image):
     tableName = 'key_image'
-    indexName = 'Image-index'
+    indexName = 'ImageIndex'
 
     table = dynamodb.Table(tableName)
     response = table.scan(IndexName=indexName)

@@ -27,7 +27,7 @@ def lambda_handler(event, context):
         set_key_image_table(new_key, new_image_name, thumbnail_name, tag)
     
         # update shared_link table
-        set_shared_link_table(new_image_name)
+        set_shared_link_table(new_key)
     
     # update statistics table
     update_num_calls_statistics()
