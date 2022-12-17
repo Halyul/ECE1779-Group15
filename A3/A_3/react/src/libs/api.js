@@ -24,7 +24,7 @@ export async function retrieveKeys(admin = false) {
   // return responseAdapter(data);
   return {
     status: 200,
-    images: [
+    image: [
       {
         key: "ajksdfghbuiagda", // the image key
         user: "gura",

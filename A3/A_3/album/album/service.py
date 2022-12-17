@@ -14,19 +14,22 @@ from album.config import Config
 from album.aws.s3 import Bucket
 import logging
 
-BUCKET = Bucket("ece1776week6")
+BUCKET = Bucket("ece1779a3hx")
 ADMIN = "admin"
 
 
 def upload_image():
     update_statistics(CALL_NUMBER, 1)
 
-    key = request.get_json()["key"]
+    data = request.form.to_dict()
+    key = data["key"]
     if " " in key or "" == key or len(key) > 48:
         return False, 400, "Key does not meet the requirement."
-    file = request.get_json()["file"]
-    user = request.get_json()["user"]
-    role = request.get_json()["role"]
+    file = request.files["file"]
+    user = data["user"]
+    role = data["role"]
+
+    
 
     filename = "{}.{}".format(str(int(time.time() * 1000)), "s3")
     time_stamp = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
