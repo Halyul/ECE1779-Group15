@@ -7,6 +7,13 @@ KEY_IMAGE_TABLE = 'key_image'
 SHARED_LINK_TABLE = 'shared_link'
 STATISTICS_TABLE = 'statistics'
 
+STATISTICS = 'Statistics'
+VALUE = 'Value'
+CAPACITY = 'Capacity'
+IMAGE_NUMBER = 'Total Number of Images'
+USER_NUMBER = 'Total Number of active users'
+CALL_NUMBER = 'Number of Calls to Lambda Function'
+
 
 def db_upload_image(key, image, user, last_time_accessed):
     table1 = dynamodb.Table(KEY_IMAGE_TABLE)
@@ -24,7 +31,9 @@ def db_upload_image(key, image, user, last_time_accessed):
     response = table2.put_item(
         Item={
             'Image key': key,
-            'Is shared': 'false'
+            'Share key': ' ',
+            'Number of accesses': 0,
+            'Is shared': 'False'
         }
     )
     logging.info('Upload image successfully')
@@ -92,24 +101,25 @@ def db_get_shared_link_table_attributes(key):
         return records
 
 
-def db_get_item_from_table(table_name, index_name, index_value):
-    table = dynamodb.Table(table_name)
-    item = table.get_item(Key={index_name: index_value})
-    return item['Item']
+def db_get_stats_from_table(stats_type):
+    table = dynamodb.Table(STATISTICS_TABLE)
+    item = table.get_item(
+        Key={
+            STATISTICS: stats_type
+        }
+    )
+    return int(item['Item'][VALUE])
 
 
-def update_num_calls_statistics():
-    tableName = 'statistics'
-    table = dynamodb.Table(tableName)
+def update_statistics(stats_type, increase_num):
+    table = dynamodb.Table(STATISTICS_TABLE)
 
-    # get current num_calls
-    curr_num_of_call = db_get_item_from_table('statistics', 'Statistics', 'Number of Calls to Lambda Function')['Value']
-    curr_num_of_call = int(curr_num_of_call)
+    curr_value = db_get_stats_from_table(stats_type)
 
     response = table.update_item(
-        Key={'Statistics': 'Number of Calls to Lambda Function'},
-        UpdateExpression="set #Value=:calls",
+        Key={STATISTICS: stats_type},
+        UpdateExpression="set #Value=:new",
         ExpressionAttributeValues={
-            ':calls': curr_num_of_call + 1},
-        ExpressionAttributeNames={'#Value': 'Value'},
+            ':new': curr_value + increase_num},
+        ExpressionAttributeNames={'#Value': VALUE},
         ReturnValues="UPDATED_NEW")

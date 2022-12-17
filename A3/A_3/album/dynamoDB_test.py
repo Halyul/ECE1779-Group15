@@ -2,7 +2,8 @@ from datetime import datetime
 
 from album.aws.dynamoDB_admin import db_get_image_by_key_admin, db_get_all_images_admin
 from album.aws.dynamoDB_common import db_upload_image, db_delete_image, db_set_is_shared, db_update_access_time, \
-    db_get_shared_link_table_attributes, update_num_calls_statistics
+    db_get_shared_link_table_attributes, STATISTICS_TABLE, CAPACITY, \
+    db_get_stats_from_table
 from album.aws.dynamoDB_table import db_create_table_stats, db_intiate_stats_table
 from album.aws.dynamoDB_user import db_is_allowed_get_shared_image, db_get_image_by_key_user, db_get_all_images_user
 from album.aws.testOnly import db_set_tag, db_set_thumbnail
@@ -74,3 +75,6 @@ time_stamp = str(now.strftime("%Y-%m-%d %H:%M:%S"))
 # update_num_calls_statistics()
 
 # print(db_get_image_by_key_admin('1'))
+
+print(db_get_stats_from_table(CAPACITY))
+# print(db_get_item_from_table(STATISTICS_TABLE, 'Statistics', 'Number of Calls to Lambda Function'))

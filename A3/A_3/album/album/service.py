@@ -1,28 +1,33 @@
 import base64, time
 from datetime import datetime
 
+import werkzeug
 from flask import request
+from flask_restful import reqparse
 
 from album.aws.dynamoDB_admin import db_get_image_by_key_admin, db_get_all_images_admin
 from album.aws.dynamoDB_common import db_upload_image, db_update_access_time, db_delete_image, \
-    db_set_is_shared
+    db_set_is_shared, CAPACITY, db_get_stats_from_table, IMAGE_NUMBER, USER_NUMBER, CALL_NUMBER, update_statistics
 from album.aws.dynamoDB_user import db_is_allowed_get_shared_image, db_get_all_images_user, db_get_image_by_key_user
 
 from album.config import Config
 from album.aws.s3 import Bucket
 import logging
 
-BUCKET = Bucket("ece1776week6")
+BUCKET = Bucket("ece1779a3hx")
 ADMIN = "admin"
 
 
 def upload_image():
-    key = request.get_json()["key"]
+    update_statistics(CALL_NUMBER, 1)
+
+    data = request.form.to_dict()
+    key = data["key"]
     if " " in key or "" == key or len(key) > 48:
         return False, 400, "Key does not meet the requirement."
-    file = request.get_json()["file"]
-    user = request.get_json()["user"]
-    role = request.get_json()["role"]
+    file = request.files["file"]
+    user = data["user"]
+    role = data["role"]
 
     filename = "{}.{}".format(str(int(time.time() * 1000)), "s3")
     time_stamp = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
@@ -35,14 +40,16 @@ def upload_image():
         db_upload_image(key, filename, user, time_stamp)
 
     # file_base64 = file
-    file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
-    flag, resp = BUCKET.object.upload(file_base64, filename)
+    # file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
+    flag, resp = BUCKET.object.upload(file, filename)
     if not flag:
         return False, 500, "Failed to upload the image."
     return True, 200, None
 
 
 def delete_image():
+    update_statistics(CALL_NUMBER, 1)
+
     key = request.get_json()["key"]
 
     image_meta = db_get_image_by_key_admin(key)
@@ -55,6 +62,8 @@ def delete_image():
 
 
 def share_image():
+    update_statistics(CALL_NUMBER, 1)
+
     key = request.get_json()["key"]
     is_shared = request.get_json()["is_shared"]
 
@@ -67,6 +76,11 @@ def share_image():
     file_name = image_meta.get('image_name')
     time_stamp = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     db_update_access_time(key, time_stamp)
+
+    flag, thumbnail = BUCKET.object.get(image_meta.get('thumbnail'))
+    thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+    image_meta.update({"thumbnail": thumbnail64})
+
     flag, content = BUCKET.object.get(file_name)
     if not flag:
         return False, 500, "Failed to retrieve the image."
@@ -78,6 +92,8 @@ def share_image():
 
 
 def get_image_by_key():
+    update_statistics(CALL_NUMBER, 1)
+
     key = request.get_json()["key"]
     user = request.get_json()["user"]
     role = request.get_json()["role"]
@@ -103,6 +119,11 @@ def get_image_by_key():
         file_name = image_meta.get('image_name')
         time_stamp = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
         db_update_access_time(key, time_stamp)
+
+        flag, thumbnail = BUCKET.object.get(image_meta.get('thumbnail'))
+        thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+        image_meta.update({"thumbnail": thumbnail64})
+
         flag, content = BUCKET.object.get(file_name)
         if not flag:
             return False, 500, "Failed to retrieve the image."
@@ -114,14 +135,33 @@ def get_image_by_key():
 
 
 def list_all_multi_attributes():
+    update_statistics(CALL_NUMBER, 1)
+
     user = request.get_json()["user"]
     role = request.get_json()["role"]
     admin = request.get_json()["admin"]
 
     if admin:
-        keys_entries = db_get_all_images_admin()
+        image_meta = db_get_all_images_admin()
     else:
-        keys_entries = db_get_all_images_user(user)
+        image_meta = db_get_all_images_user(user)
+
+    flag, thumbnail = BUCKET.object.get(image_meta.get('thumbnail'))
+    thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+    image_meta.update({"thumbnail": thumbnail64})
+
     return True, 200, dict(
-        images=keys_entries
+        images=image_meta
+    )
+
+
+def get_stats():
+    update_statistics(CALL_NUMBER, 1)
+    stats = {}
+    stats['capacity'] = db_get_stats_from_table(CAPACITY)
+    stats['total_number_of_images'] = db_get_stats_from_table(IMAGE_NUMBER)
+    stats['total_number_of_active_users'] = db_get_stats_from_table(USER_NUMBER)
+    stats['number_of_calls_to_lambda_function'] = db_get_stats_from_table(CALL_NUMBER)
+    return True, 200, dict(
+        stats=stats
     )

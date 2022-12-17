@@ -89,7 +89,7 @@ def db_is_allowed_get_shared_image(key):
             'Image key': key
         }
     )
-    if len(response['Item']) == 0 or response['Item']['Is shared'] != 'True':
+    if 'Item' not in response or response['Item']['Is shared'] != 'True':
         return False
     else:
         return True
