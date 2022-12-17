@@ -68,7 +68,7 @@ def db_get_all_images_user(user):
                 record['number_of_access'] = db_get_shared_link_table_attributes(item.get('Key')).get(
                     'number_of_access')
                 record['last_time_accessed'] = item.get('Last time accessed')
-                record['thumbnail'] = response['Item'].get('Thumbnail')
+                record['thumbnail'] = item.get('Thumbnail')
                 # thumbnail = response['Item'].get('Thumbnail')
                 # record['thumbnail'] = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(
                 #     thumbnail.read())

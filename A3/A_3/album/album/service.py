@@ -7,10 +7,10 @@ from flask_restful import reqparse
 
 from album.aws.dynamoDB_admin import db_get_image_by_key_admin, db_get_all_images_admin
 from album.aws.dynamoDB_common import db_upload_image, db_update_access_time, db_delete_image, \
-    db_set_is_shared, CAPACITY, db_get_stats_from_table, IMAGE_NUMBER, USER_NUMBER, CALL_NUMBER, update_statistics
+    db_set_is_shared, CAPACITY, db_get_stats_from_table, IMAGE_NUMBER, USER_NUMBER, CALL_NUMBER, update_statistics, \
+    db_get_table_stats
 from album.aws.dynamoDB_user import db_is_allowed_get_shared_image, db_get_all_images_user, db_get_image_by_key_user
 
-from album.config import Config
 from album.aws.s3 import Bucket
 import logging
 
@@ -27,6 +27,8 @@ def upload_image():
         return False, 400, "Key does not meet the requirement."
     file = request.files["file"]
     extension = file.filename.rsplit('.', 1)[1].lower()
+    size = len(file.read())
+    update_statistics(CAPACITY, size)
     user = data["user"]
     role = data["role"]
 
@@ -165,8 +167,8 @@ def get_stats():
     update_statistics(CALL_NUMBER, 1)
     stats = {}
     stats['capacity'] = db_get_stats_from_table(CAPACITY)
-    stats['total_number_of_images'] = db_get_stats_from_table(IMAGE_NUMBER)
-    stats['total_number_of_active_users'] = db_get_stats_from_table(USER_NUMBER)
+    stats['total_number_of_images'] = db_get_table_stats().get('image_number')
+    stats['total_number_of_active_users'] = db_get_table_stats().get('user_number')
     stats['number_of_calls_to_lambda_function'] = db_get_stats_from_table(CALL_NUMBER)
     return True, 200, dict(
         stats=stats

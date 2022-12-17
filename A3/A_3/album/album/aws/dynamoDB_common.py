@@ -123,3 +123,28 @@ def update_statistics(stats_type, increase_num):
             ':new': curr_value + increase_num},
         ExpressionAttributeNames={'#Value': VALUE},
         ReturnValues="UPDATED_NEW")
+
+
+def db_get_table_stats():
+    table = dynamodb.Table(KEY_IMAGE_TABLE)
+    response = table.scan(IndexName='UserIndex')
+    users = []
+    num = 0
+    for item in response['Items']:
+        num = num + 1
+        if item.get('User') not in users:
+            users.append(item.get('User'))
+
+    while 'LastEvaluatedKey' in response:
+        response = table.scan(
+            IndexName="UserIndex",
+            ExclusiveStartKey=response['LastEvaluatedKey']
+        )
+        for item in response['Items']:
+            num = num + 1
+            if item.get('User') not in users:
+                users.append(item.get('User'))
+    result = {}
+    result['image_number'] = num
+    result['user_number'] = len(users)
+    return result
