@@ -86,7 +86,7 @@ def share_image():
     if not flag:
         return False, 500, "Failed to retrieve the image."
 
-    content64 = "data:{};base64,".format(mimetypes.guess_type(file_name)[0]) + base64.b64encode(thumbnail).decode(
+    content64 = "data:{};base64,".format(mimetypes.guess_type(file_name)[0]) + base64.b64encode(content).decode(
         "utf-8")
     image_meta['content'] = content64
     return True, 200, dict(
@@ -131,7 +131,7 @@ def get_image_by_key():
         if not flag:
             return False, 500, "Failed to retrieve the image."
 
-        content64 = "data:{};base64,".format(mimetypes.guess_type(file_name)[0]) + base64.b64encode(thumbnail).decode("utf-8")
+        content64 = "data:{};base64,".format(mimetypes.guess_type(file_name)[0]) + base64.b64encode(content).decode("utf-8")
         image_meta['content'] = content64
         return True, 200, dict(
             image=[image_meta]
