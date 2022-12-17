@@ -17,7 +17,7 @@ from album.aws.dynamoDB_user import db_is_allowed_get_shared_image, db_get_all_i
 from album.aws.s3 import Bucket
 import logging
 
-BUCKET = Bucket("ece1779assignment3group15")
+BUCKET = Bucket("ece1779a3hx")
 ADMIN = "admin"
 
 
