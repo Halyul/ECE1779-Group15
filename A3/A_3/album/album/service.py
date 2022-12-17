@@ -17,7 +17,7 @@ from album.aws.dynamoDB_user import db_is_allowed_get_shared_image, db_get_all_i
 from album.aws.s3 import Bucket
 import logging
 
-BUCKET = Bucket("ece1779a3hx")
+BUCKET = Bucket("ece1779assignment3group15")
 ADMIN = "admin"
 
 
@@ -31,13 +31,10 @@ def upload_image():
     file = request.files["file"]
     file_content = file.read()
     extension = file.filename.rsplit('.', 1)[1].lower()
-<<<<<<< HEAD
-    size = len(file_content)
-    update_statistics(CAPACITY, size)
-=======
-    size = len(file.read()) / (1024 * 1024)
+
+    size = len(file_content)/ (1024 * 1024)
     update_statistics(CAPACITY, round(Decimal(size), 2))
->>>>>>> 69f2de021c4c04fee31a9d23a6252a72fe49eae1
+
     user = data["user"]
     role = data["role"]
 
