@@ -44,14 +44,14 @@ def set_key_image_table(new_key, new_image, thumbnail_name, new_tag):
         ExpressionAttributeNames={'#access_time': 'Last time accessed'},
         ReturnValues="UPDATED_NEW")
 
-def set_shared_link_table(new_image):
+def set_shared_link_table(new_key, new_image):
     tableName = 'shared_link'
     table = dynamodb.Table(tableName)
 
     shared_url = config.api_gateway_url + config.bucket_name + '?key=' + new_image
 
     response = table.update_item(
-        Key={'Image key': new_image},
+        Key={'Image key': new_key},
         UpdateExpression="set #Share_key=:share",
         ExpressionAttributeValues={
             ':share': shared_url},
