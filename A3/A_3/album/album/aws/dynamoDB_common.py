@@ -148,3 +148,14 @@ def db_get_table_stats():
     result['image_number'] = num
     result['user_number'] = len(users)
     return result
+
+def db_reset_share(key):
+    table = dynamodb.Table(SHARED_LINK_TABLE)
+
+    response = table.update_item(
+        Key={'Image key': key},
+        UpdateExpression="set #Value=:new",
+        ExpressionAttributeValues={
+            ':new': -1},
+        ExpressionAttributeNames={'#Value': 'Number of accesses'},
+        ReturnValues="UPDATED_NEW")
