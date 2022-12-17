@@ -12,7 +12,7 @@ from album.config import Config
 from album.aws.s3 import Bucket
 import logging
 
-BUCKET = Bucket("ece1776week6")
+BUCKET = Bucket("ece1779a3hx")
 ADMIN = "admin"
 
 
