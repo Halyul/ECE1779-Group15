@@ -1,6 +1,6 @@
 from album import webapp, service
 from album.message import response
-
+from flask import request
 
 @webapp.route('/api/photos', methods=['POST'])
 @response
