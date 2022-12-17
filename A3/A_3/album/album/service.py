@@ -78,7 +78,8 @@ def share_image():
     db_update_access_time(key, time_stamp)
 
     flag, thumbnail = BUCKET.object.get(image_meta.get('thumbnail'))
-    thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+    thumbnail64 = "data:{};base64,".format(mimetypes.guess_type(image_meta.get('thumbnail'))[0]) + base64.b64encode(
+        thumbnail).decode("utf-8")
     image_meta.update({"thumbnail": thumbnail64})
 
     flag, content = BUCKET.object.get(file_name)
@@ -121,7 +122,7 @@ def get_image_by_key():
         db_update_access_time(key, time_stamp)
 
         flag, thumbnail = BUCKET.object.get(image_meta.get('thumbnail'))
-        thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+        thumbnail64 = "data:{};base64,".format(mimetypes.guess_type(image_meta.get('thumbnail'))[0]) + base64.b64encode(thumbnail).decode("utf-8")
         image_meta.update({"thumbnail": thumbnail64})
 
         flag, content = BUCKET.object.get(file_name)
