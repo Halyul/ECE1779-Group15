@@ -15,6 +15,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  Skeleton,
 } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -22,6 +23,7 @@ import {
   retrieveKeys,
   deleteImage,
   share,
+  retrieveImage,
 } from "@/libs/api";
 import SubmissionPrompt from "@/components/submission-prompt";
 import DataTable from "@/components/data-table";
@@ -40,15 +42,28 @@ export async function loader({ params }) {
 export default function Images() {
   const loaderResponse = useLoaderData();
   const [bubble, setBubble] = useOutletContext();
-  const [imagesList, setImagesList] = useState(loaderResponse.image);
+  const [imagesList, setImagesList] = useState(loaderResponse.data.images);
   const [selectionModel, setSelectionModel] = useState([imagesList[0]?.key]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [imageContent, setImageContent] = useState(null)
 
   const [deleteImageLoading, setDeleteImageLoading] = useState(false);
   const [deleteShareLoading, setDeleteShareLoading] = useState(false);
 
+  const getImage = (key) => {
+    setImageContent(null)
+    retrieveImage(key).then((response) => {
+      if (response.status === 200) {
+        setImageContent(response.data.image[0].content)
+      }
+    }).catch((error) => {
+      console.log(error)
+    })
+  }
+
   const selectedImage = useMemo(() => {
     const image = imagesList.find((image) => image.key === selectionModel[0]);
+    getImage(selectionModel[0])
     return image ? {
       image,
       mapping: [
@@ -88,8 +103,8 @@ export default function Images() {
       params: {}
     }).then((response) => {
       setIsRefreshing(false);
-      setImagesList(response.image);
-      setSelectionModel([selectionModel[0] || response.image[0].key]);
+      setImagesList(response.data?.images);
+      setSelectionModel([selectionModel[0] || response.data?.images[0].key]);
     })
   }
 
@@ -118,10 +133,14 @@ export default function Images() {
         content={
           selectedImage && (
             <>
-              <CardMedia component="img"
-                image={selectedImage.image.thumbnail}
-                sx={{ marginTop: "8px" }}
-              />
+              {imageContent ? (
+                <CardMedia component="img"
+                  image={imageContent}
+                  sx={{ marginTop: "8px" }}
+                />
+              ) : (
+                  <Skeleton variant="rectangular" animation="wave" height={250} sx={{ marginTop: "8px" }} />
+              )}
               <TableContainer>
                 <Table>
                   <TableBody>
@@ -133,7 +152,7 @@ export default function Images() {
                         <TableCell component="th" scope="row">
                           {row.name}
                         </TableCell>
-                        <TableCell align="right">{(row.value).toString()}</TableCell>
+                        <TableCell align="right">{(row.value)?.toString()}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -188,7 +207,7 @@ export default function Images() {
                       setDeleteShareLoading(true);
                       share(selectedImage.image.key, false).then((response) => {
                         if (response.status === 200) {
-                          const result = imagesList.map((image) => image.key === response.image[0].key ? response.image[0] : image
+                          const result = imagesList.map((image) => image.key === response.data?.image[0].key ? response.data.image[0] : image
                           )
                           setImagesList(result);
                           setBubble({

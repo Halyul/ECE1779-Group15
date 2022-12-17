@@ -14,9 +14,10 @@ boto3 = "*"
 moto = {extras = ["s3"], version = "*"}
 paramiko = "*"
 numpy = "*"
+zappa = "*"
 
 [dev-packages]
 moto = {extras = ["s3"], version = "*"}
 
 [requires]
-python_version = "3.10"
+python_version = "3.9"

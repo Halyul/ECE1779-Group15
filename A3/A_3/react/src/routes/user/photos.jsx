@@ -31,7 +31,7 @@ export default function Photos() {
   const location = useLocation();
   const navigate = useNavigate();
   const filteredTag = location.state?.tag || null;
-  const [keyList, setKeyList] = useState(loaderResponse.image);
+  const [keyList, setKeyList] = useState(loaderResponse.data.images);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectionModel, setSelectionModel] = useState(
     filteredTag ?
@@ -62,10 +62,10 @@ export default function Photos() {
                 params: {}
               }).then((response) => {
                 setIsRefreshing(false);
-                setKeyList(response.image);
+                setKeyList(response.data?.images);
                 setSelectionModel(filteredTag ?
-                  response.image.filter((image) => image.tag === filteredTag).map((image) => image.key) :
-                  response.image.map((image) => image.key));
+                  response.data?.images.filter((image) => image.tag === filteredTag).map((image) => image.key) :
+                  response.data?.image.map((image) => image.key));
               })
             }}
           >

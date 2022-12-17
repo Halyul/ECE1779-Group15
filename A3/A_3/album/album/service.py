@@ -26,8 +26,9 @@ def upload_image():
     if " " in key or "" == key or len(key) > 48:
         return False, 400, "Key does not meet the requirement."
     file = request.files["file"]
+    file_content = file.read()
     extension = file.filename.rsplit('.', 1)[1].lower()
-    size = len(file.read())
+    size = len(file_content)
     update_statistics(CAPACITY, size)
     user = data["user"]
     role = data["role"]
@@ -44,7 +45,7 @@ def upload_image():
 
     # file_base64 = file
     # file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
-    flag, resp = BUCKET.object.upload(file, filename)
+    flag, resp = BUCKET.object.upload(file_content, filename)
     if not flag:
         return False, 500, "Failed to upload the image."
     return True, 200, None
@@ -165,11 +166,12 @@ def list_all_multi_attributes():
 
 def get_stats():
     update_statistics(CALL_NUMBER, 1)
-    stats = {}
-    stats['capacity'] = db_get_stats_from_table(CAPACITY)
-    stats['total_number_of_images'] = db_get_table_stats().get('image_number')
-    stats['total_number_of_active_users'] = db_get_table_stats().get('user_number')
-    stats['number_of_calls_to_lambda_function'] = db_get_stats_from_table(CALL_NUMBER)
+    stats = [
+        dict(name="Capacity", value=db_get_stats_from_table(CAPACITY)),
+        dict(name="Total Number of Images", value=db_get_table_stats().get('image_number')),
+        dict(name="Total Number of Active Users", value=db_get_table_stats().get('user_number')),
+        dict(name="Number of Lambda Function Calls", value=db_get_stats_from_table(CALL_NUMBER))
+    ]
     return True, 200, dict(
         stats=stats
     )

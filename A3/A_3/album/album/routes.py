@@ -35,6 +35,6 @@ def share():
 @webapp.route('/api/stats', methods=['POST'])
 @response
 def get_stats():
-    return get_stats()
+    return service.get_stats()
 
 

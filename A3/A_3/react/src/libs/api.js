@@ -3,12 +3,15 @@ export async function upload(requestData) {
   for (const name in requestData) {
     formData.append(name, requestData[name]);
   }
+  const user = get_user();
+  formData.append("user", user.username);
+  formData.append("role", user.role);
   const data = await request(
     "/api/upload",
     {
-      method: "POST",
-      body: formData
-    }
+      method: "POST"
+    },
+    formData
   )
   return responseAdapter(data);
 }
@@ -21,66 +24,21 @@ export async function retrieveKeys(admin = false) {
       body: { admin }
     }
   )
-  // return responseAdapter(data);
-  return {
-    status: 200,
-    image: [
-      {
-        key: "ajksdfghbuiagda", // the image key
-        user: "gura",
-        number_of_access: 1,
-        last_time_accessed: "27/11/2022 19:19:36",
-        thumbnail: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-        tag: "test",
-        share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-      },
-      {
-        key: "gura", // the image key
-        user: "gura",
-        number_of_access: 1,
-        last_time_accessed: "27/11/2022 19:19:36",
-        thumbnail: "https://gura.ch/images/0.jpg",
-        tag: "nan",
-        share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-      },
-      {
-        key: "78", // the image key
-        user: "gura",
-        number_of_access: 1,
-        last_time_accessed: "27/11/2022 19:19:36",
-        thumbnail: "https://gura.ch/images/404.jpg",
-        tag: "nan",
-        share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-      },
-      {
-        key: "8", // the image key
-        user: "gura",
-        number_of_access: 1,
-        last_time_accessed: "27/11/2022 19:19:36",
-        thumbnail: "https://gura.ch/images/200.jpg",
-        tag: "nan",
-        share_link: null,
-      },
-      {
-        key: "12381", // the image key
-        user: "gura",
-        number_of_access: 1,
-        last_time_accessed: "27/11/2022 19:19:36",
-        thumbnail: "https://gura.ch/images/302.jpg",
-        tag: "nan",
-        share_link: "https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png",
-      },
-      {
-        key: Math.random().toString(), // the image key
-        user: "gura",
-        number_of_access: 1,
-        last_time_accessed: "27/11/2022 19:19:36",
-        thumbnail: "https://gura.ch/images/414.jpg",
-        tag: "nan",
-        share_link: null,
+  const adapter = (input) => {
+    return {
+      ...input,
+      data: {
+        ...input.data,
+        images: input.data.images?.map((image) => {
+          return {
+            ...image,
+            share_link: image.is_shared === "False" ? null : image.share_link
+          }
+        })
       }
-    ]
+    }
   }
+  return adapter(responseAdapter(data));
 }
 
 export async function retrieveImage(key, share_key) {
@@ -96,35 +54,21 @@ export async function retrieveImage(key, share_key) {
       } : { key }
     }
   )
-  // return responseAdapter(data);
-  return [
-    {
-      status: 200,
-      image: [
-        {
-          content: "https://gura.ch/images/0.jpg",
-          key: key,
-          tag: "nan",
-          share_link: "123",
-          number_of_access: 1,
-          last_time_accessed: "27/11/2022 19:19:36",
-        }
-      ]
-    },
-    {
-      status: 200,
-      image: [
-        {
-          content: "https://gura.ch/images/404.jpg",
-          key: key,
-          tag: "test",
-          share_link: null,
-          number_of_access: -1,
-          last_time_accessed: "27/11/2022 19:19:36",
-        }
-      ]
+  const adapter = (input) => {
+    return {
+      ...input,
+      data: {
+        ...input.data,
+        image: [
+          {
+            ...input.data.image[0],
+            share_link: input.data.image[0].is_shared === "False" ? null : input.data.image[0].share_link
+          }
+        ]
+      }
     }
-  ][Math.floor(Math.random() * 2)]
+  }
+  return adapter(responseAdapter(data));
 }
 
 export async function deleteImage(key) {
@@ -148,40 +92,25 @@ export async function share(key, is_shared = false) {
       method: "POST",
       body: {
         key,
-        is_shared
+        is_shared: is_shared ? "True" : "False"
       }
     }
   )
-  // return responseAdapter(data);
-  return is_shared ? ({
-    status: 200,
-    image: [
-      {
-        content: "https://gura.ch/images/404.jpg",
-        thumbnail: "https://gura.ch/images/404.jpg",
-        user: "gura",
-        key: key,
-        tag: "test",
-        share_link: "456",
-        number_of_access: 0,
-        last_time_accessed: "27/11/2022 19:19:36",
+  const adapter = (input) => {
+    return {
+      ...input,
+      data: {
+        ...input.data,
+        image: [
+          {
+            ...input.data.image,
+            share_link: input.data.image.is_shared === "False" ? null : input.data.image.share_link
+          }
+        ]
       }
-    ]
-  }) : ({
-    status: 200,
-    image: [
-      {
-        content: "https://gura.ch/images/0.jpg",
-        thumbnail: "https://gura.ch/images/0.jpg",
-        key: key,
-        user: "gura",
-        tag: "nan",
-        share_link: null,
-        number_of_access: -1,
-        last_time_accessed: "27/11/2022 19:19:36",
-      }
-    ]
-  })
+    }
+  }
+  return adapter(responseAdapter(data));
 }
 
 export async function getStats() {
@@ -191,23 +120,7 @@ export async function getStats() {
       method: "POST",
     }
   )
-  // return responseAdapter(data);
-  return {
-    status: 200,
-    data: {
-      stats: [
-        { name: 'Jon', value: true },
-        { name: 'Cersei', value: 42 },
-        { name: 'Jaime', value: 45 },
-        { name: 'Arya', value: 16 },
-        { name: 'Daenerys', value: null },
-        { name: "lol", value: 150 },
-        { name: 'Ferrara', value: 44 },
-        { name: 'Rossini', value: 36 },
-        { name: 'Harvey', value: 65 },
-      ]
-    }
-  }
+  return responseAdapter(data);
 }
 
 function responseAdapter(response) {
@@ -216,11 +129,17 @@ function responseAdapter(response) {
   return output;
 }
 
+function get_user() {
+  return JSON.parse(JSON.parse(window.localStorage.getItem("persist:root")).user);
+}
+
 export default async function request(
   url,
-  options = {}
+  options = {},
+  body = null,
 ) {
-  const user = JSON.parse(JSON.parse(window.localStorage.getItem("persist:root")).user);
+  const user = get_user()
+  if (!body) options.headers = { "Content-Type": "application/json" }
   return fetch(import.meta.env.VITE_BACKEND_URL + url, {
     ...options,
     headers: {
@@ -228,7 +147,7 @@ export default async function request(
       "X-Access-Token": user.accessToken,
       "X-Id-Token": user.idToken,
     },
-    body: JSON.stringify({
+    body: body ? body : JSON.stringify({
 
       "user": user.username,
       "role": user.role,

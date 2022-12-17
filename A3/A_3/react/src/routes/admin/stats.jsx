@@ -25,7 +25,6 @@ export default function Stats() {
   const loaderResponse = useLoaderData();
   const [statsList, setStatsList] = useState(loaderResponse.data.stats);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
   return (
     <>
       <BasicCard

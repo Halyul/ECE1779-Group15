@@ -33,7 +33,7 @@ export async function loader({ params }) {
     return {
       status: response.status,
       details: {
-        message: response.message,
+        message: response.data.message,
         statusText: response.statusText
       }
     }
@@ -50,9 +50,10 @@ export default function Image({ route }) {
 
   const [bubble, setBubble] = useOutletContext();
 
-  const [image, setImage] = useState(loaderResponse.image[0]);
+  const [image, setImage] = useState(loaderResponse.data.image[0]);
   const [deleteImageLoading, setDeleteImageLoading] = useState(false);
   const [createShareLoading, setCreateShareLoading] = useState(false);
+  const [deleteShareLoading, setDeleteShareLoading] = useState(false);
 
   let error = null;
 
@@ -134,16 +135,18 @@ export default function Image({ route }) {
           route === ImageRoute.path ? (
             image.share_link ? (
               <>
-                <Button
+                <LoadingButton
                   aria-controls={shareMenuOpen ? "share-menu" : undefined}
                   aria-haspopup="true"
                   aria-expanded={shareMenuOpen ? "true" : undefined}
                   onClick={handleShareMenuOpen}
                   startIcon={<ShareIcon />}
                   size="small"
+                  loading={deleteShareLoading}
+                  loadingPosition="start"
                 >
                   Manage Share
-                </Button>
+                </LoadingButton>
                 <Menu
                   id="share-menu"
                   anchorEl={shareMenuAnchorEl}
@@ -182,9 +185,10 @@ export default function Image({ route }) {
                       <MenuItem
                         onClick={() => {
                           handleShareMenuClose();
+                          setDeleteShareLoading(true);
                           share(image.key, false).then((response) => {
                             if (response.status === 200) {
-                              setImage(response.image[0]);
+                              setImage(response.data.image[0]);
                               setBubble({
                                 ...bubble,
                                 snackbar: {
@@ -201,6 +205,7 @@ export default function Image({ route }) {
                                 }
                               })
                             }
+                            setDeleteShareLoading(false);
                           });
                         }}
                       >
@@ -230,7 +235,8 @@ export default function Image({ route }) {
                   setCreateShareLoading(true);
                   share(image.key, true).then((response) => {
                     if (response.status === 200) {
-                      setImage(response.image[0]);
+                      console.log(response)
+                      setImage(response.data.image[0]);
                       copyToClipboard(`${window.location.origin}/public/${image.key}`);
                       setBubble({
                         ...bubble,
