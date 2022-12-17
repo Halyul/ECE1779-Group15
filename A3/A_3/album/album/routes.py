@@ -35,8 +35,6 @@ def share():
 @webapp.route('/api/stats', methods=['POST'])
 @response
 def get_stats():
-    return
+    return get_stats()
 
-# @webapp.route('/api/image/attributes', methods=['POST'])
-# def get_image_attributes():
-#     return service.get_image_attributes_by_key()
+

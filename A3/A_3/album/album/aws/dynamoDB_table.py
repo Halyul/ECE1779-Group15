@@ -1,6 +1,7 @@
 import boto3
 
-from album.aws.dynamoDB_common import dynamodb, SHARED_LINK_TABLE, KEY_IMAGE_TABLE, STATISTICS_TABLE
+from album.aws.dynamoDB_common import dynamodb, SHARED_LINK_TABLE, KEY_IMAGE_TABLE, STATISTICS_TABLE, STATISTICS, VALUE, \
+    CAPACITY, IMAGE_NUMBER, USER_NUMBER, CALL_NUMBER
 
 
 def db_create_table_shared():
@@ -249,21 +250,40 @@ def db_create_table_stats():
         TableName=STATISTICS_TABLE,
         KeySchema=[
             {
-                'AttributeName': 'Statistics',
+                'AttributeName': STATISTICS,
                 'KeyType': 'HASH'  # Partition key
-            },
-            {
-                'KeyType': 'RANGE',
-                'AttributeName': 'Value'
             }
         ],
+        GlobalSecondaryIndexes=[
+            {
+                'IndexName': "ValueIndex",
+                'KeySchema': [
+                    {
+                        'KeyType': 'HASH',
+                        'AttributeName': 'Value'
+                    },
+                    {
+                        'KeyType': 'RANGE',
+                        'AttributeName': 'Statistics'
+                    }
+                ],
+                'Projection': {
+                    'ProjectionType': 'ALL',
+                },
+                'ProvisionedThroughput': {
+                    'ReadCapacityUnits': 2,
+                    'WriteCapacityUnits': 2
+                }
+            }
+        ],
+
         AttributeDefinitions=[
             {
-                'AttributeName': 'Statistics',
+                'AttributeName': STATISTICS,
                 'AttributeType': 'S'
             },
             {
-                'AttributeName': 'Value',
+                'AttributeName': VALUE,
                 'AttributeType': 'N'
             },
         ],
@@ -286,25 +306,25 @@ def db_intiate_stats_table():
     table = dynamodb.Table(STATISTICS_TABLE)
     table.put_item(
         Item={
-            'Statistics': 'Capacity',
-            'Value': 0
+            STATISTICS: CAPACITY,
+            VALUE: 0
         }
     )
     table.put_item(
         Item={
-            'Statistics': 'Total Number of Images',
-            'Value': 0
+            STATISTICS: IMAGE_NUMBER,
+            VALUE: 0
         }
     )
     table.put_item(
         Item={
-            'Statistics': 'Total Number of  active users',
-            'Value': 0
+            STATISTICS: USER_NUMBER,
+            VALUE: 0
         }
     )
     table.put_item(
         Item={
-            'Statistics': 'Number of Calls to Lambda Function',
-            'Value': 0
+            STATISTICS: CALL_NUMBER,
+            VALUE: 0
         }
     )
