@@ -34,8 +34,8 @@ def upload_image():
     else:
         db_upload_image(key, filename, user, time_stamp)
 
-    file_base64 = file
-    # file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
+    # file_base64 = file
+    file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
     flag, resp = BUCKET.object.upload(file_base64, filename)
     if not flag:
         return False, 500, "Failed to upload the image."
