@@ -146,9 +146,10 @@ def list_all_multi_attributes():
     else:
         image_meta = db_get_all_images_user(user)
 
-    flag, thumbnail = BUCKET.object.get(image_meta.get('thumbnail'))
-    thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
-    image_meta.update({"thumbnail": thumbnail64})
+    for item in image_meta:
+        flag, thumbnail = BUCKET.object.get(item.get('thumbnail'))
+        thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+        item.update({"thumbnail": thumbnail64})
 
     return True, 200, dict(
         images=image_meta
