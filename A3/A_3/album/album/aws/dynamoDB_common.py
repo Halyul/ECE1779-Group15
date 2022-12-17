@@ -31,7 +31,9 @@ def db_upload_image(key, image, user, last_time_accessed):
     response = table2.put_item(
         Item={
             'Image key': key,
-            'Is shared': 'false'
+            'Share key': ' ',
+            'Number of accesses': 0,
+            'Is shared': 'False'
         }
     )
     logging.info('Upload image successfully')

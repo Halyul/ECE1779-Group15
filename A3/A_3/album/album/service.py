@@ -29,8 +29,6 @@ def upload_image():
     user = data["user"]
     role = data["role"]
 
-    
-
     filename = "{}.{}".format(str(int(time.time() * 1000)), "s3")
     time_stamp = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
@@ -40,7 +38,6 @@ def upload_image():
             return False, 500, "Failed to upload the image. Key must be unique."
     else:
         db_upload_image(key, filename, user, time_stamp)
-
 
     # file_base64 = file
     # file_base64 = "data:{};base64,".format(file.mimetype).encode("utf-8") + base64.b64encode(file.read())
@@ -79,6 +76,11 @@ def share_image():
     file_name = image_meta.get('image_name')
     time_stamp = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     db_update_access_time(key, time_stamp)
+
+    flag, thumbnail = BUCKET.object.get(image_meta.get('thumbnail'))
+    thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+    image_meta.update({"thumbnail": thumbnail64})
+
     flag, content = BUCKET.object.get(file_name)
     if not flag:
         return False, 500, "Failed to retrieve the image."
@@ -117,6 +119,11 @@ def get_image_by_key():
         file_name = image_meta.get('image_name')
         time_stamp = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
         db_update_access_time(key, time_stamp)
+
+        flag, thumbnail = BUCKET.object.get(image_meta.get('thumbnail'))
+        thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+        image_meta.update({"thumbnail": thumbnail64})
+
         flag, content = BUCKET.object.get(file_name)
         if not flag:
             return False, 500, "Failed to retrieve the image."
@@ -135,11 +142,16 @@ def list_all_multi_attributes():
     admin = request.get_json()["admin"]
 
     if admin:
-        keys_entries = db_get_all_images_admin()
+        image_meta = db_get_all_images_admin()
     else:
-        keys_entries = db_get_all_images_user(user)
+        image_meta = db_get_all_images_user(user)
+
+    flag, thumbnail = BUCKET.object.get(image_meta.get('thumbnail'))
+    thumbnail64 = "data:{};base64,".format(thumbnail.mimetype).encode("utf-8") + base64.b64encode(thumbnail.read())
+    image_meta.update({"thumbnail": thumbnail64})
+
     return True, 200, dict(
-        images=keys_entries
+        images=image_meta
     )
 
 
