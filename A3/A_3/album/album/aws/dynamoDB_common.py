@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 import boto3
 
@@ -108,7 +109,7 @@ def db_get_stats_from_table(stats_type):
             STATISTICS: stats_type
         }
     )
-    return float(item['Item'][VALUE])
+    return item['Item'][VALUE]
 
 
 def update_statistics(stats_type, increase_num):
