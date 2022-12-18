@@ -79,10 +79,7 @@ export async function deleteImage(key) {
       body: { key }
     }
   )
-  // return responseAdapter(data);
-  return {
-    status: 200
-  }
+  return responseAdapter(data); 
 }
 
 export async function share(key, is_shared = false) {
@@ -119,7 +116,7 @@ export async function getStats() {
     {
       method: "POST",
     }
-  )
+  ) 
   return responseAdapter(data);
 }
 
