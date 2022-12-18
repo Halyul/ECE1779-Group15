@@ -32,7 +32,7 @@ def upload_image():
     file_content = file.read()
     extension = file.filename.rsplit('.', 1)[1].lower()
 
-    size = len(file_content)
+    size = len(file_content) / (1024 * 1024)
     update_statistics(CAPACITY, Decimal(size))
 
     user = data["user"]
@@ -74,7 +74,7 @@ def delete_image():
         thumbnail_name = image_meta.get('thumbnail')
 
         file = BUCKET.object.get(file_name)
-        size = len(file[1])
+        size = len(file[1]) / (1024 * 1024)
         # size = math.ceil(len(file.read())) / (1024 * 1024)
         update_statistics(CAPACITY, -1 * Decimal(size))
 
