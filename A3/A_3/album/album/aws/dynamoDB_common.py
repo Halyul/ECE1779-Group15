@@ -108,7 +108,7 @@ def db_get_stats_from_table(stats_type):
             STATISTICS: stats_type
         }
     )
-    return int(item['Item'][VALUE])
+    return float(item['Item'][VALUE])
 
 
 def update_statistics(stats_type, increase_num):
